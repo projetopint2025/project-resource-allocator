@@ -27,25 +27,25 @@ const overviewCards = [
 ];
 
 const projectData = [
-  { name: "Project Alpha", hours: 12, color: "#2B5697" },
-  { name: "Project Beta", hours: 8, color: "#4A72B0" },
-  { name: "Project Gamma", hours: 6, color: "#7491C4" },
-  { name: "Project Delta", hours: 4, color: "#A1B5D8" },
+  { name: "INOVC+", hours: 12, color: "#2B5697" },
+  { name: "DreamFAB", hours: 8, color: "#4A72B0" },
+  { name: "IAMFat", hours: 6, color: "#7491C4" },
+  { name: "Agenda GreenAuto", hours: 4, color: "#A1B5D8" },
 ];
 
 const upcomingDeadlines = [
   {
-    project: "Project Alpha",
+    project: "INOVC+",
     deadline: "25 Apr 2024",
     hours: "4h restantes",
   },
   {
-    project: "Project Beta",
+    project: "DreamFAB",
     deadline: "28 Apr 2024",
     hours: "12h restantes",
   },
   {
-    project: "Project Gamma",
+    project: "IAMFat",
     deadline: "30 Apr 2024",
     hours: "6h restantes",
   },
