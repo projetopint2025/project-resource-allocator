@@ -1,7 +1,7 @@
-
 import { LayoutDashboard, BarChart3, Users, AlertTriangle, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { GlobalActions } from "@/components/GlobalActions";
 
 const overviewCards = [
   {
@@ -54,10 +54,11 @@ const upcomingDeadlines = [
 const Index = () => {
   return (
     <div className="space-y-8 animate-fade-in">
-      <div>
+      <div className="flex items-center justify-between">
         <h1 className="text-2xl">
           Bom dia, <span className="font-semibold">Vasco</span>
         </h1>
+        <GlobalActions />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
