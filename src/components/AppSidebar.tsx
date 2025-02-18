@@ -44,13 +44,13 @@ export const AppSidebar = () => {
         collapsed ? "w-16" : "w-64"
       )}
     >
-      <div className="flex items-center p-4 h-16 border-b border-border">
+      <div className="flex items-center justify-center p-4 h-16 border-b border-border">
         <img 
-          src="/lovable-uploads/931ba173-61e4-4816-9deb-8a37b93e964b.png" 
+          src="/lovable-uploads/28745dc3-1b1b-490b-8612-41cb26f8c61d.png" 
           alt="STAR Institute"
           className={cn(
             "h-8 transition-all duration-300",
-            collapsed ? "w-8" : "w-auto"
+            collapsed ? "w-8 object-cover object-left" : "w-auto"
           )}
         />
       </div>

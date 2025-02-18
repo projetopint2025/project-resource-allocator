@@ -1,6 +1,7 @@
 
-import { LayoutDashboard, BarChart3 } from "lucide-react";
+import { LayoutDashboard, BarChart3, Users, AlertTriangle, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
 const overviewCards = [
   {
@@ -13,6 +14,41 @@ const overviewCards = [
     value: "4",
     icon: BarChart3,
   },
+  {
+    title: "Equipe atual",
+    value: "6",
+    icon: Users,
+  },
+  {
+    title: "Projetos pendentes",
+    value: "2",
+    icon: AlertTriangle,
+  },
+];
+
+const projectData = [
+  { name: "Project Alpha", hours: 12, color: "#2B5697" },
+  { name: "Project Beta", hours: 8, color: "#4A72B0" },
+  { name: "Project Gamma", hours: 6, color: "#7491C4" },
+  { name: "Project Delta", hours: 4, color: "#A1B5D8" },
+];
+
+const upcomingDeadlines = [
+  {
+    project: "Project Alpha",
+    deadline: "25 Apr 2024",
+    hours: "4h restantes",
+  },
+  {
+    project: "Project Beta",
+    deadline: "28 Apr 2024",
+    hours: "12h restantes",
+  },
+  {
+    project: "Project Gamma",
+    deadline: "30 Apr 2024",
+    hours: "6h restantes",
+  },
 ];
 
 const Index = () => {
@@ -24,7 +60,7 @@ const Index = () => {
         </h1>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {overviewCards.map((card) => (
           <Card key={card.title} className="hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -42,19 +78,75 @@ const Index = () => {
         ))}
       </div>
 
-      <Card className="hover:shadow-md transition-shadow">
-        <CardHeader>
-          <CardTitle className="text-base font-normal text-muted-foreground">
-            Distribuição do trabalho por projetos
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Número de horas em cada projeto na última semana
-          </p>
-        </CardHeader>
-        <CardContent>
-          {/* Aqui você pode adicionar o gráfico de pizza usando recharts */}
-        </CardContent>
-      </Card>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="hover:shadow-md transition-shadow">
+          <CardHeader>
+            <CardTitle className="text-base font-normal text-muted-foreground">
+              Distribuição do trabalho por projetos
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Número de horas em cada projeto na última semana
+            </p>
+          </CardHeader>
+          <CardContent className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={projectData}
+                  dataKey="hours"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  labelLine={false}
+                  label={({ name, percent }) => 
+                    `${name} ${(percent * 100).toFixed(0)}%`
+                  }
+                >
+                  {projectData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-md transition-shadow">
+          <CardHeader>
+            <CardTitle className="text-base font-normal text-muted-foreground">
+              Prazos próximos
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Projetos com deadlines esta semana
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {upcomingDeadlines.map((deadline) => (
+                <div
+                  key={deadline.project}
+                  className="flex items-center justify-between p-2 rounded-lg hover:bg-accent transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <Clock className="h-4 w-4 text-primary" />
+                    <div>
+                      <p className="font-medium">{deadline.project}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {deadline.deadline}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-sm font-medium text-primary">
+                    {deadline.hours}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
