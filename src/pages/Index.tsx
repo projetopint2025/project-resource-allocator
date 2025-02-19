@@ -1,149 +1,166 @@
-import { LayoutDashboard, BarChart3, Users, AlertTriangle, Clock } from "lucide-react";
+
+import { Calendar, Clock, BarChart3, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { GlobalActions } from "@/components/GlobalActions";
+import { Button } from "@/components/ui/button";
 
-const overviewCards = [
-  {
-    title: "Horas disponíveis esta semana",
-    value: "13/40",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Projetos em desenvolvimento",
-    value: "4",
-    icon: BarChart3,
-  },
-  {
-    title: "Equipe atual",
-    value: "6",
-    icon: Users,
-  },
-  {
-    title: "Projetos pendentes",
-    value: "2",
-    icon: AlertTriangle,
-  },
-];
-
-const projectData = [
-  { name: "INOVC+", hours: 12, color: "#2B5697" },
-  { name: "DreamFAB", hours: 8, color: "#4A72B0" },
-  { name: "IAMFat", hours: 6, color: "#7491C4" },
-  { name: "Agenda GreenAuto", hours: 4, color: "#A1B5D8" },
-];
-
-const upcomingDeadlines = [
+const nextDeliveries = [
   {
     project: "INOVC+",
+    deliverable: "Relatório de Requisitos",
     deadline: "25 Apr 2024",
-    hours: "4h restantes",
+    status: "Em progresso",
   },
   {
     project: "DreamFAB",
+    deliverable: "Protótipo UI",
     deadline: "28 Apr 2024",
-    hours: "12h restantes",
+    status: "Pendente",
   },
   {
     project: "IAMFat",
+    deliverable: "Documentação API",
     deadline: "30 Apr 2024",
-    hours: "6h restantes",
+    status: "Em revisão",
+  },
+];
+
+const projectHighlights = [
+  {
+    name: "INOVC+",
+    progress: 65,
+    urgent: true,
+  },
+  {
+    name: "DreamFAB",
+    progress: 45,
+    urgent: false,
+  },
+  {
+    name: "IAMFat",
+    progress: 30,
+    urgent: true,
   },
 ];
 
 const Index = () => {
   return (
     <div className="space-y-8 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl">
-          Bom dia, <span className="font-semibold">Vasco</span>
-        </h1>
-        <GlobalActions />
+      <div>
+        <h1 className="text-2xl font-semibold">Painel de Controlo</h1>
+        <p className="text-muted-foreground">Bem-vindo de volta, Vasco</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {overviewCards.map((card) => (
-          <Card key={card.title} className="hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-base font-normal text-muted-foreground">
-                {card.title}
-              </CardTitle>
-              <button className="p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
-                <card.icon className="h-4 w-4" />
-              </button>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-semibold">{card.value}</div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader>
-            <CardTitle className="text-base font-normal text-muted-foreground">
-              Distribuição do trabalho por projetos
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Número de horas em cada projeto na última semana
-            </p>
-          </CardHeader>
-          <CardContent className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={projectData}
-                  dataKey="hours"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  labelLine={false}
-                  label={({ name, percent }) => 
-                    `${name} ${(percent * 100).toFixed(0)}%`
-                  }
-                >
-                  {projectData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Horas esta semana</p>
+                <p className="text-2xl font-bold">13/40</p>
+              </div>
+              <Clock className="h-8 w-8 text-primary" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Projetos ativos</p>
+                <p className="text-2xl font-bold">4</p>
+              </div>
+              <BarChart3 className="h-8 w-8 text-primary" />
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-md transition-shadow">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Próxima entrega</p>
+                <p className="text-2xl font-bold">2 dias</p>
+              </div>
+              <Calendar className="h-8 w-8 text-primary" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Tarefas pendentes</p>
+                <p className="text-2xl font-bold">7</p>
+              </div>
+              <AlertTriangle className="h-8 w-8 text-primary" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-base font-normal text-muted-foreground">
-              Prazos próximos
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Projetos com deadlines esta semana
-            </p>
+            <CardTitle>Próximas Entregas</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {upcomingDeadlines.map((deadline) => (
+              {nextDeliveries.map((delivery) => (
                 <div
-                  key={deadline.project}
-                  className="flex items-center justify-between p-2 rounded-lg hover:bg-accent transition-colors"
+                  key={`${delivery.project}-${delivery.deliverable}`}
+                  className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent transition-colors"
                 >
-                  <div className="flex items-center gap-3">
-                    <Clock className="h-4 w-4 text-primary" />
-                    <div>
-                      <p className="font-medium">{deadline.project}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {deadline.deadline}
-                      </p>
-                    </div>
+                  <div>
+                    <p className="font-medium">{delivery.project}</p>
+                    <p className="text-sm text-muted-foreground">{delivery.deliverable}</p>
                   </div>
-                  <span className="text-sm font-medium text-primary">
-                    {deadline.hours}
-                  </span>
+                  <div className="text-right">
+                    <p className="text-sm font-medium">{delivery.deadline}</p>
+                    <p className="text-sm text-muted-foreground">{delivery.status}</p>
+                  </div>
                 </div>
               ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Projetos em Destaque</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {projectHighlights.map((project) => (
+                <div
+                  key={project.name}
+                  className="space-y-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <p className="font-medium">{project.name}</p>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <div className="w-full bg-secondary rounded-full h-2 mr-2">
+                          <div
+                            className="bg-primary h-2 rounded-full"
+                            style={{ width: `${project.progress}%` }}
+                          />
+                        </div>
+                        <span>{project.progress}%</span>
+                      </div>
+                    </div>
+                    {project.urgent && (
+                      <span className="px-2 py-1 text-xs font-medium bg-destructive/10 text-destructive rounded-lg">
+                        Urgente
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+              <Button variant="outline" className="w-full mt-4">
+                Ver todos os projetos
+              </Button>
             </div>
           </CardContent>
         </Card>
