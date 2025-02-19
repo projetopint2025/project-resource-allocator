@@ -1,8 +1,9 @@
-
+import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Table } from "@/components/ui/table";
+import { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell } from "@/components/ui/table";
 
 const mockProject = {
   id: 1,
