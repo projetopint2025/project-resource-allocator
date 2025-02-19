@@ -8,6 +8,8 @@ import { AppSidebar } from "./components/AppSidebar";
 import Index from "./pages/Index";
 import Projects from "./pages/Projects";
 import ProjectDetails from "./pages/ProjectDetails";
+import Users from "./pages/Users";
+import Validations from "./pages/Validations";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -16,17 +18,19 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <div className="flex min-h-screen bg-background text-foreground">
-        <AppSidebar />
-        <main className="flex-1 p-8">
-          <BrowserRouter>
+        <BrowserRouter>
+          <AppSidebar />
+          <main className="flex-1 p-8">
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/projects" element={<Projects />} />
               <Route path="/projects/:id" element={<ProjectDetails />} />
+              <Route path="/users" element={<Users />} />
+              <Route path="/validations" element={<Validations />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </BrowserRouter>
-        </main>
+          </main>
+        </BrowserRouter>
       </div>
       <Toaster />
       <Sonner />

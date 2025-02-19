@@ -40,7 +40,7 @@ export const AppSidebar = () => {
   return (
     <div
       className={cn(
-        "h-screen bg-background border-r border-border transition-all duration-300 relative",
+        "h-screen bg-white border-r border-border transition-all duration-300 relative",
         collapsed ? "w-16" : "w-64"
       )}
     >
@@ -62,15 +62,15 @@ export const AppSidebar = () => {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors",
-                "text-muted-foreground hover:text-foreground",
-                window.location.pathname === item.href && "bg-accent text-foreground"
+                "flex items-center gap-3 p-3 rounded-lg hover:bg-[#1A1F2C]/5 transition-colors",
+                "text-[#1A1F2C]/70 hover:text-[#1A1F2C]",
+                window.location.pathname === item.href && "bg-[#1A1F2C]/5 text-[#1A1F2C]"
               )}
             >
-              <item.icon size={20} />
+              <item.icon size={20} className="text-[#9b87f5]" />
               <span
                 className={cn(
-                  "transition-opacity duration-300",
+                  "transition-opacity duration-300 font-medium",
                   collapsed && "opacity-0"
                 )}
               >
@@ -82,7 +82,7 @@ export const AppSidebar = () => {
 
         <div className="pt-4 border-t border-border">
           <p className={cn(
-            "px-3 text-xs font-medium text-muted-foreground mb-2",
+            "px-3 text-sm font-medium text-[#1A1F2C]/50 mb-2",
             collapsed && "opacity-0"
           )}>
             Gestão
@@ -92,15 +92,15 @@ export const AppSidebar = () => {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors",
-                "text-muted-foreground hover:text-foreground",
-                window.location.pathname === item.href && "bg-accent text-foreground"
+                "flex items-center gap-3 p-3 rounded-lg hover:bg-[#1A1F2C]/5 transition-colors",
+                "text-[#1A1F2C]/70 hover:text-[#1A1F2C]",
+                window.location.pathname === item.href && "bg-[#1A1F2C]/5 text-[#1A1F2C]"
               )}
             >
-              <item.icon size={20} />
+              <item.icon size={20} className="text-[#9b87f5]" />
               <span
                 className={cn(
-                  "transition-opacity duration-300",
+                  "transition-opacity duration-300 font-medium",
                   collapsed && "opacity-0"
                 )}
               >
@@ -111,19 +111,18 @@ export const AppSidebar = () => {
         </div>
 
         <div className="absolute bottom-4 left-0 right-0 px-2">
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="w-full p-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-3 text-muted-foreground"
-          >
-            {collapsed ? (
-              <Menu size={20} />
-            ) : (
-              <>
-                <ChevronLeft size={20} />
-                <span>Colapsar menu</span>
-              </>
-            )}
-          </button>
+          <div className={cn(
+            "flex items-center gap-3 p-3 text-[#1A1F2C]/70",
+            collapsed && "justify-center"
+          )}>
+            <Users size={20} className="text-[#9b87f5]" />
+            <span className={cn(
+              "font-medium transition-opacity duration-300",
+              collapsed && "opacity-0"
+            )}>
+              Vasco Fernandes
+            </span>
+          </div>
         </div>
       </nav>
     </div>

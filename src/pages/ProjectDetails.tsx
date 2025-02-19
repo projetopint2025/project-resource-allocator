@@ -95,6 +95,21 @@ const ProjectDetails = () => {
   const { id } = useParams();
   const [selectedTask, setSelectedTask] = useState(null);
 
+  const handleAllocationChange = (resourceIndex, monthIndex, value) => {
+    const updatedTask = {
+      ...selectedTask,
+      resources: selectedTask.resources.map((resource, index) => {
+        if (index === resourceIndex) {
+          const newAllocation = [...resource.allocation];
+          newAllocation[monthIndex] = parseFloat(value);
+          return { ...resource, allocation: newAllocation };
+        }
+        return resource;
+      }),
+    };
+    setSelectedTask(updatedTask);
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
@@ -202,23 +217,29 @@ const ProjectDetails = () => {
 
             <div>
               <h3 className="text-sm font-medium mb-2">Alocação Mensal</h3>
-              <div className="grid grid-cols-6 gap-2">
-                {selectedTask.resources[0].allocation.map((value, index) => (
-                  <div key={index} className="text-center">
-                    <p className="text-xs text-muted-foreground mb-1">
-                      {new Date(2024, index).toLocaleDateString('pt-BR', { month: 'short' })}
-                    </p>
-                    <input
-                      type="number"
-                      min="0"
-                      max="1"
-                      step="0.1"
-                      value={value}
-                      className="w-full p-1 text-sm border rounded"
-                    />
+              {selectedTask.resources.map((resource, resourceIndex) => (
+                <div key={resource.name} className="mb-4">
+                  <p className="text-sm font-medium mb-2">{resource.name}</p>
+                  <div className="grid grid-cols-6 gap-2">
+                    {resource.allocation.map((value, monthIndex) => (
+                      <div key={monthIndex} className="text-center">
+                        <p className="text-xs text-muted-foreground mb-1">
+                          {new Date(2024, monthIndex).toLocaleDateString('pt-BR', { month: 'short' })}
+                        </p>
+                        <input
+                          type="number"
+                          min="0"
+                          max="1"
+                          step="0.1"
+                          value={value}
+                          onChange={(e) => handleAllocationChange(resourceIndex, monthIndex, e.target.value)}
+                          className="w-full p-1 text-sm border rounded"
+                        />
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
