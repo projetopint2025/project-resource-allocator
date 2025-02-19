@@ -64,44 +64,52 @@ const Projects = () => {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {projects.map((project) => (
-          <Card key={project.id} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="font-semibold">{project.name}</h3>
-                  <p className="text-sm text-muted-foreground">{project.status}</p>
-                </div>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-muted-foreground">Progresso</span>
-                    <span className="font-medium">{project.progress}%</span>
+          <a
+            key={project.id}
+            href={`/projects/${project.id}`}
+            className="block group"
+          >
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h3 className="font-semibold group-hover:text-primary transition-colors">
+                      {project.name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">{project.status}</p>
                   </div>
-                  <div className="h-2 rounded-full bg-secondary">
-                    <div
-                      className="h-full rounded-full bg-primary transition-all"
-                      style={{ width: `${project.progress}%` }}
-                    />
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex items-center justify-between text-sm mb-1">
+                      <span className="text-muted-foreground">Progresso</span>
+                      <span className="font-medium">{project.progress}%</span>
+                    </div>
+                    <div className="h-2 rounded-full bg-secondary">
+                      <div
+                        className="h-full rounded-full bg-primary transition-all"
+                        style={{ width: `${project.progress}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Deadline</span>
+                    <span>{project.deadline}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Horas restantes</span>
+                    <span className="font-medium text-primary">{project.hoursLeft}h</span>
                   </div>
                 </div>
-
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Deadline</span>
-                  <span>{project.deadline}</span>
-                </div>
-
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Horas restantes</span>
-                  <span className="font-medium text-primary">{project.hoursLeft}h</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </a>
         ))}
       </div>
     </div>
