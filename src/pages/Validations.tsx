@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -41,7 +42,7 @@ const Validations = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Solicitações</CardTitle>
+          <CardTitle>Projetos Pendentes</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
