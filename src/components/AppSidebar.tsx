@@ -43,16 +43,17 @@ export const AppSidebar = () => {
     <Link
       to={item.href}
       className={cn(
-        "flex items-center gap-3 p-3 rounded-xl transition-all duration-300",
-        "text-gray-500 hover:text-gray-900 hover:bg-gray-100/80",
-        location.pathname === item.href && "bg-gray-100/80 text-gray-900",
+        "flex items-center gap-3 p-3 rounded-lg transition-all duration-300",
+        "text-gray-500 hover:text-gray-900 hover:bg-gray-50",
+        location.pathname === item.href && "bg-indigo-50 text-indigo-600",
         className
       )}
     >
       <item.icon 
         size={20} 
         className={cn(
-          "text-[#4338ca] transition-transform duration-300",
+          "transition-transform duration-300",
+          location.pathname === item.href ? "text-indigo-600" : "text-gray-400",
           collapsed && "transform scale-110"
         )} 
       />
@@ -70,11 +71,11 @@ export const AppSidebar = () => {
   return (
     <div
       className={cn(
-        "h-screen bg-white border-r border-gray-100 transition-all duration-300 relative flex flex-col",
+        "h-screen bg-white transition-all duration-300 relative flex flex-col",
         collapsed ? "w-20" : "w-64"
       )}
     >
-      <div className="flex items-center justify-center p-6 h-16 border-b border-gray-100">
+      <div className="flex items-center justify-center p-6 h-16">
         <img 
           src="/lovable-uploads/28745dc3-1b1b-490b-8612-41cb26f8c61d.png" 
           alt="STAR Institute"
@@ -85,16 +86,16 @@ export const AppSidebar = () => {
         />
       </div>
 
-      <nav className="flex-1 p-4 space-y-8">
-        <div className="space-y-2">
+      <nav className="flex-1 px-3 py-6 space-y-8">
+        <div className="space-y-1">
           {menuItems.map((item) => (
             <MenuItem key={item.href} item={item} />
           ))}
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1">
           <p className={cn(
-            "px-3 text-xs font-medium text-gray-400 uppercase tracking-wider",
+            "px-3 text-xs font-medium text-gray-400 uppercase tracking-wider mb-2",
             collapsed && "opacity-0"
           )}>
             Gestão
@@ -105,23 +106,28 @@ export const AppSidebar = () => {
         </div>
       </nav>
 
-      <div className="p-4 border-t border-gray-100">
+      <div className="p-3">
         <Link
           to="/profile"
           className={cn(
-            "flex items-center gap-3 p-3 rounded-xl transition-all",
-            "text-gray-500 hover:text-gray-900 hover:bg-gray-100/80",
-            location.pathname === "/profile" && "bg-gray-100/80 text-gray-900"
+            "flex items-center gap-3 p-3 rounded-lg transition-all",
+            "hover:bg-gray-50",
+            location.pathname === "/profile" && "bg-indigo-50"
           )}
         >
-          <User size={20} className="text-[#4338ca]" />
+          <div className="relative flex-shrink-0">
+            <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center">
+              <User size={20} className="text-indigo-600" />
+            </div>
+            <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-400 border-2 border-white" />
+          </div>
           <div
             className={cn(
-              "transition-all duration-300",
-              collapsed && "opacity-0 w-0"
+              "transition-all duration-300 overflow-hidden",
+              collapsed && "w-0 opacity-0"
             )}
           >
-            <p className="font-medium">Vasco Fernandes</p>
+            <p className="font-medium text-gray-900">Vasco Fernandes</p>
             <p className="text-sm text-gray-500">Project Manager</p>
           </div>
         </Link>
