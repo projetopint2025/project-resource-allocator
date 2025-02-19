@@ -1,8 +1,8 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Users as UsersIcon, Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const mockUsers = [
   { id: 1, name: "João Silva", email: "joao.silva@star.pt", role: "Analista", status: "Ativo" },
