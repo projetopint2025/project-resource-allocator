@@ -21,7 +21,7 @@ const Profile = () => {
     <div className="space-y-8 animate-fade-in">
       <div>
         <h1 className="text-2xl font-semibold">Perfil</h1>
-        <p className="text-muted-foreground">Gerencie suas informações e veja suas contribuições</p>
+        <p className="text-muted-foreground">Consulte as suas informações e contribuições</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

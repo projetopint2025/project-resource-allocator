@@ -1,8 +1,17 @@
-
-import { useState } from "react";
-import { Home, FolderKanban, ChevronLeft, Menu, Users, FileBarChart2, Settings, User } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import {
+  Home,
+  FolderKanban,
+  FileBarChart2,
+  Users,
+  Settings,
+  User,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const menuItems = [
   {
@@ -20,14 +29,14 @@ const menuItems = [
     label: "Relatórios",
     href: "/reports",
   },
-];
-
-const managementItems = [
   {
     icon: Users,
     label: "Utilizadores",
     href: "/users",
   },
+];
+
+const managementItems = [
   {
     icon: Settings,
     label: "Validações",
@@ -38,29 +47,47 @@ const managementItems = [
 export const AppSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const sidebarRef = useRef(null);
+
+  // Function to toggle the sidebar collapse state
+  const toggleCollapse = () => {
+    setCollapsed(!collapsed);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        if (!collapsed) {
+          setCollapsed(true);
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [sidebarRef, collapsed]);
 
   const MenuItem = ({ item, className = "" }) => (
     <Link
       to={item.href}
       className={cn(
-        "flex items-center gap-3 p-3 rounded-lg transition-all duration-300",
-        "text-gray-500 hover:text-gray-900 hover:bg-gray-50",
-        location.pathname === item.href && "bg-indigo-50 text-indigo-600",
-        className
+        "group flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors duration-200",
+        location.pathname === item.href && "text-customBlue"
       )}
     >
-      <item.icon 
-        size={20} 
-        className={cn(
-          "transition-transform duration-300",
-          location.pathname === item.href ? "text-indigo-600" : "text-gray-400",
-          collapsed && "transform scale-110"
-        )} 
-      />
+      <div className={cn(
+        "p-2 rounded-md transition-colors duration-200",
+        "group-hover:bg-customBlue group-hover:text-white",
+        location.pathname === item.href && "bg-customBlue text-white"
+      )}>
+        <item.icon size={18} className="h-5 w-5 shrink-0" />
+      </div>
       <span
         className={cn(
-          "font-medium transition-all duration-300",
-          collapsed && "opacity-0 w-0"
+          "transition-all duration-200",
+          collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
         )}
       >
         {item.label}
@@ -69,68 +96,98 @@ export const AppSidebar = () => {
   );
 
   return (
-    <div
-      className={cn(
-        "h-screen bg-white transition-all duration-300 relative flex flex-col",
-        collapsed ? "w-20" : "w-64"
-      )}
-    >
-      <div className="flex items-center justify-center p-6 h-16">
-        <img 
-          src="/lovable-uploads/28745dc3-1b1b-490b-8612-41cb26f8c61d.png" 
-          alt="STAR Institute"
-          className={cn(
-            "h-8 transition-all duration-300",
-            collapsed ? "w-8 object-cover object-left" : "w-auto"
+    <div className="relative h-screen flex">
+      {/* Sidebar */}
+      <div
+        ref={sidebarRef}
+        className={cn(
+          "h-screen bg-white border-r border-gray-100 transition-all duration-200 flex flex-col",
+          collapsed ? "w-[4.5rem]" : "w-64"
+        )}
+      >
+        {/* Logo and Toggle Section */}
+        <div className="flex items-center p-4 border-b border-gray-100 justify-center">
+          {!collapsed && (
+            <img
+              src="/lovable-uploads/28745dc3-1b1b-490b-8612-41cb26f8c61d.png"
+              alt="STAR Institute"
+              className="h-8 transition-all duration-200"
+            />
           )}
-        />
-      </div>
-
-      <nav className="flex-1 px-3 py-6 space-y-8">
-        <div className="space-y-1">
-          {menuItems.map((item) => (
-            <MenuItem key={item.href} item={item} />
-          ))}
         </div>
 
-        <div className="space-y-1">
-          <p className={cn(
-            "px-3 text-xs font-medium text-gray-400 uppercase tracking-wider mb-2",
-            collapsed && "opacity-0"
-          )}>
-            Gestão
-          </p>
-          {managementItems.map((item) => (
-            <MenuItem key={item.href} item={item} />
-          ))}
-        </div>
-      </nav>
-
-      <div className="p-3">
-        <Link
-          to="/profile"
-          className={cn(
-            "flex items-center gap-3 p-3 rounded-lg transition-all",
-            "hover:bg-gray-50",
-            location.pathname === "/profile" && "bg-indigo-50"
-          )}
-        >
-          <div className="relative flex-shrink-0">
-            <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center">
-              <User size={20} className="text-indigo-600" />
-            </div>
-            <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-400 border-2 border-white" />
+        {/* Navigation */}
+        <nav className="flex-1 px-3 py-6 space-y-4">
+          <div className="space-y-2">
+            {menuItems.map((item) => (
+              <MenuItem key={item.href} item={item} />
+            ))}
           </div>
-          <div
+
+          <div className="space-y-2">
+            {!collapsed && (
+              <p className="px-3 mb-1 text-xs font-medium text-gray-400 uppercase tracking-wider">
+                Gestão
+              </p>
+            )}
+            {managementItems.map((item) => (
+              <MenuItem key={item.href} item={item} />
+            ))}
+          </div>
+        </nav>
+
+        {/* Collapse Button */}
+        <div className="p-3 border-t border-gray-100">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleCollapse}
             className={cn(
-              "transition-all duration-300 overflow-hidden",
-              collapsed && "w-0 opacity-0"
+              "w-full rounded-md hover:bg-gray-100 transition-colors duration-200",
+              collapsed ? "justify-center" : "justify-start"
             )}
           >
-            <p className="font-medium text-gray-900">Vasco Fernandes</p>
-            <p className="text-sm text-gray-500">Project Manager</p>
-          </div>
-        </Link>
+            {collapsed ? (
+              <ChevronRight
+                className={cn(
+                  "h-5 w-5 text-gray-500 transition-transform duration-200",
+                  collapsed && "rotate-0"
+                )}
+              />
+            ) : (
+              <ChevronLeft
+                className={cn(
+                  "h-5 w-5 text-gray-500 transition-transform duration-200",
+                  collapsed && "rotate-180"
+                )}
+              />
+            )}
+          </Button>
+
+          {/* Profile Section */}
+          <Link
+            to="/profile"
+            className={cn(
+              "flex items-center gap-3 p-2 rounded-md hover:bg-gray-50 transition-colors duration-200 mt-3",
+              location.pathname === "/profile" && "bg-gray-50"
+            )}
+          >
+            <div className="relative">
+              <div className="w-9 h-9 rounded-md bg-gray-100 flex items-center justify-center">
+                <User size={18} className="text-gray-600" />
+              </div>
+              <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-green-500 border-2 border-white" />
+            </div>
+            {!collapsed && (
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  Vasco Fernandes
+                </p>
+                <p className="text-xs text-gray-500">Project Manager</p>
+              </div>
+            )}
+          </Link>
+        </div>
       </div>
     </div>
   );
