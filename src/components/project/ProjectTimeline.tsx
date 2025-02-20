@@ -35,7 +35,10 @@ export const ProjectTimeline = ({
       <CardHeader className="border-b bg-customBlue-subtle">
         <div className="flex items-center justify-between">
           <CardTitle className="text-customBlue">Cronograma</CardTitle>
-          <Select value={timelineYear.toString()} onValueChange={(value) => setTimelineYear(parseInt(value))}>
+          <Select 
+            value={timelineYear.toString()} 
+            onValueChange={(value) => setTimelineYear(parseInt(value))}
+          >
             <SelectTrigger className="w-[120px]">
               <SelectValue />
             </SelectTrigger>

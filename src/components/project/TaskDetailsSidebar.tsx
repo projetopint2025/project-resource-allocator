@@ -1,5 +1,5 @@
 
-import { X, Trash } from "lucide-react";
+import { X, Trash, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Task } from "@/types/project";
