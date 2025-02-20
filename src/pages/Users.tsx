@@ -10,7 +10,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, Filter } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -60,7 +60,7 @@ const mockUsers: User[] = [
 
 const Users = () => {
   const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
 
   const filteredUsers = mockUsers.filter(user => {
     const searchMatch = (
@@ -68,7 +68,7 @@ const Users = () => {
       user.email.toLowerCase().includes(search.toLowerCase()) ||
       user.role.toLowerCase().includes(search.toLowerCase())
     );
-    const roleMatch = roleFilter ? user.role === roleFilter : true;
+    const roleMatch = roleFilter === "all" ? true : user.role === roleFilter;
     return searchMatch && roleMatch;
   });
 
@@ -109,7 +109,7 @@ const Users = () => {
             <SelectValue placeholder="Filtrar por função" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todas as funções</SelectItem>
+            <SelectItem value="all">Todas as funções</SelectItem>
             {uniqueRoles.map(role => (
               <SelectItem key={role} value={role}>{role}</SelectItem>
             ))}
