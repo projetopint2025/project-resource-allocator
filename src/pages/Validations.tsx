@@ -90,7 +90,7 @@ const Validations = () => {
     switch (status) {
       case "Aprovado":
         return (
-          <Badge variant="success">
+          <Badge variant="default" className="bg-green-500 hover:bg-green-600">
             {status}
           </Badge>
         );
