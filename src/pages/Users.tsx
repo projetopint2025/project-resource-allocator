@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -9,11 +10,17 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Search, Plus, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface User {
   id: number;
@@ -49,118 +56,120 @@ const mockUsers: User[] = [
     status: "Inativo",
     availability: 8,
   },
-  {
-    id: 4,
-    name: "Ana Oliveira",
-    email: "ana.oliveira@star.pt",
-    role: "Designer",
-    status: "Ativo",
-    availability: 6,
-  },
-  {
-    id: 5,
-    name: "Ricardo Pereira",
-    email: "ricardo.pereira@star.pt",
-    role: "Infraestrutura",
-    status: "Ativo",
-    availability: 10,
-  },
-  {
-    id: 6,
-    name: "Sofia Castro",
-    email: "sofia.castro@star.pt",
-    role: "Gerente de Projeto",
-    status: "Ativo",
-    availability: 12,
-  },
 ];
-
-const getAvailabilityColor = (availability: number) => {
-  if (availability <= 4) {
-    return "bg-red-500 text-white";
-  } else if (availability <= 8) {
-    return "bg-yellow-500 text-gray-800";
-  } else {
-    return "bg-green-500 text-white";
-  }
-};
 
 const Users = () => {
   const [search, setSearch] = useState("");
-  const [users, setUsers] = useState(mockUsers);
+  const [roleFilter, setRoleFilter] = useState("");
 
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(search.toLowerCase()) ||
-    user.email.toLowerCase().includes(search.toLowerCase()) ||
-    user.role.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredUsers = mockUsers.filter(user => {
+    const searchMatch = (
+      user.name.toLowerCase().includes(search.toLowerCase()) ||
+      user.email.toLowerCase().includes(search.toLowerCase()) ||
+      user.role.toLowerCase().includes(search.toLowerCase())
+    );
+    const roleMatch = roleFilter ? user.role === roleFilter : true;
+    return searchMatch && roleMatch;
+  });
+
+  const getAvailabilityColor = (availability: number) => {
+    if (availability <= 4) return "text-red-600 bg-red-50";
+    if (availability <= 8) return "text-yellow-600 bg-yellow-50";
+    return "text-green-600 bg-green-50";
+  };
+
+  const uniqueRoles = Array.from(new Set(mockUsers.map(user => user.role)));
 
   return (
-    <div className="container mx-auto py-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-semibold tracking-tight">Utilizadores</h2>
-          <p className="text-muted-foreground">Consulte os utilizadores do sistema</p>
+    <div className="flex flex-col h-[calc(100vh-4rem)] p-8 animate-fade-in">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900">Utilizadores</h1>
+          <p className="text-muted-foreground mt-1">Gerencie os utilizadores do sistema</p>
         </div>
-        <Button>
+        <Button className="bg-customBlue hover:bg-customBlue/90">
           <Plus className="h-4 w-4 mr-2" />
           Adicionar Utilizador
         </Button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Lista de Utilizadores</CardTitle>
+      <div className="flex items-center gap-4 mb-6">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Input
+            type="text"
+            placeholder="Pesquisar utilizadores..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <Select value={roleFilter} onValueChange={setRoleFilter}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filtrar por função" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">Todas as funções</SelectItem>
+            {uniqueRoles.map(role => (
+              <SelectItem key={role} value={role}>{role}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <Card className="flex-1 overflow-hidden">
+        <CardHeader className="bg-customBlue-subtle py-4">
+          <CardTitle className="text-customBlue">Lista de Utilizadores</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="mb-4">
-            <Input
-              type="search"
-              placeholder="Pesquisar utilizador..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+        <CardContent className="p-0">
+          <div className="overflow-auto h-[calc(100vh-20rem)]">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50">
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Função</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead className="text-center">Disponibilidade</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredUsers.map((user) => (
+                  <TableRow key={user.id} className="hover:bg-gray-50/50">
+                    <TableCell className="font-medium">{user.name}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.role}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={user.status === "Ativo" ? "default" : "secondary"}
+                        className={user.status === "Ativo" ? "bg-customBlue" : ""}
+                      >
+                        {user.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "px-3 py-1 font-medium",
+                          getAvailabilityColor(user.availability)
+                        )}
+                      >
+                        {user.availability}h
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {filteredUsers.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                      Nenhum utilizador encontrado
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Função</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead className="text-center">Disponibilidade</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.role}</TableCell>
-                  <TableCell>
-                    <Badge variant={user.status === "Ativo" ? "outline" : "secondary"}>
-                      {user.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <Badge className={cn(
-                      "px-3 py-1 font-semibold rounded-full",
-                      getAvailabilityColor(user.availability)
-                    )}>
-                      {user.availability}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {filteredUsers.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-4">
-                    Nenhum utilizador encontrado.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
         </CardContent>
       </Card>
     </div>

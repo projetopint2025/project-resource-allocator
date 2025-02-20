@@ -286,134 +286,120 @@ const ProjectDetails = () => {
   const cardShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)";
 
   return (
-      <div className="min-h-screen antialiased" style={{ backgroundColor: backgroundColor, color: textColorPrimary }}>
+    <div className="min-h-screen bg-gray-50/50 animate-fade-in">
       {/* Project Header */}
-      <div className="bg-white shadow-md mb-6">
-        <div className="max-w-full mx-auto py-3 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+      <div className="bg-white border-b">
+        <div className="max-w-full mx-auto py-6 px-8">
+          <div className="flex items-center space-x-4">
             <Link to="/projects">
-              <Button variant="ghost" size="icon">
-                <ArrowLeft className="h-5 w-5" style={{ color: textColorPrimary }} />
+              <Button variant="ghost" size="icon" className="hover:bg-gray-100">
+                <ArrowLeft className="h-5 w-5 text-gray-600" />
               </Button>
             </Link>
             <div>
-              <h1 className="text-2xl font-semibold" style={{ color: textColorPrimary }}>{mockProject.name}</h1>
-              <p className="text-sm" style={{ color: textColorSecondary }}>{mockProject.description}</p>
+              <h1 className="text-2xl font-semibold text-gray-900">{mockProject.name}</h1>
+              <p className="text-gray-500 mt-1">{mockProject.description}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="container-fluid px-4 sm:px-6 lg:px-8">
+      <div className="px-8 py-6">
         {/* Project Overview Stats */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="shadow-sm border rounded-lg w-full" style={{ backgroundColor: cardBackgroundColor, boxShadow: cardShadow, borderColor: "#E5E7EB" }}>
-            <CardHeader className="px-4 py-3">
-              <CardTitle className="text-sm font-medium" style={{ color: textColorPrimary }}>Progresso do Projeto</CardTitle>
+          <Card className="bg-white shadow-sm border-gray-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Progresso do Projeto</CardTitle>
             </CardHeader>
-            <CardContent className="px-4 py-3">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm" style={{ color: textColorSecondary }}>Workpackages</p>
-                  <p className="text-sm" style={{ color: textColorPrimary }}>{mockProject.completedPacotesDeTrabalho} / {mockProject.totalPacotesDeTrabalho}</p>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm text-gray-600">Workpackages</p>
+                    <p className="text-sm font-medium">{mockProject.completedPacotesDeTrabalho} / {mockProject.totalPacotesDeTrabalho}</p>
+                  </div>
+                  <Progress value={workPackagesProgress} className="h-2 bg-gray-100" />
                 </div>
-                <Progress value={workPackagesProgress} className="h-2" style={{ backgroundColor: "#E5E7EB", color: primaryColor }} />
-                <div className="flex items-center justify-between">
-                  <p className="text-sm" style={{ color: textColorSecondary }}>Tarefas</p>
-                  <p className="text-sm" style={{ color: textColorPrimary }}>{mockProject.completedTasks} / {mockProject.totalTasks}</p>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm text-gray-600">Tarefas</p>
+                    <p className="text-sm font-medium">{mockProject.completedTasks} / {mockProject.totalTasks}</p>
+                  </div>
+                  <Progress value={tasksProgress} className="h-2 bg-gray-100" />
                 </div>
-                <Progress value={tasksProgress} className="h-2" style={{ backgroundColor: "#E5E7EB", color: primaryColor }} />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-sm border rounded-lg w-full" style={{ backgroundColor: cardBackgroundColor, boxShadow: cardShadow, borderColor: "#E5E7EB" }}>
-            <CardHeader className="px-4 py-3">
-              <CardTitle className="text-sm font-medium flex items-center" style={{ color: textColorPrimary }}>
-                <DollarSign className="h-4 w-4 mr-2" /> Orçamento
+          <Card className="bg-white shadow-sm border-gray-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
+                <DollarSign className="h-4 w-4 mr-2 text-customBlue" /> 
+                Orçamento
               </CardTitle>
             </CardHeader>
-            <CardContent className="px-4 py-3">
-              <div className="space-y-3">
+            <CardContent>
+              <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm" style={{ color: textColorSecondary }}>Total</p>
-                  <p className="text-sm" style={{ color: textColorPrimary }}>
+                  <span className="text-gray-600">Total</span>
+                  <span className="font-medium">
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'EUR' }).format(mockProject.budget)}
-                  </p>
+                  </span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm" style={{ color: textColorSecondary }}>Gasto</p>
-                  <p className="text-green-600 text-sm">
-                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'EUR' }).format(mockProject.totalSpent)}
-                  </p>
-                </div>
-                {/* Budget Progress Bar */}
-                <Progress
-                  value={(mockProject.totalSpent / mockProject.budget) * 100}
-                  className="h-2"
-                  style={{ backgroundColor: "#E5E7EB", color: primaryColor }}
+                <Progress 
+                  value={(mockProject.totalSpent / mockProject.budget) * 100} 
+                  className="h-2 bg-gray-100" 
                 />
-                <div className="flex items-center justify-between">
-                  <p className="text-sm" style={{ color: textColorSecondary }}>Restante</p>
-                  <p className="text-blue-600 text-sm">
-                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'EUR' }).format(mockProject.budget - mockProject.totalSpent)}
-                  </p>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Gasto</span>
+                  <span className="text-green-600 font-medium">
+                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'EUR' }).format(mockProject.totalSpent)}
+                  </span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-sm border rounded-lg w-full" style={{ backgroundColor: cardBackgroundColor, boxShadow: cardShadow, borderColor: "#E5E7EB" }}>
-            <CardHeader className="px-4 py-3">
-              <CardTitle className="text-sm font-medium flex items-center" style={{ color: textColorPrimary }}>
-                <Users className="h-4 w-4 mr-2" /> Recursos
+          <Card className="bg-white shadow-sm border-gray-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
+                <Users className="h-4 w-4 mr-2 text-customBlue" /> 
+                Recursos
               </CardTitle>
             </CardHeader>
-            <CardContent className="px-4 py-3">
-              <div className="space-y-3">
-                {/* Resource Bar Chart */}
+            <CardContent>
+              <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm" style={{ color: textColorSecondary }}>Alocados</p>
-                  <p className="text-sm" style={{ color: textColorPrimary }}>5</p> {/* Mock Value */}
+                  <span className="text-gray-600">Alocados</span>
+                  <span className="font-medium">5</span>
                 </div>
-                <div className="h-2 bg-gray-200 rounded-full">
-                  <div
-                    className="bg-blue-500 h-2 rounded-full"
-                    style={{ width: '60%' }} // Example: 60% allocated
-                  />
-                </div>
+                <Progress value={60} className="h-2 bg-gray-100" />
                 <div className="flex items-center justify-between">
-                  <p className="text-sm" style={{ color: textColorSecondary }}>Disponíveis</p>
-                  <p className="text-green-600 text-sm">2</p> {/* Mock Value */}
-                </div>
-                <div className="h-2 bg-gray-200 rounded-full">
-                  <div
-                    className="bg-green-500 h-2 rounded-full"
-                    style={{ width: '40%' }} // Example: 40% available
-                  />
+                  <span className="text-gray-600">Disponíveis</span>
+                  <span className="text-green-600 font-medium">2</span>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Timeline Card */}
-        <Card className="shadow-sm border rounded-lg w-full mb-8" style={{ backgroundColor: cardBackgroundColor, boxShadow: cardShadow, borderColor: "#E5E7EB" }}>
-          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 py-3">
-            <CardTitle className="text-sm font-medium" style={{ color: textColorPrimary }}>Cronograma</CardTitle>
-            <div className="flex items-center gap-4">
+        {/* Timeline */}
+        <Card className="bg-white shadow-sm border-gray-200 mb-8">
+          <CardHeader className="border-b bg-customBlue-subtle">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-customBlue">Cronograma</CardTitle>
               <Select value={timelineYear.toString()} onValueChange={(value) => setTimelineYear(parseInt(value))}>
-                <SelectTrigger className="w-[120px]" style={{ backgroundColor: cardBackgroundColor, borderColor: "#D1D5DB", color: textColorPrimary }}>
-                  <SelectValue placeholder="Selecionar Ano" className="text-sm" style={{ color: textColorPrimary }} />
+                <SelectTrigger className="w-[120px]">
+                  <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="shadow-md rounded-md" style={{ backgroundColor: cardBackgroundColor }}>
-                  <SelectItem value="2026" style={{ color: textColorPrimary }}>2026</SelectItem>
-                  <SelectItem value="2027" style={{ color: textColorPrimary }}>2027</SelectItem>
+                <SelectContent>
+                  <SelectItem value="2026">2026</SelectItem>
+                  <SelectItem value="2027">2027</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </CardHeader>
-          <CardContent className="px-4 py-3">
+          <CardContent className="p-6">
             <div className="overflow-x-auto">
               <div className="min-w-[800px] w-full">
                 <div className="grid grid-cols-[200px_repeat(12,1fr)] gap-2 border-b" style={{ borderColor: "#D1D5DB" }}>
@@ -505,23 +491,17 @@ const ProjectDetails = () => {
 
       {/* Task Details Sidebar */}
       {selectedTask && (
-        <div 
-          className="fixed top-0 right-0 w-full sm:w-[480px] lg:w-[600px] h-full p-6 overflow-y-auto shadow-xl animate-slide-in-right" 
-          style={{ 
-            backgroundColor: cardBackgroundColor, 
-            borderLeft: `1px solid #D1D5DB`,
-            zIndex: 50 
-          }}
-        >
-          <div className="space-y-6">
+        <div className="fixed inset-y-0 right-0 w-full sm:w-[480px] lg:w-[600px] bg-white shadow-xl border-l border-gray-200 overflow-y-auto animate-slide-in-right">
+          <div className="p-6 space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold" style={{ color: textColorPrimary }}>{selectedTask.name}</h2>
+              <h2 className="text-lg font-semibold text-gray-900">{selectedTask.name}</h2>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setSelectedTask(null)}
+                className="hover:bg-gray-100"
               >
-                <X className="h-4 w-4" style={{ color: textColorSecondary }} />
+                <X className="h-4 w-4 text-gray-500" />
               </Button>
             </div>
 
