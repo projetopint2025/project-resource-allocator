@@ -1,17 +1,6 @@
+
 import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { X, ArrowLeft, Plus, Trash, DollarSign, Users } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import {
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-react';
-import { Progress } from "@/components/ui/progress";
-import { Input } from "@/components/ui/input";
-import { Project, Task } from "@/types/project";
+import { Project, Task, Resource } from "@/types/project";
 import { ProjectHeader } from "@/components/project/ProjectHeader";
 import { ProjectStats } from "@/components/project/ProjectStats";
 import { ProjectTimeline } from "@/components/project/ProjectTimeline";
@@ -240,15 +229,34 @@ const ProjectDetails = () => {
     });
   };
 
+  const handleAddResource = (resource: Resource) => {
+    if (!selectedTask) return;
+
+    setSelectedTask({
+      ...selectedTask,
+      resources: [...selectedTask.resources, resource],
+    });
+  };
+
+  const handleRemoveResource = (resourceIndex: number) => {
+    if (!selectedTask) return;
+
+    const updatedResources = [...selectedTask.resources];
+    updatedResources.splice(resourceIndex, 1);
+
+    setSelectedTask({
+      ...selectedTask,
+      resources: updatedResources,
+    });
+  };
+
+  const handleMarkTaskCompleted = (taskId: number) => {
+    // Aqui você implementaria a lógica para marcar a tarefa como concluída
+    console.log('Tarefa marcada como concluída:', taskId);
+  };
+
   const workPackagesProgress = (mockProject.completedPacotesDeTrabalho / mockProject.totalPacotesDeTrabalho) * 100;
   const tasksProgress = (mockProject.completedTasks / mockProject.totalTasks) * 100;
-
-  const primaryColor = "#2C5697";
-  const backgroundColor = "#F9FAFB";
-  const textColorPrimary = "#374151";
-  const textColorSecondary = "#6B7280";
-  const cardBackgroundColor = "#FFFFFF";
-  const cardShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)";
 
   return (
     <div className="min-h-screen bg-gray-50/50 animate-fade-in">
@@ -289,6 +297,9 @@ const ProjectDetails = () => {
           onAddMaterial={handleAddMaterial}
           onRemoveMaterial={handleRemoveMaterial}
           onMaterialChange={handleMaterialChange}
+          onMarkCompleted={handleMarkTaskCompleted}
+          onAddResource={handleAddResource}
+          onRemoveResource={handleRemoveResource}
         />
       )}
     </div>
