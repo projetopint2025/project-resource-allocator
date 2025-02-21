@@ -1,7 +1,6 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, ChartBar, Calendar, CheckCircle2, FileText } from "lucide-react";
+import { User, ChartBar, Calendar, CheckCircle2, FileText, Play, Pause, StopCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -10,8 +9,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableFooter,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 const mockUserStats = {
   nome: "Vasco Fernandes",
@@ -65,30 +66,117 @@ const mockUserStats = {
   ]
 };
 
+interface TimeEntry {
+  startTime: Date;
+  endTime?: Date;
+  pauses: { start: Date; end?: Date }[];
+  isActive: boolean;
+  isPaused: boolean;
+}
+
 const Profile = () => {
   const [showingReport, setShowingReport] = useState(false);
   const [allocations, setAllocations] = useState(mockUserStats.detalhesAlocacao);
+  const [timeTracking, setTimeTracking] = useState<TimeEntry | null>(null);
+  const [totalWorkTime, setTotalWorkTime] = useState("00:00:00");
 
-  const handleAllocationChange = (index: number, field: string, value: string | number) => {
-    const newAllocations = [...allocations];
-    newAllocations[index] = {
-      ...newAllocations[index],
-      [field]: field === 'alocacao' ? Math.min(1, Math.max(0, Number(value))) : value
-    };
-    setAllocations(newAllocations);
+  const startWork = () => {
+    setTimeTracking({
+      startTime: new Date(),
+      pauses: [],
+      isActive: true,
+      isPaused: false
+    });
   };
 
-  const getMonthName = (index: number) => {
-    return new Date(2024, index).toLocaleDateString('pt-BR', { month: 'short' });
+  const pauseWork = () => {
+    if (timeTracking) {
+      const updatedTimeTracking = {
+        ...timeTracking,
+        isPaused: true,
+        pauses: [
+          ...timeTracking.pauses,
+          { start: new Date() }
+        ]
+      };
+      setTimeTracking(updatedTimeTracking);
+    }
   };
+
+  const resumeWork = () => {
+    if (timeTracking && timeTracking.pauses.length > 0) {
+      const updatedPauses = [...timeTracking.pauses];
+      const currentPause = updatedPauses[updatedPauses.length - 1];
+      currentPause.end = new Date();
+
+      setTimeTracking({
+        ...timeTracking,
+        isPaused: false,
+        pauses: updatedPauses
+      });
+    }
+  };
+
+  const stopWork = () => {
+    if (timeTracking) {
+      if (timeTracking.isPaused) {
+        resumeWork();
+      }
+      setTimeTracking({
+        ...timeTracking,
+        endTime: new Date(),
+        isActive: false
+      });
+    }
+  };
+
+  const calculateTotalTime = () => {
+    if (!timeTracking) return "00:00:00";
+
+    const now = timeTracking.endTime || new Date();
+    let totalMs = now.getTime() - timeTracking.startTime.getTime();
+
+    // Subtrair tempo das pausas
+    timeTracking.pauses.forEach(pause => {
+      const pauseEnd = pause.end || (timeTracking.isPaused ? new Date() : pause.start);
+      totalMs -= (pauseEnd.getTime() - pause.start.getTime());
+    });
+
+    const hours = Math.floor(totalMs / 3600000);
+    const minutes = Math.floor((totalMs % 3600000) / 60000);
+    const seconds = Math.floor((totalMs % 60000) / 1000);
+
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  useEffect(() => {
+    let interval: number;
+    if (timeTracking?.isActive) {
+      interval = window.setInterval(() => {
+        setTotalWorkTime(calculateTotalTime());
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [timeTracking]);
 
   if (showingReport) {
+    let totalAlocacao = 0;
+
+    const handleAllocationChange = (index: number, field: string, value: string | number) => {
+      const newAllocations = [...allocations];
+      newAllocations[index] = {
+        ...newAllocations[index],
+        [field]: field === 'alocacao' ? Math.min(1, Math.max(0, Number(value))) : value
+      };
+      setAllocations(newAllocations);
+    };
+
     return (
       <div className="space-y-8 p-8 animate-fade-in">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold">Relatório de Alocação</h1>
-            <p className="text-muted-foreground">Detalhes de alocação por tarefa</p>
+            <p className="text-muted-foreground">Detalhes de alocação por workpackage e tarefa</p>
           </div>
           <Button
             variant="outline"
@@ -102,7 +190,7 @@ const Profile = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Detalhes de Alocação por Tarefa</CardTitle>
+            <CardTitle>Detalhes de Alocação</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
@@ -111,38 +199,53 @@ const Profile = () => {
                   <TableHead>Projeto</TableHead>
                   <TableHead>Pacote de Trabalho</TableHead>
                   <TableHead>Tarefa</TableHead>
-                  <TableHead>Horas</TableHead>
-                  <TableHead>Alocação</TableHead>
+                  <TableHead className="text-right">Alocação</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {allocations.map((item, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{item.projeto}</TableCell>
-                    <TableCell>{item.workpackage}</TableCell>
-                    <TableCell>{item.tarefa}</TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={item.horas}
-                        onChange={(e) => handleAllocationChange(index, 'horas', e.target.value)}
-                        className="w-24"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={item.alocacao}
-                        onChange={(e) => handleAllocationChange(index, 'alocacao', e.target.value)}
-                        step="0.1"
-                        min="0"
-                        max="1"
-                        className="w-24"
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {allocations.map((item, index) => {
+                  totalAlocacao += item.alocacao;
+                  return (
+                    <TableRow key={index}>
+                      <TableCell>{item.projeto}</TableCell>
+                      <TableCell>{item.workpackage}</TableCell>
+                      <TableCell>{item.tarefa}</TableCell>
+                      <TableCell className="text-right">
+                        <Input
+                          type="number"
+                          value={item.alocacao.toFixed(1)}
+                          onChange={(e) => handleAllocationChange(index, 'alocacao', e.target.value)}
+                          step="0.1"
+                          min="0"
+                          max="1"
+                          className="w-20 text-right"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TableCell colSpan={3}>Total</TableCell>
+                  <TableCell className="text-right">
+                    <Input
+                      type="number"
+                      value={totalAlocacao.toFixed(1)}
+                      onChange={(e) => {
+                        const newTotal = parseFloat(e.target.value);
+                        const ratio = newTotal / totalAlocacao;
+                        setAllocations(allocations.map(a => ({
+                          ...a,
+                          alocacao: Math.min(1, Math.max(0, a.alocacao * ratio))
+                        })));
+                      }}
+                      step="0.1"
+                      className="w-20 text-right font-medium"
+                    />
+                  </TableCell>
+                </TableRow>
+              </TableFooter>
             </Table>
           </CardContent>
         </Card>
@@ -157,14 +260,65 @@ const Profile = () => {
           <h1 className="text-2xl font-semibold">Perfil</h1>
           <p className="text-muted-foreground">Consulte as suas informações e contribuições</p>
         </div>
-        <Button
-          variant="outline"
-          onClick={() => setShowingReport(true)}
-          className="gap-2"
-        >
-          <FileText className="h-4 w-4" />
-          Gerar Relatório
-        </Button>
+        <div className="flex gap-4">
+          <Card className="w-fit">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-4">
+                <div className="text-2xl font-mono">{totalWorkTime}</div>
+                <div className="flex gap-2">
+                  {!timeTracking?.isActive ? (
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={startWork}
+                      className="text-green-600 hover:text-green-700"
+                    >
+                      <Play className="h-4 w-4" />
+                    </Button>
+                  ) : (
+                    <>
+                      {!timeTracking.isPaused ? (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={pauseWork}
+                          className="text-yellow-600 hover:text-yellow-700"
+                        >
+                          <Pause className="h-4 w-4" />
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={resumeWork}
+                          className="text-green-600 hover:text-green-700"
+                        >
+                          <Play className="h-4 w-4" />
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={stopWork}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <StopCircle className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Button
+            variant="outline"
+            onClick={() => setShowingReport(true)}
+            className="gap-2"
+          >
+            <FileText className="h-4 w-4" />
+            Gerar Relatório
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
