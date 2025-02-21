@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Card,
   CardContent,
@@ -21,57 +22,58 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import {
-  RocketIcon,
-  BeakerIcon,
-  BookOpenIcon,
-  BrainCircuitIcon,
-  BuildingIcon,
-  LeafIcon,
+  EuroIcon,
+  Plus,
+  Trash,
+  ListTodo,
+  Users,
 } from "lucide-react";
 
-const templates = [
+interface WorkPackage {
+  id: string;
+  name: string;
+  tasks: Task[];
+}
+
+interface Task {
+  id: string;
+  name: string;
+  description: string;
+  hasDeliverable: boolean;
+  deliverableDescription?: string;
+  resources: string[];
+}
+
+const fundingTemplates = [
   {
-    id: "research",
-    name: "Projeto de Investigação",
-    icon: BeakerIcon,
-    description: "Template para projetos de investigação científica e desenvolvimento.",
+    id: "pt2030",
+    name: "Portugal 2030",
+    icon: EuroIcon,
+    description: "Programas de financiamento do quadro Portugal 2030.",
     color: "blue"
   },
   {
-    id: "innovation",
-    name: "Projeto de Inovação",
-    icon: RocketIcon,
-    description: "Template para projetos de inovação e desenvolvimento de produto.",
-    color: "purple"
+    id: "horizon",
+    name: "Horizonte Europa",
+    icon: EuroIcon,
+    description: "Programa-quadro de investigação e inovação da UE.",
+    color: "yellow"
   },
   {
-    id: "education",
-    name: "Projeto Educacional",
-    icon: BookOpenIcon,
-    description: "Template para projetos educacionais e de formação.",
-    color: "orange"
-  },
-  {
-    id: "ai",
-    name: "Projeto de IA",
-    icon: BrainCircuitIcon,
-    description: "Template para projetos de inteligência artificial.",
-    color: "green"
-  },
-  {
-    id: "enterprise",
-    name: "Projeto Empresarial",
-    icon: BuildingIcon,
-    description: "Template para projetos empresariais.",
-    color: "gray"
-  },
-  {
-    id: "sustainability",
-    name: "Projeto Sustentável",
-    icon: LeafIcon,
-    description: "Template para projetos de sustentabilidade.",
-    color: "emerald"
+    id: "norte2030",
+    name: "Norte 2030",
+    icon: EuroIcon,
+    description: "Programa Operacional Regional do Norte 2030.",
+    color: "red"
   }
+];
+
+const availableResources = [
+  "João Silva",
+  "Maria Santos",
+  "Pedro Costa",
+  "Ana Pereira",
+  "Rui Almeida"
 ];
 
 interface ProjectTemplateWizardProps {
@@ -88,13 +90,86 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
     startDate: "",
     endDate: "",
     budget: "",
-    team: []
   });
+  const [workPackages, setWorkPackages] = useState<WorkPackage[]>([]);
+
+  const addWorkPackage = () => {
+    setWorkPackages([
+      ...workPackages,
+      {
+        id: Date.now().toString(),
+        name: "",
+        tasks: []
+      }
+    ]);
+  };
+
+  const removeWorkPackage = (wpId: string) => {
+    setWorkPackages(workPackages.filter(wp => wp.id !== wpId));
+  };
+
+  const updateWorkPackage = (wpId: string, field: string, value: any) => {
+    setWorkPackages(workPackages.map(wp => 
+      wp.id === wpId ? { ...wp, [field]: value } : wp
+    ));
+  };
+
+  const addTask = (wpId: string) => {
+    setWorkPackages(workPackages.map(wp => 
+      wp.id === wpId ? {
+        ...wp,
+        tasks: [
+          ...wp.tasks,
+          {
+            id: Date.now().toString(),
+            name: "",
+            description: "",
+            hasDeliverable: false,
+            resources: []
+          }
+        ]
+      } : wp
+    ));
+  };
+
+  const removeTask = (wpId: string, taskId: string) => {
+    setWorkPackages(workPackages.map(wp => 
+      wp.id === wpId ? {
+        ...wp,
+        tasks: wp.tasks.filter(task => task.id !== taskId)
+      } : wp
+    ));
+  };
+
+  const updateTask = (wpId: string, taskId: string, field: string, value: any) => {
+    setWorkPackages(workPackages.map(wp => 
+      wp.id === wpId ? {
+        ...wp,
+        tasks: wp.tasks.map(task => 
+          task.id === taskId ? { ...task, [field]: value } : task
+        )
+      } : wp
+    ));
+  };
 
   const handleNext = () => {
     if (step === 1 && !selectedTemplate) return;
-    if (step === 3) {
-      onSubmit({ ...formData, template: selectedTemplate });
+    if (step === 4) {
+      // Validar se todas as tarefas têm recursos atribuídos
+      const allTasksHaveResources = workPackages.every(wp => 
+        wp.tasks.every(task => task.resources.length > 0)
+      );
+      
+      if (!allTasksHaveResources) {
+        alert("Todas as tarefas devem ter pelo menos um recurso atribuído.");
+        return;
+      }
+      
+      onSubmit({
+        ...formData,
+        template: selectedTemplate,
+        workPackages
+      });
       return;
     }
     setStep(step + 1);
@@ -113,7 +188,7 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
       case 1:
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {templates.map((template) => (
+            {fundingTemplates.map((template) => (
               <Card
                 key={template.id}
                 className={cn(
@@ -154,13 +229,6 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 />
               </div>
-            </div>
-          </div>
-        );
-      case 3:
-        return (
-          <div className="space-y-4">
-            <div className="grid gap-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="startDate">Data de Início</Label>
@@ -193,6 +261,160 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
             </div>
           </div>
         );
+      case 3:
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-medium">Pacotes de Trabalho</h3>
+              <Button onClick={addWorkPackage} variant="outline" size="sm">
+                <Plus className="w-4 h-4 mr-2" />
+                Adicionar Pacote
+              </Button>
+            </div>
+            <div className="space-y-6">
+              {workPackages.map((wp) => (
+                <Card key={wp.id} className="relative">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-2 text-red-500 hover:text-red-700"
+                    onClick={() => removeWorkPackage(wp.id)}
+                  >
+                    <Trash className="w-4 h-4" />
+                  </Button>
+                  <CardHeader>
+                    <div className="grid gap-2">
+                      <Label>Nome do Pacote de Trabalho</Label>
+                      <Input
+                        value={wp.name}
+                        onChange={(e) => updateWorkPackage(wp.id, 'name', e.target.value)}
+                        placeholder="Ex: WP1 - Análise de Requisitos"
+                      />
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h4 className="text-sm font-medium">Tarefas</h4>
+                      <Button
+                        onClick={() => addTask(wp.id)}
+                        variant="outline"
+                        size="sm"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Adicionar Tarefa
+                      </Button>
+                    </div>
+                    <div className="space-y-4">
+                      {wp.tasks.map((task) => (
+                        <Card key={task.id}>
+                          <CardContent className="pt-6">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="absolute right-2 top-2 text-red-500 hover:text-red-700"
+                              onClick={() => removeTask(wp.id, task.id)}
+                            >
+                              <Trash className="w-4 h-4" />
+                            </Button>
+                            <div className="space-y-4">
+                              <div className="grid gap-2">
+                                <Label>Nome da Tarefa</Label>
+                                <Input
+                                  value={task.name}
+                                  onChange={(e) => updateTask(wp.id, task.id, 'name', e.target.value)}
+                                  placeholder="Ex: Levantamento de requisitos"
+                                />
+                              </div>
+                              <div className="grid gap-2">
+                                <Label>Descrição</Label>
+                                <Textarea
+                                  value={task.description}
+                                  onChange={(e) => updateTask(wp.id, task.id, 'description', e.target.value)}
+                                />
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Checkbox
+                                  id={`deliverable-${task.id}`}
+                                  checked={task.hasDeliverable}
+                                  onCheckedChange={(checked) => 
+                                    updateTask(wp.id, task.id, 'hasDeliverable', checked)
+                                  }
+                                />
+                                <Label htmlFor={`deliverable-${task.id}`}>
+                                  Requer entregável
+                                </Label>
+                              </div>
+                              {task.hasDeliverable && (
+                                <div className="grid gap-2">
+                                  <Label>Descrição do Entregável</Label>
+                                  <Textarea
+                                    value={task.deliverableDescription}
+                                    onChange={(e) => updateTask(wp.id, task.id, 'deliverableDescription', e.target.value)}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        );
+      case 4:
+        return (
+          <div className="space-y-6">
+            <h3 className="text-lg font-medium">Atribuição de Recursos</h3>
+            {workPackages.map((wp) => (
+              <Card key={wp.id}>
+                <CardHeader>
+                  <CardTitle>{wp.name}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {wp.tasks.map((task) => (
+                    <div key={task.id} className="space-y-2">
+                      <Label className="flex items-center gap-2">
+                        <ListTodo className="w-4 h-4" />
+                        {task.name}
+                      </Label>
+                      <Select
+                        value={task.resources.join(',')}
+                        onValueChange={(value) => updateTask(wp.id, task.id, 'resources', value.split(',').filter(Boolean))}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Selecione os recursos..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableResources.map((resource) => (
+                            <SelectItem key={resource} value={resource}>
+                              {resource}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {task.resources.length > 0 && (
+                        <div className="flex gap-2 flex-wrap">
+                          {task.resources.map((resource) => (
+                            <div
+                              key={resource}
+                              className="flex items-center gap-1 bg-secondary px-2 py-1 rounded-md text-sm"
+                            >
+                              <Users className="w-3 h-3" />
+                              {resource}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        );
     }
   };
 
@@ -200,14 +422,16 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
     <Card className="w-full max-w-4xl mx-auto">
       <CardHeader>
         <CardTitle>
-          {step === 1 && "Escolha um Template"}
+          {step === 1 && "Tipo de Financiamento"}
           {step === 2 && "Informações Básicas"}
-          {step === 3 && "Configurações do Projeto"}
+          {step === 3 && "Estrutura do Projeto"}
+          {step === 4 && "Atribuição de Recursos"}
         </CardTitle>
         <CardDescription>
-          {step === 1 && "Selecione um template para começar seu projeto"}
+          {step === 1 && "Selecione o tipo de financiamento do projeto"}
           {step === 2 && "Preencha as informações básicas do projeto"}
-          {step === 3 && "Configure as datas e orçamento do projeto"}
+          {step === 3 && "Defina os pacotes de trabalho e tarefas"}
+          {step === 4 && "Atribua recursos às tarefas"}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -218,7 +442,7 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
           {step === 1 ? "Cancelar" : "Voltar"}
         </Button>
         <Button onClick={handleNext}>
-          {step === 3 ? "Criar Projeto" : "Próximo"}
+          {step === 4 ? "Criar Projeto" : "Próximo"}
         </Button>
       </CardFooter>
     </Card>

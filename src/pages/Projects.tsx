@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { Search, Filter, MoreHorizontal, Plus, File, LayoutDashboard, Edit } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import {
@@ -288,50 +288,52 @@ const Projects = () => {
       {/* Add Project Popup */}
       <Dialog.Root open={isAddProjectPopupOpen} onOpenChange={setIsAddProjectPopupOpen}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50" />
+          <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" />
           <Dialog.Content className={cn(
-            "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl p-6 z-50",
-            selectedOption === 'template' ? "w-[90vw] max-w-6xl" : "w-full max-w-md"
+            "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 max-h-[90vh] overflow-y-auto",
+            selectedOption === 'template' ? "w-[90vw]" : "w-full max-w-md"
           )}>
             {selectedOption === 'template' ? (
               <ProjectTemplateWizard onClose={handleClosePopup} onSubmit={handleCreateProject} />
             ) : (
-              <>
-                <Dialog.Title className="text-lg font-semibold mb-4">Adicionar Projeto</Dialog.Title>
-                <div className="grid gap-4">
-                  <Button
-                    variant="ghost"
-                    className="justify-start"
-                    onClick={() => setSelectedOption('import')}
-                  >
-                    <File className="h-4 w-4 mr-2" />
-                    Importar
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="justify-start"
-                    onClick={() => setSelectedOption('template')}
-                  >
-                    <LayoutDashboard className="h-4 w-4 mr-2" />
-                    A partir de um template
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="justify-start"
-                    onClick={() => setSelectedOption('custom')}
-                  >
-                    <Edit className="h-4 w-4 mr-2" />
-                    Personalizado
-                  </Button>
-                </div>
-                <div className="mt-6 flex justify-end">
-                  <Dialog.Close asChild>
-                    <Button variant="ghost" onClick={handleClosePopup}>
-                      Cancelar
+              <Card>
+                <CardHeader>
+                  <CardTitle>Adicionar Projeto</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4">
+                    <Button
+                      variant="ghost"
+                      className="justify-start"
+                      onClick={() => setSelectedOption('import')}
+                    >
+                      <File className="h-4 w-4 mr-2" />
+                      Importar
                     </Button>
-                  </Dialog.Close>
-                </div>
-              </>
+                    <Button
+                      variant="ghost"
+                      className="justify-start"
+                      onClick={() => setSelectedOption('template')}
+                    >
+                      <LayoutDashboard className="h-4 w-4 mr-2" />
+                      A partir de um template
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="justify-start"
+                      onClick={() => setSelectedOption('custom')}
+                    >
+                      <Edit className="h-4 w-4 mr-2" />
+                      Personalizado
+                    </Button>
+                  </div>
+                </CardContent>
+                <CardFooter className="flex justify-end">
+                  <Button variant="ghost" onClick={handleClosePopup}>
+                    Cancelar
+                  </Button>
+                </CardFooter>
+              </Card>
             )}
           </Dialog.Content>
         </Dialog.Portal>
