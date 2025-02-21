@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, ChartBar, Calendar, CheckCircle2, FileText, Play, Pause, StopCircle } from "lucide-react";
@@ -14,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { TimeTracker } from "@/components/TimeTracker";
 
 const mockUserStats = {
   nome: "Vasco Fernandes",
@@ -67,98 +67,9 @@ const mockUserStats = {
   ]
 };
 
-interface TimeEntry {
-  startTime: Date;
-  endTime?: Date;
-  pauses: { start: Date; end?: Date }[];
-  isActive: boolean;
-  isPaused: boolean;
-}
-
 const Profile = () => {
   const [showingReport, setShowingReport] = useState(false);
   const [allocations, setAllocations] = useState(mockUserStats.detalhesAlocacao);
-  const [timeTracking, setTimeTracking] = useState<TimeEntry | null>(null);
-  const [totalWorkTime, setTotalWorkTime] = useState("00:00:00");
-
-  const startWork = () => {
-    setTimeTracking({
-      startTime: new Date(),
-      pauses: [],
-      isActive: true,
-      isPaused: false
-    });
-  };
-
-  const pauseWork = () => {
-    if (timeTracking) {
-      const updatedTimeTracking = {
-        ...timeTracking,
-        isPaused: true,
-        pauses: [
-          ...timeTracking.pauses,
-          { start: new Date() }
-        ]
-      };
-      setTimeTracking(updatedTimeTracking);
-    }
-  };
-
-  const resumeWork = () => {
-    if (timeTracking && timeTracking.pauses.length > 0) {
-      const updatedPauses = [...timeTracking.pauses];
-      const currentPause = updatedPauses[updatedPauses.length - 1];
-      currentPause.end = new Date();
-
-      setTimeTracking({
-        ...timeTracking,
-        isPaused: false,
-        pauses: updatedPauses
-      });
-    }
-  };
-
-  const stopWork = () => {
-    if (timeTracking) {
-      if (timeTracking.isPaused) {
-        resumeWork();
-      }
-      setTimeTracking({
-        ...timeTracking,
-        endTime: new Date(),
-        isActive: false
-      });
-    }
-  };
-
-  const calculateTotalTime = () => {
-    if (!timeTracking) return "00:00:00";
-
-    const now = timeTracking.endTime || new Date();
-    let totalMs = now.getTime() - timeTracking.startTime.getTime();
-
-    // Subtrair tempo das pausas
-    timeTracking.pauses.forEach(pause => {
-      const pauseEnd = pause.end || (timeTracking.isPaused ? new Date() : pause.start);
-      totalMs -= (pauseEnd.getTime() - pause.start.getTime());
-    });
-
-    const hours = Math.floor(totalMs / 3600000);
-    const minutes = Math.floor((totalMs % 3600000) / 60000);
-    const seconds = Math.floor((totalMs % 60000) / 1000);
-
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  };
-
-  useEffect(() => {
-    let interval: number;
-    if (timeTracking?.isActive) {
-      interval = window.setInterval(() => {
-        setTotalWorkTime(calculateTotalTime());
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [timeTracking]);
 
   if (showingReport) {
     let totalAlocacao = 0;
@@ -262,55 +173,7 @@ const Profile = () => {
           <p className="text-muted-foreground">Consulte as suas informações e contribuições</p>
         </div>
         <div className="flex gap-4">
-          <Card className="w-fit">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-4">
-                <div className="text-2xl font-mono">{totalWorkTime}</div>
-                <div className="flex gap-2">
-                  {!timeTracking?.isActive ? (
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={startWork}
-                      className="text-green-600 hover:text-green-700"
-                    >
-                      <Play className="h-4 w-4" />
-                    </Button>
-                  ) : (
-                    <>
-                      {!timeTracking.isPaused ? (
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={pauseWork}
-                          className="text-yellow-600 hover:text-yellow-700"
-                        >
-                          <Pause className="h-4 w-4" />
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={resumeWork}
-                          className="text-green-600 hover:text-green-700"
-                        >
-                          <Play className="h-4 w-4" />
-                        </Button>
-                      )}
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={stopWork}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <StopCircle className="h-4 w-4" />
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <TimeTracker />
           <Button
             variant="outline"
             onClick={() => setShowingReport(true)}
@@ -407,4 +270,3 @@ const Profile = () => {
 };
 
 export default Profile;
-

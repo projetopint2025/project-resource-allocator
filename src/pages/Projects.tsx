@@ -31,6 +31,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { ProjectTemplateWizard } from "@/components/project/ProjectTemplateWizard";
 
 const projects = [
   {
@@ -107,16 +108,10 @@ const Projects = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
+  const [selectedOption, setSelectedOption] = useState<'template' | 'import' | 'custom' | null>(null);
+
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
-  }, []);
-
-  const handleAddProjectClick = useCallback(() => {
-    setIsAddProjectPopupOpen(true);
-  }, []);
-
-  const handleClosePopup = useCallback(() => {
-    setIsAddProjectPopupOpen(false);
   }, []);
 
   const filteredProjects = useMemo(() => {
@@ -145,6 +140,21 @@ const Projects = () => {
       console.error("Error formatting date:", error);
       return "Data inválida";
     }
+  };
+
+  const handleAddProjectClick = useCallback(() => {
+    setIsAddProjectPopupOpen(true);
+  }, []);
+
+  const handleClosePopup = useCallback(() => {
+    setIsAddProjectPopupOpen(false);
+    setSelectedOption(null);
+  }, []);
+
+  const handleCreateProject = (data: any) => {
+    console.log('Novo projeto:', data);
+    // Aqui você implementaria a lógica de criação do projeto
+    handleClosePopup();
   };
 
   return (
@@ -279,29 +289,50 @@ const Projects = () => {
       <Dialog.Root open={isAddProjectPopupOpen} onOpenChange={setIsAddProjectPopupOpen}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50" />
-          <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl p-6 w-full max-w-md z-50">
-            <Dialog.Title className="text-lg font-semibold mb-4">Adicionar Projeto</Dialog.Title>
-            <div className="grid gap-4">
-              <Button variant="ghost" className="justify-start" onClick={() => { /* Handle Import */ handleClosePopup(); }}>
-                <File className="h-4 w-4 mr-2" />
-                Importar
-              </Button>
-              <Button variant="ghost" className="justify-start" onClick={() => { /* Handle From Template */ handleClosePopup(); }}>
-                <LayoutDashboard className="h-4 w-4 mr-2" />
-                A partir de um template
-              </Button>
-              <Button variant="ghost" className="justify-start" onClick={() => { /* Handle Custom */ handleClosePopup(); }}>
-                <Edit className="h-4 w-4 mr-2" />
-                Personalizado
-              </Button>
-            </div>
-            <div className="mt-6 flex justify-end">
-              <Dialog.Close asChild>
-                <Button variant="ghost" onClick={handleClosePopup}>
-                  Cancelar
-                </Button>
-              </Dialog.Close>
-            </div>
+          <Dialog.Content className={cn(
+            "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl p-6 z-50",
+            selectedOption === 'template' ? "w-[90vw] max-w-6xl" : "w-full max-w-md"
+          )}>
+            {selectedOption === 'template' ? (
+              <ProjectTemplateWizard onClose={handleClosePopup} onSubmit={handleCreateProject} />
+            ) : (
+              <>
+                <Dialog.Title className="text-lg font-semibold mb-4">Adicionar Projeto</Dialog.Title>
+                <div className="grid gap-4">
+                  <Button
+                    variant="ghost"
+                    className="justify-start"
+                    onClick={() => setSelectedOption('import')}
+                  >
+                    <File className="h-4 w-4 mr-2" />
+                    Importar
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="justify-start"
+                    onClick={() => setSelectedOption('template')}
+                  >
+                    <LayoutDashboard className="h-4 w-4 mr-2" />
+                    A partir de um template
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="justify-start"
+                    onClick={() => setSelectedOption('custom')}
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Personalizado
+                  </Button>
+                </div>
+                <div className="mt-6 flex justify-end">
+                  <Dialog.Close asChild>
+                    <Button variant="ghost" onClick={handleClosePopup}>
+                      Cancelar
+                    </Button>
+                  </Dialog.Close>
+                </div>
+              </>
+            )}
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
