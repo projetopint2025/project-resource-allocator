@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, ChartBar, Calendar, CheckCircle2, FileText, Play, Pause, StopCircle } from "lucide-react";
@@ -388,7 +389,9 @@ const Profile = () => {
                   <div className="grid grid-cols-6 md:grid-cols-12 gap-2">
                     {contribuicao.alocacaoMensal.map((alocacao, index) => (
                       <div key={index} className="text-center">
-                        <p className="text-xs mb-1 text-gray-600">{getMonthName(index)}</p>
+                        <p className="text-xs mb-1 text-gray-600">
+                          {new Date(2024, index).toLocaleDateString('pt-BR', { month: 'short' })}
+                        </p>
                         <p className="text-sm font-medium">{alocacao.toFixed(1)}</p>
                       </div>
                     ))}
@@ -404,3 +407,4 @@ const Profile = () => {
 };
 
 export default Profile;
+
