@@ -16,6 +16,17 @@ export function Timeline({ workPackages, timelineYear, onSelectTask }: TimelineP
     "Jul", "Ago", "Set", "Out", "Nov", "Dez"
   ];
 
+  const getTaskTypeIcon = (type: Task['type']) => {
+    switch (type) {
+      case 'research': return '🔬';
+      case 'development': return '💻';
+      case 'testing': return '🧪';
+      case 'documentation': return '📝';
+      case 'management': return '📊';
+      default: return '⚡';
+    }
+  };
+
   const getTaskPosition = (startDate: string, endDate: string) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -59,22 +70,23 @@ export function Timeline({ workPackages, timelineYear, onSelectTask }: TimelineP
                   if (!position) return null;
                   
                   return (
-                    <div key={task.id} className="relative grid grid-cols-12 gap-4 items-center group hover:bg-gray-50/50 p-2 rounded-lg transition-colors">
+                    <div key={task.id} className="relative grid grid-cols-12 gap-4 items-center group hover:bg-customBlue/5 p-2 rounded-lg transition-colors">
                       <div
-                        className="col-span-3 cursor-pointer text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+                        className="col-span-3 cursor-pointer text-sm font-medium text-gray-700 hover:text-customBlue transition-colors"
                         onClick={() => onSelectTask(task)}
                       >
                         <div className="flex items-center gap-2">
+                          <span className="text-base" role="img" aria-label={task.type}>
+                            {getTaskTypeIcon(task.type)}
+                          </span>
                           <span className="hover:underline line-clamp-1">{task.name}</span>
                           <Badge variant="outline" className={cn(
                             'text-xs whitespace-nowrap',
-                            task.status === 'completed' && 'border-green-500 text-green-700 bg-green-50',
-                            task.status === 'in-progress' && 'border-blue-500 text-blue-700 bg-blue-50',
-                            task.status === 'pending' && 'border-gray-500 text-gray-700 bg-gray-50'
+                            task.status === 'completed' ? 
+                              'border-green-500 text-green-700 bg-green-50' :
+                              'border-customBlue text-customBlue bg-customBlue/5'
                           )}>
-                            {task.status === 'completed' ? 'Concluído' : 
-                             task.status === 'in-progress' ? 'Em Progresso' : 
-                             'Pendente'}
+                            {task.status === 'completed' ? 'Concluído' : 'Em Progresso'}
                           </Badge>
                         </div>
                       </div>
@@ -82,9 +94,9 @@ export function Timeline({ workPackages, timelineYear, onSelectTask }: TimelineP
                         <div
                           className={cn(
                             "absolute h-10 rounded-lg border-2 transition-all duration-200",
-                            task.status === 'completed' && 'bg-green-500/20 border-green-500',
-                            task.status === 'in-progress' && 'bg-blue-500/20 border-blue-500',
-                            task.status === 'pending' && 'bg-gray-500/20 border-gray-500',
+                            task.status === 'completed' ? 
+                              'bg-green-500/20 border-green-500' :
+                              'bg-customBlue/20 border-customBlue',
                             "top-1/2 -translate-y-1/2 shadow-sm"
                           )}
                           style={{

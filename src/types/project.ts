@@ -1,3 +1,6 @@
+
+export type TaskType = 'research' | 'development' | 'testing' | 'documentation' | 'management';
+
 export interface Material {
   id: string;
   name: string;
@@ -15,7 +18,8 @@ export interface Resource {
 export interface Task {
   id: number;
   name: string;
-  status: string;
+  type: TaskType;
+  status: 'pending' | 'completed';
   startDate: string;
   endDate: string;
   description: string;
