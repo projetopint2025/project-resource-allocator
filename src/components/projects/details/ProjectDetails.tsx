@@ -10,7 +10,6 @@ import { ObjectivesTab } from "./tabs/ObjectivesTab";
 import { ProjectTabs } from "../ProjectTabs";
 import { type Project, type Task, type Resource } from "@/types/project";
 import { TaskSidebar } from "./TaskSidebar";
-import { ProjectTimeline } from "@/components";
 
 const mockProject: Project = {
   id: 1,
@@ -99,118 +98,12 @@ const mockProject: Project = {
   ]
 };
 
-const calculateTaskPosition = (startDate: string, endDate: string, year: number) => {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  
-  if (start.getFullYear() !== year || end.getFullYear() !== year) return null;
-  
-  const startMonth = start.getMonth();
-  const endMonth = end.getMonth();
-  const duration = endMonth - startMonth + 1;
-  
-  return {
-    gridColumnStart: startMonth + 1,
-    gridColumnEnd: `span ${duration}`,
-  };
-};
-
 export function ProjectDetails() {
   const navigate = useNavigate();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [allocationYear, setAllocationYear] = useState(2026);
   const [timelineYear, setTimelineYear] = useState(2026);
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState('timeline');
-
-  const itemsPerPage = 2;
-  const pageCount = Math.ceil(mockProject.workPackages.length / itemsPerPage);
-
-  const paginatedWorkPackages = mockProject.workPackages.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const handleAllocationChange = (resourceIndex: number, monthIndex: number, value: string) => {
-    if (!selectedTask) return;
-
-    const updatedTask = {
-      ...selectedTask,
-      resources: selectedTask.resources.map((resource, index) => {
-        if (index === resourceIndex) {
-          const newAllocation = [...resource.allocation];
-          newAllocation[monthIndex] = parseFloat(value);
-          return { ...resource, allocation: newAllocation };
-        }
-        return resource;
-      }),
-    };
-    setSelectedTask(updatedTask);
-  };
-
-  const handleAddMaterial = () => {
-    if (!selectedTask) return;
-
-    const newMaterial = {
-      id: Math.random().toString(36).substring(2, 9),
-      name: '',
-      units: 0,
-      unitPrice: 0,
-    };
-
-    setSelectedTask({
-      ...selectedTask,
-      materials: [...selectedTask.materials, newMaterial],
-    });
-  };
-
-  const handleRemoveMaterial = (materialIndex: number) => {
-    if (!selectedTask) return;
-
-    const updatedMaterials = [...selectedTask.materials];
-    updatedMaterials.splice(materialIndex, 1);
-
-    setSelectedTask({
-      ...selectedTask,
-      materials: updatedMaterials,
-    });
-  };
-
-  const handleMaterialChange = (materialIndex: number, field: string, value: string | number) => {
-    if (!selectedTask) return;
-
-    const updatedMaterials = [...selectedTask.materials];
-    updatedMaterials[materialIndex] = {
-      ...updatedMaterials[materialIndex],
-      [field]: value,
-    };
-
-    setSelectedTask({
-      ...selectedTask,
-      materials: updatedMaterials,
-    });
-  };
-
-  const handleAddResource = (resource: Resource) => {
-    if (!selectedTask) return;
-
-    setSelectedTask({
-      ...selectedTask,
-      resources: [...selectedTask.resources, resource],
-    });
-  };
-
-  const handleRemoveResource = (resourceIndex: number) => {
-    if (!selectedTask) return;
-
-    const updatedResources = [...selectedTask.resources];
-    updatedResources.splice(resourceIndex, 1);
-
-    setSelectedTask({
-      ...selectedTask,
-      resources: updatedResources,
-    });
-  };
 
   const handleMarkTaskCompleted = (taskId: number) => {
     console.log('Tarefa marcada como concluída:', taskId);
@@ -270,13 +163,9 @@ export function ProjectDetails() {
           task={selectedTask}
           open={!!selectedTask}
           onClose={() => setSelectedTask(null)}
-          allocationYear={allocationYear}
-          onAllocationChange={handleAllocationChange}
           onMarkCompleted={handleMarkTaskCompleted}
         />
       )}
     </div>
   );
 }
-
-export default ProjectDetails;
