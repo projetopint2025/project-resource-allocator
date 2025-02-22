@@ -7,10 +7,17 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CalendarDays, Users, Package, Trash2, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { Textarea } from "@/components/ui/textarea";
 
 interface TaskSidebarProps {
   task: Task;
@@ -19,6 +26,13 @@ interface TaskSidebarProps {
   onUpdate: (task: Task) => void;
 }
 
+// Simular lista de recursos disponíveis
+const availableResources = [
+  { id: "1", name: "João Silva", role: "Developer", profile: "Senior" },
+  { id: "2", name: "Maria Santos", role: "Designer", profile: "Mid-level" },
+  { id: "3", name: "Pedro Costa", role: "Analyst", profile: "Junior" },
+];
+
 export function TaskSidebar({
   task: initialTask,
   open,
@@ -26,17 +40,8 @@ export function TaskSidebar({
   onUpdate,
 }: TaskSidebarProps) {
   const [task, setTask] = useState<Task>(initialTask);
-  const [newResource, setNewResource] = useState<Partial<Resource>>({
-    name: "",
-    role: "",
-    profile: "",
-    allocation: Array(12).fill(0)
-  });
-  const [newMaterial, setNewMaterial] = useState<Partial<Material>>({
-    name: "",
-    units: 0,
-    unitPrice: 0
-  });
+  const [editingMaterial, setEditingMaterial] = useState<boolean>(false);
+  const [selectedResource, setSelectedResource] = useState<string>("");
 
   const handleUpdateTask = (updates: Partial<Task>) => {
     const updatedTask = { ...task, ...updates };
@@ -44,33 +49,52 @@ export function TaskSidebar({
     onUpdate(updatedTask);
   };
 
+  const handleAddMaterial = () => {
+    handleUpdateTask({
+      materials: [
+        ...task.materials,
+        { id: Date.now().toString(), name: "", units: 0, unitPrice: 0 }
+      ]
+    });
+  };
+
+  const handleUpdateMaterial = (id: string, updates: Partial<Material>) => {
+    handleUpdateTask({
+      materials: task.materials.map(m => 
+        m.id === id ? { ...m, ...updates } : m
+      )
+    });
+  };
+
+  const handleRemoveMaterial = (id: string) => {
+    handleUpdateTask({
+      materials: task.materials.filter(m => m.id !== id)
+    });
+  };
+
   const handleAddResource = () => {
-    if (newResource.name && newResource.role && newResource.profile) {
-      handleUpdateTask({
-        resources: [...task.resources, newResource as Resource]
-      });
-      setNewResource({ name: "", role: "", profile: "", allocation: Array(12).fill(0) });
+    if (selectedResource) {
+      const resourceToAdd = availableResources.find(r => r.id === selectedResource);
+      if (resourceToAdd) {
+        handleUpdateTask({
+          resources: [
+            ...task.resources,
+            {
+              name: resourceToAdd.name,
+              role: resourceToAdd.role,
+              profile: resourceToAdd.profile,
+              allocation: Array(12).fill(0)
+            }
+          ]
+        });
+        setSelectedResource("");
+      }
     }
   };
 
   const handleRemoveResource = (index: number) => {
     handleUpdateTask({
       resources: task.resources.filter((_, i) => i !== index)
-    });
-  };
-
-  const handleAddMaterial = () => {
-    if (newMaterial.name && newMaterial.units && newMaterial.unitPrice) {
-      handleUpdateTask({
-        materials: [...task.materials, { id: Date.now().toString(), ...newMaterial as Material }]
-      });
-      setNewMaterial({ name: "", units: 0, unitPrice: 0 });
-    }
-  };
-
-  const handleRemoveMaterial = (id: string) => {
-    handleUpdateTask({
-      materials: task.materials.filter(m => m.id !== id)
     });
   };
 
@@ -82,7 +106,7 @@ export function TaskSidebar({
 
   return (
     <Sheet open={open} onOpenChange={onClose}>
-      <SheetContent side="right" className="w-full sm:w-[800px] p-0 overflow-y-auto">
+      <SheetContent side="right" className="w-full lg:w-[1000px] p-0 overflow-y-auto">
         <div className="h-full flex flex-col">
           <div className="border-b p-6 bg-customBlue/5">
             <SheetHeader className="space-y-4">
@@ -134,13 +158,13 @@ export function TaskSidebar({
             </SheetHeader>
           </div>
 
-          <div className="flex-1 p-6 space-y-6">
+          <div className="flex-1 p-6 space-y-8">
             <div className="space-y-2">
               <Label>Descrição</Label>
-              <textarea
+              <Textarea
                 value={task.description}
                 onChange={(e) => handleUpdateTask({ description: e.target.value })}
-                className="w-full min-h-[100px] p-2 text-sm border rounded"
+                className="min-h-[100px]"
               />
             </div>
 
@@ -151,24 +175,18 @@ export function TaskSidebar({
                   <h3 className="text-sm font-medium">Recursos</h3>
                 </div>
                 <div className="flex gap-2">
-                  <Input
-                    placeholder="Nome"
-                    value={newResource.name}
-                    onChange={(e) => setNewResource({ ...newResource, name: e.target.value })}
-                    className="text-sm w-32"
-                  />
-                  <Input
-                    placeholder="Função"
-                    value={newResource.role}
-                    onChange={(e) => setNewResource({ ...newResource, role: e.target.value })}
-                    className="text-sm w-32"
-                  />
-                  <Input
-                    placeholder="Perfil"
-                    value={newResource.profile}
-                    onChange={(e) => setNewResource({ ...newResource, profile: e.target.value })}
-                    className="text-sm w-32"
-                  />
+                  <Select value={selectedResource} onValueChange={setSelectedResource}>
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Selecionar recurso" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableResources.map((resource) => (
+                        <SelectItem key={resource.id} value={resource.id}>
+                          {resource.name} - {resource.role}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <Button size="sm" onClick={handleAddResource}>
                     <Plus className="h-4 w-4" />
                   </Button>
@@ -181,7 +199,7 @@ export function TaskSidebar({
                       <TableHead>Nome</TableHead>
                       <TableHead>Função</TableHead>
                       <TableHead>Perfil</TableHead>
-                      <TableHead>Alocação</TableHead>
+                      <TableHead>Alocação Mensal</TableHead>
                       <TableHead className="w-[50px]"></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -194,7 +212,7 @@ export function TaskSidebar({
                         <TableCell>
                           <div className="flex gap-1">
                             {resource.allocation.map((value, i) => (
-                              <input
+                              <Input
                                 key={i}
                                 type="number"
                                 min="0"
@@ -208,7 +226,7 @@ export function TaskSidebar({
                                   newResources[index] = { ...resource, allocation: newAllocation };
                                   handleUpdateTask({ resources: newResources });
                                 }}
-                                className="w-10 text-xs border rounded p-1"
+                                className="w-10 text-xs"
                               />
                             ))}
                           </div>
@@ -216,7 +234,7 @@ export function TaskSidebar({
                         <TableCell>
                           <Button
                             variant="ghost"
-                            size="sm"
+                            size="icon"
                             onClick={() => handleRemoveResource(index)}
                           >
                             <Trash2 className="h-4 w-4 text-red-500" />
@@ -235,31 +253,10 @@ export function TaskSidebar({
                   <Package className="h-4 w-4 text-customBlue" />
                   <h3 className="text-sm font-medium">Materiais</h3>
                 </div>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Nome"
-                    value={newMaterial.name}
-                    onChange={(e) => setNewMaterial({ ...newMaterial, name: e.target.value })}
-                    className="text-sm w-32"
-                  />
-                  <Input
-                    placeholder="Unidades"
-                    type="number"
-                    value={newMaterial.units}
-                    onChange={(e) => setNewMaterial({ ...newMaterial, units: Number(e.target.value) })}
-                    className="text-sm w-24"
-                  />
-                  <Input
-                    placeholder="Preço Unit."
-                    type="number"
-                    value={newMaterial.unitPrice}
-                    onChange={(e) => setNewMaterial({ ...newMaterial, unitPrice: Number(e.target.value) })}
-                    className="text-sm w-24"
-                  />
-                  <Button size="sm" onClick={handleAddMaterial}>
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
+                <Button size="sm" onClick={handleAddMaterial}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Adicionar Material
+                </Button>
               </div>
               <Card>
                 <Table>
@@ -275,18 +272,39 @@ export function TaskSidebar({
                   <TableBody>
                     {task.materials?.map((material) => (
                       <TableRow key={material.id}>
-                        <TableCell className="font-medium">{material.name}</TableCell>
-                        <TableCell className="text-right">{material.units}</TableCell>
-                        <TableCell className="text-right">
-                          {material.unitPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'EUR' })}
+                        <TableCell>
+                          <Input
+                            value={material.name}
+                            onChange={(e) => handleUpdateMaterial(material.id, { name: e.target.value })}
+                            className="border-none p-0 h-8"
+                          />
                         </TableCell>
                         <TableCell className="text-right">
-                          {(material.units * material.unitPrice).toLocaleString('pt-BR', { style: 'currency', currency: 'EUR' })}
+                          <Input
+                            type="number"
+                            value={material.units}
+                            onChange={(e) => handleUpdateMaterial(material.id, { units: Number(e.target.value) })}
+                            className="border-none p-0 h-8 text-right w-20 ml-auto"
+                          />
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Input
+                            type="number"
+                            value={material.unitPrice}
+                            onChange={(e) => handleUpdateMaterial(material.id, { unitPrice: Number(e.target.value) })}
+                            className="border-none p-0 h-8 text-right w-24 ml-auto"
+                          />
+                        </TableCell>
+                        <TableCell className="text-right font-medium">
+                          {(material.units * material.unitPrice).toLocaleString('pt-BR', { 
+                            style: 'currency', 
+                            currency: 'EUR' 
+                          })}
                         </TableCell>
                         <TableCell>
                           <Button
                             variant="ghost"
-                            size="sm"
+                            size="icon"
                             onClick={() => handleRemoveMaterial(material.id)}
                           >
                             <Trash2 className="h-4 w-4 text-red-500" />
@@ -297,7 +315,10 @@ export function TaskSidebar({
                     <TableRow>
                       <TableCell colSpan={3} className="text-right font-medium">Total</TableCell>
                       <TableCell className="text-right font-medium">
-                        {getTotalMaterialsCost().toLocaleString('pt-BR', { style: 'currency', currency: 'EUR' })}
+                        {getTotalMaterialsCost().toLocaleString('pt-BR', { 
+                          style: 'currency', 
+                          currency: 'EUR' 
+                        })}
                       </TableCell>
                       <TableCell />
                     </TableRow>

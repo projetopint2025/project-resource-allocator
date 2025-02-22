@@ -16,17 +16,6 @@ export function Timeline({ workPackages, timelineYear, onSelectTask }: TimelineP
     "Jul", "Ago", "Set", "Out", "Nov", "Dez"
   ];
 
-  const getTaskTypeIcon = (type: Task['type']) => {
-    switch (type) {
-      case 'research': return '🔬';
-      case 'development': return '💻';
-      case 'testing': return '🧪';
-      case 'documentation': return '📝';
-      case 'management': return '📊';
-      default: return '⚡';
-    }
-  };
-
   const getTaskPosition = (startDate: string, endDate: string) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -76,9 +65,6 @@ export function Timeline({ workPackages, timelineYear, onSelectTask }: TimelineP
                         onClick={() => onSelectTask(task)}
                       >
                         <div className="flex items-center gap-2">
-                          <span className="text-base" role="img" aria-label={task.type}>
-                            {getTaskTypeIcon(task.type)}
-                          </span>
                           <span className="hover:underline line-clamp-1">{task.name}</span>
                           <Badge variant="outline" className={cn(
                             'text-xs whitespace-nowrap',
