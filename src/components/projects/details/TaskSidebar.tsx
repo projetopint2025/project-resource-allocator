@@ -4,17 +4,14 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { CalendarDays, Check } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { CalendarDays, Users, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ResourcesSection } from "./sections/ResourcesSection";
-import { MaterialsSection } from "./sections/MaterialsSection";
 
 interface TaskSidebarProps {
   task: Task;
   open: boolean;
   onClose: () => void;
-  allocationYear: number;
-  onAllocationChange: (resourceIndex: number, monthIndex: number, value: string) => void;
   onMarkCompleted: (taskId: number) => void;
 }
 
@@ -22,8 +19,6 @@ export function TaskSidebar({
   task,
   open,
   onClose,
-  allocationYear,
-  onAllocationChange,
   onMarkCompleted,
 }: TaskSidebarProps) {
   return (
@@ -65,22 +60,48 @@ export function TaskSidebar({
           </div>
 
           <div className="flex-1 p-6 space-y-6">
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium text-gray-500">Fundamentação</h3>
-              <Card className="p-4">
-                <p className="text-sm text-gray-700">{task.rationale}</p>
+            {task.description && (
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium text-gray-500">Descrição</h3>
+                <p className="text-sm text-gray-700">{task.description}</p>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-gray-500" />
+                <h3 className="text-sm font-medium text-gray-500">Recursos</h3>
+              </div>
+              <Card>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Função</TableHead>
+                      <TableHead>Perfil</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {task.resources?.map((resource) => (
+                      <TableRow key={resource.name}>
+                        <TableCell className="font-medium">{resource.name}</TableCell>
+                        <TableCell>{resource.role}</TableCell>
+                        <TableCell>{resource.profile}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </Card>
             </div>
 
-            <ResourcesSection
-              resources={task.resources}
-              allocationYear={allocationYear}
-              onAllocationChange={onAllocationChange}
-            />
-
-            <MaterialsSection
-              materials={task.materials}
-            />
+            {task.rationale && (
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium text-gray-500">Fundamentação</h3>
+                <Card className="p-4">
+                  <p className="text-sm text-gray-700">{task.rationale}</p>
+                </Card>
+              </div>
+            )}
           </div>
         </div>
       </SheetContent>

@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
@@ -6,7 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppSidebar } from "./components/AppSidebar";
 import Index from "./pages/Index";
 import Projects from "./pages/Projects";
-import { ProjectDetails } from "./components/project/ProjectDetails";
+import { ProjectDetails } from "./components/projects/details/ProjectDetails";
 import Users from "./pages/Users";
 import Validations from "./pages/Validations";
 import Profile from "./pages/Profile";
