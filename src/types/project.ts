@@ -1,4 +1,3 @@
-
 export interface Material {
   id: string;
   name: string;
@@ -16,8 +15,11 @@ export interface Resource {
 export interface Task {
   id: number;
   name: string;
+  status: string;
   startDate: string;
   endDate: string;
+  description: string;
+  assignedTo: string;
   rationale: string;
   resources: Resource[];
   materials: Material[];
@@ -33,11 +35,9 @@ export interface Project {
   id: number;
   name: string;
   description: string;
-  budget: number;
-  totalSpent: number;
-  pacotesDeTrabalho: WorkPackage[];
-  totalPacotesDeTrabalho: number;
-  completedPacotesDeTrabalho: number;
-  totalTasks: number;
-  completedTasks: number;
+  status: string;
+  progress: number;
+  startDate: string;
+  endDate: string;
+  workPackages: WorkPackage[];
 }

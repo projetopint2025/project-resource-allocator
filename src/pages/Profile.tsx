@@ -71,6 +71,11 @@ const Profile = () => {
   const [showingReport, setShowingReport] = useState(false);
   const [allocations, setAllocations] = useState(mockUserStats.detalhesAlocacao);
 
+  const generateReport = () => {
+    // Implementar lógica para gerar relatório
+    setShowingReport(true);
+  };
+
   if (showingReport) {
     let totalAlocacao = 0;
 
@@ -84,34 +89,32 @@ const Profile = () => {
     };
 
     return (
-      <div className="space-y-8 p-8 animate-fade-in">
+      <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold">Relatório de Alocação</h1>
+            <h2 className="text-2xl font-bold">Relatório de Horas</h2>
             <p className="text-muted-foreground">Detalhes de alocação por workpackage e tarefa</p>
           </div>
-          <Button
-            variant="outline"
-            onClick={() => setShowingReport(false)}
-            className="gap-2"
-          >
-            <ChartBar className="h-4 w-4" />
+          <Button variant="outline" onClick={() => setShowingReport(false)}>
+            <ChartBar className="h-4 w-4 mr-2" />
             Voltar ao Perfil
           </Button>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Detalhes de Alocação</CardTitle>
+            <CardTitle>Alocação de Horas por Projeto</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Projeto</TableHead>
-                  <TableHead>Pacote de Trabalho</TableHead>
-                  <TableHead>Tarefa</TableHead>
-                  <TableHead className="text-right">Alocação</TableHead>
+                  <TableHead>Projeto/Work Package/Tarefa</TableHead>
+                  <TableHead>Jan</TableHead>
+                  <TableHead>Fev</TableHead>
+                  <TableHead>Mar</TableHead>
+                  {/* Continue for all months */}
+                  <TableHead>Total</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -166,7 +169,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="space-y-8 p-8 animate-fade-in">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Perfil</h1>
@@ -176,7 +179,7 @@ const Profile = () => {
           <TimeTracker />
           <Button
             variant="outline"
-            onClick={() => setShowingReport(true)}
+            onClick={generateReport}
             className="gap-2"
           >
             <FileText className="h-4 w-4" />

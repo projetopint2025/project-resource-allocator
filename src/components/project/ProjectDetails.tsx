@@ -1,18 +1,28 @@
-
 import { useState } from "react";
-import { Project, Task, Resource } from "@/types/project";
-import { ProjectHeader } from "@/components/project/ProjectHeader";
-import { ProjectStats } from "@/components/project/ProjectStats";
-import { ProjectTimeline } from "@/components/project/ProjectTimeline";
-import { TaskDetailsSidebar } from "@/components/project/TaskDetailsSidebar";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import {
+  TimelineTab,
+  KPIsTab,
+  MetricsTab,
+  ObjectivesTab,
+  ProjectTimeline,
+  TaskDetailsSidebar,
+  ProjectHeader,
+  ProjectTabs
+} from "@/components";
+import { type Project, type Task, type Resource } from "@/types/project";
 
 const mockProject: Project = {
   id: 1,
   name: "INOVC+",
   description: "Sistema de gestão de inovação para empresas tecnológicas",
-  budget: 50000, // Added budget
-  totalSpent: 25000, // Added total spent
-  pacotesDeTrabalho: [
+  status: "in-progress",
+  progress: 45,
+  startDate: "2026-01-01",
+  endDate: "2026-12-31",
+  workPackages: [
     {
       id: 1,
       name: "WP1 - Análise de Requisitos",
@@ -20,8 +30,11 @@ const mockProject: Project = {
         {
           id: 1,
           name: "Levantamento de requisitos",
+          status: "completed",
           startDate: "2026-01-01",
           endDate: "2026-01-15",
+          description: "Identificar as necessidades dos stakeholders",
+          assignedTo: "João Silva",
           rationale: "Identificar as necessidades dos stakeholders e definir os aspetos fundamentais do projeto",
           resources: [
             {
@@ -42,8 +55,11 @@ const mockProject: Project = {
         {
           id: 2,
           name: "Validação com stakeholders",
+          status: "in-progress",
           startDate: "2026-01-16",
           endDate: "2026-01-31",
+          description: "Validar requisitos com stakeholders",
+          assignedTo: "Maria Santos",
           rationale: "Garantir que os requisitos levantados atendem às necessidades do negócio",
           resources: [
             {
@@ -64,8 +80,11 @@ const mockProject: Project = {
         {
           id: 3,
           name: "Implementação do backend",
+          status: "pending",
           startDate: "2026-02-01",
           endDate: "2026-03-15",
+          description: "Desenvolver a API e serviços necessários",
+          assignedTo: "Pedro Costa",
           rationale: "Desenvolver a API e serviços necessários",
           resources: [
             {
@@ -76,95 +95,40 @@ const mockProject: Project = {
             }
           ],
           materials: []
-        },
-        {
-          id: 4,
-          name: "Desenvolvimento da UI",
-          startDate: "2026-02-15",
-          endDate: "2026-04-01",
-          rationale: "Implementar a interface do usuário seguindo o design system",
-          resources: [
-            {
-              name: "Ana Oliveira",
-              role: "Desenvolvedora Frontend",
-              profile: "Pleno",
-              allocation: [0, 0, 0.8, 1, 1, 0, 0, 0, 0, 0, 0, 0]
-            }
-          ],
-          materials: []
-        }
-      ]
-    },
-    {
-      id: 3,
-      name: "WP3 - Testes",
-      tasks: [
-        {
-          id: 5,
-          name: "Testes unitários",
-          startDate: "2026-03-15",
-          endDate: "2026-03-31",
-          rationale: "Garantir a qualidade do código",
-          resources: [],
-          materials: []
-        },
-        {
-          id: 6,
-          name: "Testes de integração",
-          startDate: "2026-04-01",
-          endDate: "2026-04-15",
-          rationale: "Garantir a integração dos módulos",
-          resources: [],
-          materials: []
-        },
-        {
-          id: 7,
-          name: "Testes de sistema",
-          startDate: "2026-04-16",
-          endDate: "2026-04-30",
-          rationale: "Garantir o funcionamento do sistema",
-          resources: [],
-          materials: []
-        },
-        {
-          id: 8,
-          name: "Testes de aceitação",
-          startDate: "2026-05-01",
-          endDate: "2026-05-15",
-          rationale: "Obter a aprovação do cliente",
-          resources: [],
-          materials: []
         }
       ]
     }
-  ],
-  totalPacotesDeTrabalho: 3, // Added total work packages
-  completedPacotesDeTrabalho: 1, // Added completed work packages
-  totalTasks: 8, // Added total tasks
-  completedTasks: 2, // Added completed tasks
+  ]
 };
 
-const itemsPerPage = 2;
+const calculateTaskPosition = (startDate: string, endDate: string, year: number) => {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  
+  if (start.getFullYear() !== year || end.getFullYear() !== year) return null;
+  
+  const startMonth = start.getMonth();
+  const endMonth = end.getMonth();
+  const duration = endMonth - startMonth + 1;
+  
+  return {
+    gridColumnStart: startMonth + 1,
+    gridColumnEnd: `span ${duration}`,
+  };
+};
 
-const ProjectDetails = () => {
+export function ProjectDetails() {
+  const navigate = useNavigate();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [allocationYear, setAllocationYear] = useState(2026);
   const [timelineYear, setTimelineYear] = useState(2026);
   const [currentPage, setCurrentPage] = useState(1);
-  const [timelineCurrentPage, setTimelineCurrentPage] = useState(1);
+  const [activeTab, setActiveTab] = useState('timeline');
 
-  const pageCount = Math.ceil(mockProject.pacotesDeTrabalho.length / itemsPerPage);
-  const timelinePageCount = Math.ceil(mockProject.pacotesDeTrabalho.length / itemsPerPage);
+  const itemsPerPage = 2;
+  const pageCount = Math.ceil(mockProject.workPackages.length / itemsPerPage);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handleTimelinePageChange = (page: number) => {
-    setTimelineCurrentPage(page);
-  };
-
-  const paginatedWorkPackages = mockProject.pacotesDeTrabalho.slice(
+  const paginatedWorkPackages = mockProject.workPackages.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -255,37 +219,82 @@ const ProjectDetails = () => {
     console.log('Tarefa marcada como concluída:', taskId);
   };
 
-  const workPackagesProgress = (mockProject.completedPacotesDeTrabalho / mockProject.totalPacotesDeTrabalho) * 100;
-  const tasksProgress = (mockProject.completedTasks / mockProject.totalTasks) * 100;
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'timeline':
+        return (
+          <TimelineTab>
+            <div className="p-4">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">Cronograma</h2>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setTimelineYear(2025)}
+                    className={timelineYear === 2025 ? 'bg-primary text-primary-foreground' : ''}
+                  >
+                    2025
+                  </Button>
+                  <Button
+                    variant={timelineYear === 2026 ? 'default' : 'outline'}
+                    onClick={() => setTimelineYear(2026)}
+                  >
+                    2026
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setTimelineYear(2027)}
+                    className={timelineYear === 2027 ? 'bg-primary text-primary-foreground' : ''}
+                  >
+                    2027
+                  </Button>
+                </div>
+              </div>
+              <ProjectTimeline
+                workPackages={mockProject.workPackages}
+                timelineYear={timelineYear}
+                setTimelineYear={setTimelineYear}
+                onSelectTask={setSelectedTask}
+                currentPage={currentPage}
+                pageCount={pageCount}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          </TimelineTab>
+        );
+      case 'kpis':
+        return <KPIsTab project={mockProject} />;
+      case 'metrics':
+        return <MetricsTab project={mockProject} />;
+      case 'objectives':
+        return <ObjectivesTab project={mockProject} />;
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 animate-fade-in">
-      <ProjectHeader
-        name={mockProject.name}
-        description={mockProject.description}
-      />
-
-      <div className="px-8 py-6">
-        <ProjectStats
-          workPackagesProgress={workPackagesProgress}
-          tasksProgress={tasksProgress}
-          completedWorkPackages={mockProject.completedPacotesDeTrabalho}
-          totalWorkPackages={mockProject.totalPacotesDeTrabalho}
-          completedTasks={mockProject.completedTasks}
-          totalTasks={mockProject.totalTasks}
-          budget={mockProject.budget}
-          totalSpent={mockProject.totalSpent}
+    <div className="space-y-4">
+      <div className="flex items-center gap-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate(-1)}
+          className="hover:bg-gray-100"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <ProjectHeader
+          name={mockProject.name}
+          description={mockProject.description}
         />
+      </div>
 
-        <ProjectTimeline
-          workPackages={paginatedWorkPackages}
-          timelineYear={timelineYear}
-          setTimelineYear={setTimelineYear}
-          onSelectTask={setSelectedTask}
-          currentPage={currentPage}
-          pageCount={pageCount}
-          onPageChange={handlePageChange}
-        />
+      <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+        <ProjectTabs activeTab={activeTab} onTabChange={setActiveTab} />
+        <div>
+          {renderTabContent()}
+        </div>
       </div>
 
       {selectedTask && (
@@ -304,6 +313,7 @@ const ProjectDetails = () => {
       )}
     </div>
   );
-};
+}
 
 export default ProjectDetails;
+

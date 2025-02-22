@@ -1,8 +1,7 @@
-
-import { X, Trash, Plus, Check, ChevronDown } from "lucide-react";
+import { type Task, type Resource } from "@/types/project";
+import { X, Trash, Plus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Task, Resource } from "@/types/project";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +25,7 @@ const availableResources = [
   { name: "Maria Costa", role: "Product Owner", profile: "Senior" },
 ];
 
-export const TaskDetailsSidebar = ({
+export function TaskDetailsSidebar({
   task,
   onClose,
   allocationYear,
@@ -37,7 +36,7 @@ export const TaskDetailsSidebar = ({
   onMarkCompleted,
   onAddResource,
   onRemoveResource,
-}: TaskDetailsSidebarProps) => {
+}: TaskDetailsSidebarProps) {
   const getMonthName = (monthIndex: number) => {
     return new Date(allocationYear, monthIndex).toLocaleDateString('pt-BR', { month: 'short' });
   };
@@ -63,7 +62,9 @@ export const TaskDetailsSidebar = ({
           <div>
             <h2 className="text-lg font-semibold text-customBlue">{task.name}</h2>
             <Badge variant="outline" className="mt-2">
-              Em Progresso
+              {task.status === 'completed' ? 'Concluído' : 
+               task.status === 'in-progress' ? 'Em Progresso' : 
+               'Pendente'}
             </Badge>
           </div>
           <div className="flex gap-2">
@@ -253,4 +254,4 @@ export const TaskDetailsSidebar = ({
       </div>
     </div>
   );
-};
+}
