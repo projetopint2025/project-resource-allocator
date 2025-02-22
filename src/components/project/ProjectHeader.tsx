@@ -1,4 +1,6 @@
-// Remove all imports and start with the interface
+
+import React from 'react';
+
 interface ProjectHeaderProps {
   name: string;
   description: string;
@@ -6,9 +8,9 @@ interface ProjectHeaderProps {
 
 export function ProjectHeader({ name, description }: ProjectHeaderProps) {
   return (
-    <div>
-      <h1 className="text-2xl font-semibold text-gray-900">{name}</h1>
-      <p className="text-sm text-gray-500 mt-1">{description}</p>
+    <div className="space-y-1">
+      <h1 className="text-2xl font-bold tracking-tight">{name}</h1>
+      <p className="text-sm text-muted-foreground">{description}</p>
     </div>
   );
 }

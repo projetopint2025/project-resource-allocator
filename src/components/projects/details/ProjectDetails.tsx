@@ -1,14 +1,15 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { ProjectHeader } from "@/components";
+import { ProjectHeader } from "@/components/project/ProjectHeader";
 import { TimelineTab } from "./tabs/TimelineTab";
 import { KPIsTab } from "./tabs/KPIsTab";
 import { MetricsTab } from "./tabs/MetricsTab";
 import { ObjectivesTab } from "./tabs/ObjectivesTab";
 import { ProjectTabs } from "../ProjectTabs";
-import { type Project, type Task, type Resource } from "@/types/project";
+import { type Project, type Task } from "@/types/project";
 import { TaskSidebar } from "./TaskSidebar";
 
 const mockProject: Project = {
