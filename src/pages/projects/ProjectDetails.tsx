@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ const mockProject: Project = {
   id: 1,
   name: "INOVC+",
   description: "Sistema de gestão de inovação para empresas tecnológicas",
-  status: "in-progress",
+  status: "pending",
   progress: 45,
   startDate: "2026-01-01",
   endDate: "2026-12-31",
@@ -27,6 +28,7 @@ const mockProject: Project = {
         {
           id: 1,
           name: "Levantamento de requisitos",
+          type: "research",
           status: "completed",
           startDate: "2026-01-01",
           endDate: "2026-01-15",
@@ -52,7 +54,8 @@ const mockProject: Project = {
         {
           id: 2,
           name: "Validação com stakeholders",
-          status: "in-progress",
+          type: "management",
+          status: "pending",
           startDate: "2026-01-16",
           endDate: "2026-01-31",
           description: "Validar requisitos com stakeholders",
@@ -77,6 +80,7 @@ const mockProject: Project = {
         {
           id: 3,
           name: "Implementação do backend",
+          type: "development",
           status: "pending",
           startDate: "2026-02-01",
           endDate: "2026-03-15",
@@ -105,33 +109,9 @@ export function ProjectDetails() {
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState('timeline');
 
-  const handleMarkTaskCompleted = (taskId: number) => {
-    console.log('Tarefa marcada como concluída:', taskId);
-  };
-
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'timeline':
-        return (
-          <TimelineTab
-            project={mockProject}
-            timelineYear={timelineYear}
-            setTimelineYear={setTimelineYear}
-            onSelectTask={setSelectedTask}
-            currentPage={currentPage}
-            pageCount={Math.ceil(mockProject.workPackages.length / 2)}
-            onPageChange={setCurrentPage}
-          />
-        );
-      case 'kpis':
-        return <KPIsTab project={mockProject} />;
-      case 'metrics':
-        return <MetricsTab project={mockProject} />;
-      case 'objectives':
-        return <ObjectivesTab project={mockProject} />;
-      default:
-        return null;
-    }
+  const handleUpdateTask = (updatedTask: Task) => {
+    console.log('Task updated:', updatedTask);
+    // Aqui você implementaria a lógica para atualizar a tarefa no estado global
   };
 
   return (
@@ -154,7 +134,20 @@ export function ProjectDetails() {
       <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
         <ProjectTabs activeTab={activeTab} onTabChange={setActiveTab} />
         <div>
-          {renderTabContent()}
+          {activeTab === 'timeline' && (
+            <TimelineTab
+              project={mockProject}
+              timelineYear={timelineYear}
+              setTimelineYear={setTimelineYear}
+              onSelectTask={setSelectedTask}
+              currentPage={currentPage}
+              pageCount={Math.ceil(mockProject.workPackages.length / 2)}
+              onPageChange={setCurrentPage}
+            />
+          )}
+          {activeTab === 'kpis' && <KPIsTab project={mockProject} />}
+          {activeTab === 'metrics' && <MetricsTab project={mockProject} />}
+          {activeTab === 'objectives' && <ObjectivesTab project={mockProject} />}
         </div>
       </div>
 
@@ -163,7 +156,7 @@ export function ProjectDetails() {
           task={selectedTask}
           open={!!selectedTask}
           onClose={() => setSelectedTask(null)}
-          onMarkCompleted={handleMarkTaskCompleted}
+          onUpdate={handleUpdateTask}
         />
       )}
     </div>

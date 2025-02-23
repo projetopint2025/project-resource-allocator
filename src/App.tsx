@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppSidebar } from "./components/AppSidebar";
 import Index from "./pages/Index";
 import Projects from "./pages/projects/Projects";
-import { ProjectDetails } from "./components/projects/projects/details/ProjectDetails";
+import { ProjectDetails } from "./pages/projects/ProjectDetails";
 import Users from "./pages/Users";
 import Validations from "./pages/Validations";
 import Profile from "./pages/Profile";
