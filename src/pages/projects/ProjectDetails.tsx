@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,9 @@ import { ObjectivesTab } from "./tabs/ObjectivesTab";
 import { ProjectTabs } from "@/components/projects/ProjectTabs";
 import { type Project, type Task } from "@/types/project";
 import { TaskSidebar } from "./TaskSidebar";
+import { ProjectProgress } from "@/components/projects/stats/ProjectProgress";
+import { ProjectBudget } from "@/components/projects/stats/ProjectBudget";
+import { ProjectResources } from "@/components/projects/stats/ProjectResources";
 
 const mockProject: Project = {
   id: 1,
@@ -111,11 +113,10 @@ export function ProjectDetails() {
 
   const handleUpdateTask = (updatedTask: Task) => {
     console.log('Task updated:', updatedTask);
-    // Aqui você implementaria a lógica para atualizar a tarefa no estado global
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Button
           variant="ghost"
@@ -128,6 +129,24 @@ export function ProjectDetails() {
         <ProjectHeader
           name={mockProject.name}
           description={mockProject.description}
+        />
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        <ProjectProgress 
+          workpackagesCount={2} 
+          totalWorkpackages={3}
+          tasksCount={2}
+          totalTasks={8}
+        />
+        <ProjectBudget 
+          total={50000}
+          spent={25000}
+          remaining={25000}
+        />
+        <ProjectResources 
+          allocated={5}
+          available={2}
         />
       </div>
 
