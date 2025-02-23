@@ -31,7 +31,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ProjectTemplateWizard } from "@/components/project/ProjectTemplateWizard";
+import { ProjectTemplateWizard } from "@/components/projects/creation/useProjectTemplate";
 
 const projects = [
   {
