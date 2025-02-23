@@ -1,7 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, ChartBar, Calendar, CheckCircle2, FileText, Play, Pause, StopCircle } from "lucide-react";
+import { 
+  User, Activity, Target, Calendar, FileText, 
+  ChevronRight, LineChart 
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -12,8 +16,9 @@ import {
   TableFooter,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { TimeTracker } from "@/components/TimeTracker";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
 
 const mockUserStats = {
   nome: "Vasco Fernandes",
@@ -67,14 +72,9 @@ const mockUserStats = {
   ]
 };
 
-const Profile = () => {
+export default function Profile() {
   const [showingReport, setShowingReport] = useState(false);
   const [allocations, setAllocations] = useState(mockUserStats.detalhesAlocacao);
-
-  const generateReport = () => {
-    // Implementar lógica para gerar relatório
-    setShowingReport(true);
-  };
 
   if (showingReport) {
     let totalAlocacao = 0;
@@ -172,104 +172,170 @@ const Profile = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Perfil</h1>
-          <p className="text-muted-foreground">Consulte as suas informações e contribuições</p>
+          <h1 className="text-2xl font-bold">Perfil</h1>
+          <p className="text-muted-foreground">Gerencie suas informações e atividades</p>
         </div>
         <div className="flex gap-4">
           <TimeTracker />
-          <Button
-            variant="outline"
-            onClick={generateReport}
-            className="gap-2"
-          >
+          <Button variant="outline" onClick={() => setShowingReport()} className="gap-2">
             <FileText className="h-4 w-4" />
             Gerar Relatório
           </Button>
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-full">
-                <User className="w-6 h-6 text-blue-600" />
-              </div>
+      <div className="grid grid-cols-12 gap-6">
+        {/* Perfil Card */}
+        <Card className="col-span-12 md:col-span-4">
+          <CardContent className="pt-6">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <Avatar className="h-24 w-24">
+                <AvatarImage src="/placeholder.svg" />
+                <AvatarFallback>VF</AvatarFallback>
+              </Avatar>
               <div>
-                <p className="text-sm text-muted-foreground">Projetos Ativos</p>
-                <p className="text-2xl font-semibold">{mockUserStats.projetos}</p>
+                <h2 className="text-xl font-semibold">{mockUserStats.nome}</h2>
+                <p className="text-sm text-muted-foreground">{mockUserStats.cargo}</p>
+              </div>
+              <div className="w-full pt-4 border-t">
+                <div className="grid grid-cols-3 gap-4 py-4">
+                  <div>
+                    <p className="text-2xl font-bold">{mockUserStats.projetos}</p>
+                    <p className="text-xs text-muted-foreground">Projetos</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">{mockUserStats.horasAlocadas}</p>
+                    <p className="text-xs text-muted-foreground">Horas</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">{mockUserStats.tarefasConcluidas}</p>
+                    <p className="text-xs text-muted-foreground">Tarefas</p>
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 rounded-full">
-                <Calendar className="w-6 h-6 text-green-600" />
+        {/* Projetos Ativos */}
+        <div className="col-span-12 md:col-span-8 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Projetos Ativos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {mockUserStats.contribuicoes.map((projeto, index) => (
+                  <div key={index} className="group relative">
+                    <div className="flex items-start justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-medium">{projeto.projeto}</h3>
+                          <Badge variant="outline">{projeto.papel}</Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {projeto.horas} horas alocadas
+                        </p>
+                        <div className="mt-2">
+                          <Progress value={67} className="h-2" />
+                        </div>
+                      </div>
+                      <Button variant="ghost" size="icon">
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Horas Alocadas</p>
-                <p className="text-2xl font-semibold">{mockUserStats.horasAlocadas}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-100 rounded-full">
-                <CheckCircle2 className="w-6 h-6 text-purple-600" />
+          {/* Performance Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Performance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Activity className="h-4 w-4 text-blue-500" />
+                      <span className="text-sm font-medium">Produtividade</span>
+                    </div>
+                    <span className="text-sm">85%</span>
+                  </div>
+                  <Progress value={85} className="h-2" />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Target className="h-4 w-4 text-green-500" />
+                      <span className="text-sm font-medium">Metas Atingidas</span>
+                    </div>
+                    <span className="text-sm">92%</span>
+                  </div>
+                  <Progress value={92} className="h-2" />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <LineChart className="h-4 w-4 text-purple-500" />
+                      <span className="text-sm font-medium">Eficiência</span>
+                    </div>
+                    <span className="text-sm">78%</span>
+                  </div>
+                  <Progress value={78} className="h-2" />
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Tarefas Concluídas</p>
-                <p className="text-2xl font-semibold">{mockUserStats.tarefasConcluidas}</p>
-              </div>
-            </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Últimas Atividades */}
+        <Card className="col-span-12">
+          <CardHeader>
+            <CardTitle>Últimas Atividades</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Projeto</TableHead>
+                  <TableHead>Atividade</TableHead>
+                  <TableHead>Data</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Tempo</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell>INOVC+</TableCell>
+                  <TableCell>Revisão de código</TableCell>
+                  <TableCell>Hoje</TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">
+                      Concluído
+                    </Badge>
+                  </TableCell>
+                  <TableCell>2h 30min</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>DreamFAB</TableCell>
+                  <TableCell>Análise de requisitos</TableCell>
+                  <TableCell>Ontem</TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300">
+                      Em progresso
+                    </Badge>
+                  </TableCell>
+                  <TableCell>4h 15min</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Contribuições em Projetos</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            {mockUserStats.contribuicoes.map((contribuicao) => (
-              <div key={contribuicao.projeto} className="space-y-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div>
-                    <h3 className="font-medium">{contribuicao.projeto}</h3>
-                    <p className="text-sm text-muted-foreground">{contribuicao.papel}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-semibold">{contribuicao.horas}</p>
-                    <p className="text-sm text-muted-foreground">horas</p>
-                  </div>
-                </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-sm font-medium mb-3">Alocação Mensal</p>
-                  <div className="grid grid-cols-6 md:grid-cols-12 gap-2">
-                    {contribuicao.alocacaoMensal.map((alocacao, index) => (
-                      <div key={index} className="text-center">
-                        <p className="text-xs mb-1 text-gray-600">
-                          {new Date(2024, index).toLocaleDateString('pt-BR', { month: 'short' })}
-                        </p>
-                        <p className="text-sm font-medium">{alocacao.toFixed(1)}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
-};
-
-export default Profile;
+}
