@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   User, Activity, Target, Calendar, FileText, 
-  ChevronRight, LineChart 
+  ChevronRight, LineChart, ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -96,7 +96,7 @@ export default function Profile() {
             <p className="text-muted-foreground">Detalhes de alocação por workpackage e tarefa</p>
           </div>
           <Button variant="outline" onClick={() => setShowingReport(false)}>
-            <ChartBar className="h-4 w-4 mr-2" />
+            <ArrowLeft className="h-4 w-4 mr-2" />
             Voltar ao Perfil
           </Button>
         </div>

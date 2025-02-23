@@ -1,26 +1,17 @@
-import { useState, useEffect } from 'react';
-import { getProjects, getProjectById } from '@/lib/api/projects';
-import type { Project } from '@/types/project';
+
+import { useQuery } from "@tanstack/react-query";
+import { getProject, getProjects } from "@/lib/api/projects";
 
 export function useProjects() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  return useQuery({
+    queryKey: ['projects'],
+    queryFn: getProjects,
+  });
+}
 
-  useEffect(() => {
-    async function loadProjects() {
-      try {
-        const data = await getProjects();
-        setProjects(data);
-      } catch (err) {
-        setError(err as Error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadProjects();
-  }, []);
-
-  return { projects, loading, error };
-} 
+export function useProject(id: number) {
+  return useQuery({
+    queryKey: ['project', id],
+    queryFn: () => getProject(id),
+  });
+}
