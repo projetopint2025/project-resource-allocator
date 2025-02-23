@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Search, Plus, Users as UsersIcon, UserCheck, UserCog, Activity } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import UserGrid from "@/components/ui/UserGrid";
+import UserGrid from "@/components/users/UserGrid";
 
 interface User {
   id: number;

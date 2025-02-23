@@ -3,16 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { ProjectHeader } from "@/components/projects/ProjectHeader";
-import { TimelineTab } from "./tabs/TimelineTab";
 import { KPIsTab } from "./tabs/KPIsTab";
 import { MetricsTab } from "./tabs/MetricsTab";
 import { ObjectivesTab } from "./tabs/ObjectivesTab";
-import { ProjectTabs } from "@/components/projects/ProjectTabs";
 import { type Project, type Task } from "@/types/project";
-import { TaskSidebar } from "./TaskSidebar";
-import { ProjectProgress } from "@/components/projects/stats/ProjectProgress";
-import { ProjectBudget } from "@/components/projects/stats/ProjectBudget";
-import { ProjectResources } from "@/components/projects/stats/ProjectResources";
+import { TaskSidebar } from "@/components/projects/tasks/TaskSidebar";
+import { Timeline } from "@/components/projects/Timeline";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"; // Usando os componentes de Tabs do Shadcn
+import { Progress } from "@/components/ui/progress";
 
 const mockProject: Project = {
   id: 1,
@@ -42,16 +45,16 @@ const mockProject: Project = {
               name: "João Silva",
               role: "Investigador Científico",
               profile: "Senior",
-              allocation: [0.8, 0.8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+              allocation: [0.8, 0.8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             },
             {
               name: "Maria Santos",
               role: "Product Owner",
               profile: "Senior",
-              allocation: [0.5, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            }
+              allocation: [0.5, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            },
           ],
-          materials: []
+          materials: [],
         },
         {
           id: 2,
@@ -68,12 +71,12 @@ const mockProject: Project = {
               name: "João Silva",
               role: "Investigador Científico",
               profile: "Senior",
-              allocation: [0, 0.8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            }
+              allocation: [0, 0.8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            },
           ],
-          materials: []
-        }
-      ]
+          materials: [],
+        },
+      ],
     },
     {
       id: 2,
@@ -94,80 +97,126 @@ const mockProject: Project = {
               name: "Pedro Costa",
               role: "Desenvolvedor Backend",
               profile: "Senior",
-              allocation: [0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]
-            }
+              allocation: [0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+            },
           ],
-          materials: []
-        }
-      ]
-    }
-  ]
+          materials: [],
+        },
+      ],
+    },
+  ],
 };
 
 export function ProjectDetails() {
   const navigate = useNavigate();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [timelineYear, setTimelineYear] = useState(2026);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [activeTab, setActiveTab] = useState('timeline');
+  const [activeTab, setActiveTab] = useState("timeline");
 
   const handleUpdateTask = (updatedTask: Task) => {
-    console.log('Task updated:', updatedTask);
+    console.log("Task updated:", updatedTask);
   };
 
+  // Sugestão: Adicionar uma seção de progresso geral do projeto no topo da Timeline para um resumo visual
+  const projectProgress = mockProject.progress;
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate(-1)}
-          className="hover:bg-gray-100"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <ProjectHeader
-          name={mockProject.name}
-          description={mockProject.description}
-        />
-      </div>
-
-      <div className="grid grid-cols-3 gap-4">
-        <ProjectProgress 
-          workpackagesCount={2} 
-          totalWorkpackages={3}
-          tasksCount={2}
-          totalTasks={8}
-        />
-        <ProjectBudget 
-          total={50000}
-          spent={25000}
-          remaining={25000}
-        />
-        <ProjectResources 
-          allocated={5}
-          available={2}
-        />
-      </div>
-
-      <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
-        <ProjectTabs activeTab={activeTab} onTabChange={setActiveTab} />
-        <div>
-          {activeTab === 'timeline' && (
-            <TimelineTab
-              project={mockProject}
-              timelineYear={timelineYear}
-              setTimelineYear={setTimelineYear}
-              onSelectTask={setSelectedTask}
-              currentPage={currentPage}
-              pageCount={Math.ceil(mockProject.workPackages.length / 2)}
-              onPageChange={setCurrentPage}
-            />
-          )}
-          {activeTab === 'kpis' && <KPIsTab project={mockProject} />}
-          {activeTab === 'metrics' && <MetricsTab project={mockProject} />}
-          {activeTab === 'objectives' && <ObjectivesTab project={mockProject} />}
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-8">
+      <div className="max-w-8xl mx-auto space-y-12">
+        {/* Header com Breadcrumbs */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(-1)}
+              className="rounded-full hover:bg-gray-100 shadow-sm"
+            >
+              <ArrowLeft className="h-5 w-5 text-gray-600" />
+            </Button>
+            <div className="space-y-2">
+              <h1 className="text-4xl font-bold text-gray-900 tracking-tight">{mockProject.name}</h1>
+              <p className="text-lg text-gray-500 line-clamp-2">{mockProject.description}</p>
+            </div>
+          </div>
+          <div className="flex gap-4">
+            <Button
+              variant="outline"
+              className="rounded-full border-gray-200 text-gray-600 hover:bg-gray-100 shadow-sm"
+            >
+              Ações
+            </Button>
+            <Button
+              variant="default"
+              className="rounded-full bg-customBlue hover:bg-customBlue/90 text-white shadow-md px-6"
+            >
+              Exportar Relatório
+            </Button>
+          </div>
         </div>
+
+        {/* Tabs para Navegação com Progresso Geral */}
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="border-b border-gray-100"
+        >
+          <div className="bg-white rounded-t-2xl shadow-md overflow-hidden">
+            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+              <TabsList className="inline-flex space-x-4">
+                <TabsTrigger
+                  value="timeline"
+                  className="px-4 py-2 text-sm font-medium text-gray-600 data-[state=active]:text-customBlue data-[state=active]:border-b-2 data-[state=active]:border-customBlue hover:text-gray-900 transition-colors"
+                >
+                  Linha do Tempo
+                </TabsTrigger>
+                <TabsTrigger
+                  value="kpis"
+                  className="px-4 py-2 text-sm font-medium text-gray-600 data-[state=active]:text-customBlue data-[state=active]:border-b-2 data-[state=active]:border-customBlue hover:text-gray-900 transition-colors"
+                >
+                  KPIs
+                </TabsTrigger>
+                <TabsTrigger
+                  value="metrics"
+                  className="px-4 py-2 text-sm font-medium text-gray-600 data-[state=active]:text-customBlue data-[state=active]:border-b-2 data-[state=active]:border-customBlue hover:text-gray-900 transition-colors"
+                >
+                  Métricas
+                </TabsTrigger>
+                <TabsTrigger
+                  value="objectives"
+                  className="px-4 py-2 text-sm font-medium text-gray-600 data-[state=active]:text-customBlue data-[state=active]:border-b-2 data-[state=active]:border-customBlue hover:text-gray-900 transition-colors"
+                >
+                  Objetivos
+                </TabsTrigger>
+              </TabsList>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-gray-600">Progresso Geral:</span>
+                <div className="w-24">
+                  <Progress value={projectProgress} className="h-2 bg-gray-200 rounded-full" />
+                </div>
+                <span className="text-sm font-medium text-gray-600">{projectProgress}%</span>
+              </div>
+            </div>
+
+            {/* Conteúdo das Tabs */}
+            <TabsContent value="timeline" className="p-6 bg-white rounded-b-2xl shadow-md">
+              <Timeline
+                workPackages={mockProject.workPackages}
+                timelineYear={timelineYear}
+                onSelectTask={setSelectedTask}
+              />
+            </TabsContent>
+            <TabsContent value="kpis" className="p-6 bg-white rounded-b-2xl shadow-md">
+              <KPIsTab project={mockProject} />
+            </TabsContent>
+            <TabsContent value="metrics" className="p-6 bg-white rounded-b-2xl shadow-md">
+              <MetricsTab project={mockProject} />
+            </TabsContent>
+            <TabsContent value="objectives" className="p-6 bg-white rounded-b-2xl shadow-md">
+              <ObjectivesTab project={mockProject} />
+            </TabsContent>
+          </div>
+        </Tabs>
       </div>
 
       {selectedTask && (

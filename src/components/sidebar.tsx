@@ -106,7 +106,7 @@ export const AppSidebar = () => {
         )}
       >
         {/* Logo and Toggle Section */}
-        <div className="flex items-center p-4 border-b border-gray-100 justify-center">
+        <div className="flex items-center mt-5 p-4 border-b border-gray-100 justify-center">
           {!collapsed && (
             <img
               src="/lovable-uploads/28745dc3-1b1b-490b-8612-41cb26f8c61d.png"
@@ -117,7 +117,7 @@ export const AppSidebar = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-6 space-y-4">
+        <nav className="flex-1 px-3 py-6 space-y-4 pt-8">
           <div className="space-y-2">
             {menuItems.map((item) => (
               <MenuItem key={item.href} item={item} />
