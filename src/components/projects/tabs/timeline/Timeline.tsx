@@ -1,4 +1,3 @@
-
 import { type WorkPackage, type Task } from "@/types/project";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -43,9 +42,9 @@ export function Timeline({ workPackages, timelineYear, onSelectTask }: TimelineP
           ))}
         </div>
 
-        <div className="space-y-12">
+        <div className="space-y-6">
           {workPackages.map((wp) => (
-            <div key={wp.id} className="space-y-6">
+            <div key={wp.id} className="space-y-2">
               <div className="flex items-center gap-3">
                 <h3 className="font-semibold text-lg text-gray-900">{wp.name}</h3>
                 <Badge variant="outline" className="text-xs">
@@ -53,13 +52,13 @@ export function Timeline({ workPackages, timelineYear, onSelectTask }: TimelineP
                 </Badge>
                 <div className="h-[1px] flex-1 bg-gray-200"></div>
               </div>
-              <div className="space-y-6">
+              <div className="space-y-1">
                 {wp.tasks.map((task) => {
                   const position = getTaskPosition(task.startDate, task.endDate);
                   if (!position) return null;
                   
                   return (
-                    <div key={task.id} className="relative grid grid-cols-12 gap-4 items-center group hover:bg-customBlue/5 p-2 rounded-lg transition-colors">
+                    <div key={task.id} className="relative grid grid-cols-12 gap-4 items-center group hover:bg-customBlue/5 py-0.5 rounded-lg transition-colors">
                       <div
                         className="col-span-3 cursor-pointer text-sm font-medium text-gray-700 hover:text-customBlue transition-colors"
                         onClick={() => onSelectTask(task)}
@@ -76,10 +75,10 @@ export function Timeline({ workPackages, timelineYear, onSelectTask }: TimelineP
                           </Badge>
                         </div>
                       </div>
-                      <div className="col-span-9 relative h-16">
+                      <div className="col-span-9 relative h-12">
                         <div
                           className={cn(
-                            "absolute h-10 rounded-lg border-2 transition-all duration-200",
+                            "absolute h-8 rounded-lg border-2 transition-all duration-200",
                             task.status === 'completed' ? 
                               'bg-green-500/20 border-green-500' :
                               'bg-customBlue/20 border-customBlue',
