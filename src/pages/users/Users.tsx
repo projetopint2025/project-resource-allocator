@@ -113,7 +113,7 @@ const Users = () => {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
-            placeholder="Buscar utilizadores..."
+            placeholder="Procurar utilizadores..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9 bg-gray-50/50 border-gray-100"

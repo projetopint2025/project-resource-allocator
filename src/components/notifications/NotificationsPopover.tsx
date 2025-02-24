@@ -21,7 +21,7 @@ const mockNotifications = [
   {
     id: 2,
     title: "Validação pendente",
-    description: "O relatório final do projeto DreamFAB aguarda sua validação",
+    description: "O relatório final do projeto DreamFAB aguarda a sua validação",
     type: "validation",
     read: true,
     date: "2024-03-14T15:30:00",

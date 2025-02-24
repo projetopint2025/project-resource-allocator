@@ -98,7 +98,7 @@ export default function Validations() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
-            placeholder="Buscar validações..."
+            placeholder="Procurar validações..."
             className="pl-9 bg-gray-50/50 border-gray-100"
           />
         </div>

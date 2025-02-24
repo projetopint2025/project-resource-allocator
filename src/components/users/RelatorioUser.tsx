@@ -89,27 +89,25 @@ export function RelatorioUser({ year, onYearChange, data }: RelatorioUserProps) 
       return;
     }
 
-    const numValue = parseInt(value, 10);
+    const numValue = parseFloat(value);
 
     if (isNaN(numValue)) {
       toast({
         title: "Entrada inválida",
-        description: "Por favor, insira um número entre 0 e 10.",
+        description: "Por favor, insira um número válido entre 0 e 1.",
         variant: "destructive",
       });
       return;
     }
 
-    if (numValue < 0 || numValue > 10) {
+    if (numValue < 0 || numValue > 1.0) {
       toast({
         title: "Entrada inválida",
-        description: "Por favor, insira um número entre 0 e 10.",
+        description: "Por favor, insira um número válido entre 0 e 1.0.",
         variant: "destructive",
       });
       return;
     }
-
-    const newValue = numValue / 10;
 
     setAllocations((prev) =>
       prev.map((wp, i) =>
@@ -121,7 +119,7 @@ export function RelatorioUser({ year, onYearChange, data }: RelatorioUserProps) 
                   ? {
                       ...task,
                       allocations: task.allocations.map((alloc, k) =>
-                        k === monthIndex ? newValue : alloc
+                        k === monthIndex ? numValue : alloc
                       ),
                     }
                   : task
@@ -225,17 +223,15 @@ export function RelatorioUser({ year, onYearChange, data }: RelatorioUserProps) 
                   <TableRow key={task.id} className="hover:bg-gray-50">
                     <TableCell className="pl-6 text-gray-600">{task.name}</TableCell>
                     {task.allocations.map((allocation, monthIndex) => (
-                      <TableCell key={monthIndex} className="text-right">
-                        <Input
-                          type="number"
-                          value={(allocation * 10).toFixed(0)}
-                          onChange={(e) => handleAllocationChange(wpIndex, taskIndex, monthIndex, e.target.value)}
-                          className="w-16 text-right text-gray-900 border border-gray-200 rounded-md focus:ring-customBlue/50"
-                          placeholder="0"
-                          min="0"
-                          max="10"
-                        />
-                      </TableCell>
+<TableCell key={monthIndex} className="text-right">
+  <Input
+    type="number"
+    value={allocation === 0 ? "" : allocation.toFixed(1)}
+    onChange={(e) => handleAllocationChange(wpIndex, taskIndex, monthIndex, e.target.value)}
+    className="w-16 text-right text-gray-900 border border-gray-200 rounded-md focus:ring-customBlue/50 shadow-sm"
+    placeholder="0.0"
+  />
+</TableCell>
                     ))}
                   </TableRow>
                 ))}
@@ -259,20 +255,20 @@ export function RelatorioUser({ year, onYearChange, data }: RelatorioUserProps) 
                 );
               })}
             </TableRow>
-            <TableRow>
-              <TableCell className="text-gray-700 font-medium">Total Definido</TableCell>
-              {months.map((_, monthIndex) => (
-                <TableCell key={monthIndex} className="text-right">
-                  <Input
-                    type="number"
-                    value={targetTotals[monthIndex]}
-                    onChange={(e) => handleTargetTotalChange(monthIndex, e.target.value)}
-                    className="w-16 text-right text-gray-900 border border-gray-200 rounded-md font-medium focus:ring-customBlue/50"
-                    placeholder="0"
-                  />
-                </TableCell>
-              ))}
-            </TableRow>
+<TableRow>
+  <TableCell className="text-gray-700 font-medium">Total Definido</TableCell>
+  {months.map((_, monthIndex) => (
+    <TableCell key={monthIndex} className="text-right">
+      <Input
+        type="number"
+        value={targetTotals[monthIndex]}
+        onChange={(e) => handleTargetTotalChange(monthIndex, e.target.value)}
+        className="w-16 text-right text-gray-900 border border-gray-200 rounded-md font-medium focus:ring-customBlue/50 shadow-sm"
+        placeholder="0"
+      />
+    </TableCell>
+  ))}
+</TableRow>
             <TableRow className="bg-gray-50">
               <TableCell className="text-gray-700 font-medium">Total Alocado</TableCell>
               {months.map((_, monthIndex) => (
