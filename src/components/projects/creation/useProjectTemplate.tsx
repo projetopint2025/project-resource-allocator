@@ -28,6 +28,15 @@ import {
   ListTodo,
   Users,
 } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Trash2 } from "lucide-react";
 
 interface WorkPackage {
   id: string;
@@ -42,6 +51,11 @@ interface Task {
   hasDeliverable: boolean;
   deliverableDescription?: string;
   resources: string[];
+  allocations?: {
+    [resourceName: string]: {
+      [monthIndex: number]: number;
+    };
+  };
 }
 
 const fundingTemplates = [
@@ -647,6 +661,35 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
       default:
         return null;
     }
+  };
+
+  const handleAllocationChange = (wpId: string, taskId: string, resourceIndex: number, monthIndex: number, value: string) => {
+    const numValue = parseFloat(value);
+    if (isNaN(numValue) || numValue < 0 || numValue > 1) return;
+  
+    setWorkPackages(prev =>
+      prev.map(wp =>
+        wp.id === wpId
+          ? {
+              ...wp,
+              tasks: wp.tasks.map(task =>
+                task.id === taskId
+                  ? {
+                      ...task,
+                      allocations: {
+                        ...task.allocations,
+                        [task.resources[resourceIndex]]: {
+                          ...(task.allocations?.[task.resources[resourceIndex]] || {}),
+                          [monthIndex]: numValue
+                        }
+                      }
+                    }
+                  : task
+              )
+            }
+          : wp
+      )
+    );
   };
 
   return (

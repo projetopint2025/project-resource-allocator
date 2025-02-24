@@ -27,6 +27,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ProjectTemplateWizard } from "@/components/projects/creation/useProjectTemplate";
+import { NewProjectButton } from "@/components/projects/NewProjectButton";
 
 const projects = [
   { id: 1, name: "INOVC+", status: "Em desenvolvimento", progress: 65, deadline: "2024-04-25", team: ["João Silva", "Maria Santos"] },
@@ -96,19 +97,12 @@ const Projects = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-8">
       <div className="max-w-8xl mx-auto space-y-8">
-        {/* Page Header */}
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <h1 className="text-3xl font-bold text-gray-900">Projetos</h1>
             <p className="text-sm text-gray-500">Consulte os seus projetos e acompanhe o progresso</p>
           </div>
-          <Button
-            onClick={handleAddProjectClick}
-            className="rounded-full bg-customBlue hover:bg-customBlue/90 text-white px-6 shadow-md"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Adicionar Projeto
-          </Button>
+          <NewProjectButton />
         </div>
 
         {/* Filters and Search */}
