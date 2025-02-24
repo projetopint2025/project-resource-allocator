@@ -81,6 +81,12 @@ interface ProjectTemplateWizardProps {
   onSubmit: (data: any) => void;
 }
 
+interface ResourceAllocation {
+  name: string;
+  role: string;
+  allocation: number[];
+}
+
 export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWizardProps) {
   const [step, setStep] = useState(1);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
@@ -92,6 +98,8 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
     budget: "",
   });
   const [workPackages, setWorkPackages] = useState<WorkPackage[]>([]);
+  const [selectedResource, setSelectedResource] = useState("");
+  const [selectedYear, setSelectedYear] = useState(2024);
 
   const addWorkPackage = () => {
     setWorkPackages([
@@ -171,18 +179,15 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
     );
   };
 
+  const years = Array.from({ length: 5 }, (_, i) => 2024 + i);
+  const months = [
+    'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
+    'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
+  ];
+
   const handleNext = () => {
     if (step === 1 && !selectedTemplate) return;
     if (step === 4) {
-      const allTasksHaveResources = workPackages.every((wp) =>
-        wp.tasks.every((task) => task.resources.length > 0)
-      );
-
-      if (!allTasksHaveResources) {
-        alert("Todas as tarefas devem ter pelo menos um recurso atribuído.");
-        return;
-      }
-
       onSubmit({
         ...formData,
         template: selectedTemplate,
@@ -201,48 +206,46 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
     setStep(step - 1);
   };
 
-  const handleAddResource = (wpId: string, taskId: string, resource: string) => {
-    setWorkPackages((prev) =>
-      prev.map((wp) =>
+  const addResourceToTask = (wpId: string, taskId: string) => {
+    if (!selectedResource) return;
+    
+    const resource = availableResources.find(r => r === selectedResource);
+    if (!resource) return;
+
+    setWorkPackages(prev =>
+      prev.map(wp =>
         wp.id === wpId
           ? {
               ...wp,
-              tasks: wp.tasks.map((task) =>
+              tasks: wp.tasks.map(task =>
                 task.id === taskId
                   ? {
                       ...task,
-                      resources: [...task.resources, resource],
+                      resources: [...task.resources, resource]
                     }
                   : task
-              ),
+              )
             }
           : wp
       )
     );
+    setSelectedResource("");
   };
 
-  const handleAllocationChange = (
-    wpId: string,
-    taskId: string,
-    resourceIndex: number,
-    monthIndex: number,
-    value: string
-  ) => {
-    setWorkPackages((prev) =>
-      prev.map((wp) =>
+  const removeResourceFromTask = (wpId: string, taskId: string, resourceName: string) => {
+    setWorkPackages(prev =>
+      prev.map(wp =>
         wp.id === wpId
           ? {
               ...wp,
-              tasks: wp.tasks.map((task) =>
+              tasks: wp.tasks.map(task =>
                 task.id === taskId
                   ? {
                       ...task,
-                      resources: task.resources.map((resource, index) =>
-                        index === resourceIndex ? resource : resource
-                      ),
+                      resources: task.resources.filter(r => r !== resourceName)
                     }
                   : task
-              ),
+              )
             }
           : wp
       )
@@ -504,71 +507,145 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
       case 4:
         return (
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900">Atribuição de Recursos</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Recursos e Alocação</h3>
             {workPackages.map((wp) => (
-              <Card
-                key={wp.id}
-                className="border border-gray-200 shadow-md rounded-xl hover:shadow-lg transition-shadow"
-              >
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-gray-900">
-                    {wp.name}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6 space-y-6">
+              <Card key={wp.id} className="border border-gray-200 shadow-md rounded-xl">
+                <div className="p-6 space-y-6">
+                  <h4 className="font-semibold text-gray-900">{wp.name}</h4>
+                  
                   {wp.tasks.map((task) => (
                     <div key={task.id} className="space-y-4">
-                      <Label className="flex items-center gap-2 text-sm font-medium text-gray-900">
-                        <ListTodo className="w-4 h-4 text-customBlue" />
-                        {task.name}
-                      </Label>
-                      <Select
-                        value={task.resources.join(",")}
-                        onValueChange={(value) =>
-                          updateTask(
-                            wp.id,
-                            task.id,
-                            "resources",
-                            value.split(",").filter(Boolean)
-                          )
-                        }
-                      >
-                        <SelectTrigger className="border border-gray-200 rounded-md text-gray-700 focus:ring-customBlue/50">
-                          <SelectValue placeholder="Selecione os recursos..." />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-md border-gray-200">
-                          {availableResources.map((resource) => (
-                            <SelectItem
-                              key={resource}
-                              value={resource}
-                              className="text-gray-700 hover:bg-gray-50"
-                            >
-                              {resource}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <div className="flex items-center justify-between">
+                        <h5 className="text-sm font-medium text-gray-700">{task.name}</h5>
+                        <div className="flex items-center gap-2">
+                          <Select
+                            value={selectedResource}
+                            onValueChange={setSelectedResource}
+                          >
+                            <SelectTrigger className="w-[280px]">
+                              <SelectValue placeholder="Selecionar recurso" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {availableResources
+                                .filter(r => !task.resources.includes(r))
+                                .map((resource) => (
+                                  <SelectItem key={resource} value={resource}>
+                                    {resource}
+                                  </SelectItem>
+                                ))}
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => addResourceToTask(wp.id, task.id)}
+                            className="gap-2"
+                          >
+                            <Plus className="h-4 w-4" />
+                            Adicionar
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Resources List */}
                       {task.resources.length > 0 && (
-                        <div className="flex gap-2 flex-wrap">
-                          {task.resources.map((resource) => (
-                            <Badge
-                              key={resource}
-                              variant="outline"
-                              className="bg-customBlue/10 text-customBlue border-customBlue/30 rounded-md text-sm"
+                        <Card className="border-gray-100">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Nome</TableHead>
+                                <TableHead className="w-[100px]"></TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {task.resources.map((resource) => (
+                                <TableRow key={resource}>
+                                  <TableCell>{resource}</TableCell>
+                                  <TableCell>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => removeResourceFromTask(wp.id, task.id, resource)}
+                                      className="text-red-500 hover:text-red-600"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </Card>
+                      )}
+
+                      {/* Resource Allocation */}
+                      {task.resources.length > 0 && (
+                        <div className="space-y-6 pt-4">
+                          <div className="flex items-center justify-between">
+                            <h6 className="text-sm font-medium text-gray-700">Alocação Mensal</h6>
+                            <Select
+                              value={selectedYear.toString()}
+                              onValueChange={(value) => setSelectedYear(Number(value))}
                             >
-                              <Users className="w-3 h-3 mr-1" />
-                              {resource}
-                            </Badge>
+                              <SelectTrigger className="w-[120px]">
+                                <SelectValue placeholder="Ano" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {years.map((year) => (
+                                  <SelectItem key={year} value={year.toString()}>
+                                    {year}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {task.resources.map((resource, resourceIndex) => (
+                            <div key={resource} className="space-y-2 bg-gray-50/50 p-4 rounded-lg">
+                              <p className="text-sm font-medium text-gray-700">{resource}</p>
+                              <div className="grid grid-cols-6 gap-4">
+                                {months.slice(0, 6).map((month, monthIndex) => (
+                                  <div key={monthIndex} className="space-y-1">
+                                    <Label className="text-xs text-gray-500">{month}</Label>
+                                    <Input
+                                      type="number"
+                                      min="0"
+                                      max="1"
+                                      step="0.1"
+                                      className="text-right h-8 text-sm"
+                                      onChange={(e) => handleAllocationChange(wp.id, task.id, resourceIndex, monthIndex, e.target.value)}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                              <div className="grid grid-cols-6 gap-4">
+                                {months.slice(6).map((month, monthIndex) => (
+                                  <div key={monthIndex} className="space-y-1">
+                                    <Label className="text-xs text-gray-500">{month}</Label>
+                                    <Input
+                                      type="number"
+                                      min="0"
+                                      max="1"
+                                      step="0.1"
+                                      className="text-right h-8 text-sm"
+                                      onChange={(e) => handleAllocationChange(wp.id, task.id, resourceIndex, monthIndex + 6, e.target.value)}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
                           ))}
                         </div>
                       )}
                     </div>
                   ))}
-                </CardContent>
+                </div>
               </Card>
             ))}
           </div>
         );
+      default:
+        return null;
     }
   };
 
@@ -579,13 +656,13 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
           {step === 1 && "Tipo de Financiamento"}
           {step === 2 && "Informações Básicas"}
           {step === 3 && "Estrutura do Projeto"}
-          {step === 4 && "Atribuição de Recursos"}
+          {step === 4 && "Recursos e Alocação"}
         </CardTitle>
         <CardDescription className="text-sm text-gray-600">
           {step === 1 && "Selecione o tipo de financiamento do projeto"}
           {step === 2 && "Preencha as informações básicas do projeto"}
           {step === 3 && "Defina os pacotes de trabalho e tarefas"}
-          {step === 4 && "Atribua recursos às tarefas"}
+          {step === 4 && "Atribua recursos às tarefas e defina suas alocações"}
         </CardDescription>
       </CardHeader>
       <CardContent className="p-6 space-y-8">
