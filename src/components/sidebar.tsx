@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import {
   Home,
@@ -16,13 +15,14 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 
+// Menu items for main navigation
 const menuItems = [
   { icon: Home, label: "Início", href: "/" },
   { icon: FolderKanban, label: "Projetos", href: "/projects" },
-  { icon: FileBarChart2, label: "Relatórios", href: "/reports" },
   { icon: Users, label: "Utilizadores", href: "/users" },
 ];
 
+// Management section items
 const managementItems = [
   { icon: Settings, label: "Validações", href: "/validations" },
 ];
@@ -34,6 +34,7 @@ export const AppSidebar = () => {
 
   const toggleCollapse = () => setCollapsed(!collapsed);
 
+  // Click outside handler to collapse sidebar
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
@@ -45,23 +46,24 @@ export const AppSidebar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [sidebarRef, collapsed]);
 
+  // Reusable menu item component
   const MenuItem = ({ item, className = "" }) => (
     <Link
       to={item.href}
       className={cn(
-        "flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-200 group",
+        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 group",
         "text-gray-500 hover:text-gray-900",
-        location.pathname === item.href && "text-customBlue",
+        location.pathname === item.href && "text-customBlue bg-blue-50",
         className
       )}
     >
       <div className={cn(
-        "w-12 h-12 flex items-center justify-center rounded-lg transition-all duration-200",
+        "p-2 rounded-lg transition-all duration-200",
         location.pathname === item.href 
           ? "bg-customBlue text-white" 
-          : "text-gray-500 group-hover:bg-customBlue group-hover:text-white"
+          : "bg-gray-50 text-gray-500 group-hover:bg-customBlue group-hover:text-white"
       )}>
-        <item.icon size={20} />
+        <item.icon size={18} />
       </div>
       <span className={cn(
         "transition-all duration-200",
@@ -73,15 +75,16 @@ export const AppSidebar = () => {
   );
 
   return (
-    <div className="fixed top-0 left-0 h-screen z-50">
+    <div className="relative h-screen">
       <div
         ref={sidebarRef}
         className={cn(
-          "h-full bg-white shadow-lg transition-all duration-200 flex flex-col",
-          collapsed ? "w-[5rem]" : "w-64"
+          "h-screen bg-white shadow-lg transition-all duration-200 flex flex-col",
+          collapsed ? "w-[4.5rem]" : "w-64"
         )}
       >
-        <div className="h-32 flex items-center justify-center px-4">
+        {/* Logo Section */}
+        <div className="flex items-center justify-center h-16 px-4 mt-5">
           {!collapsed && (
             <img
               src="/lovable-uploads/28745dc3-1b1b-490b-8612-41cb26f8c61d.png"
@@ -91,17 +94,20 @@ export const AppSidebar = () => {
           )}
         </div>
 
-        <div className="flex-1 px-3 space-y-6">
+        {/* Main Navigation Content */}
+        <ScrollArea className="flex-1 px-3 py-4 mt-5">
           <nav className="space-y-6">
+            {/* Main Menu Items */}
             <div className="space-y-2">
               {menuItems.map((item) => (
                 <MenuItem key={item.href} item={item} />
               ))}
             </div>
 
+            {/* Management Section */}
             <div className="space-y-2">
               {!collapsed && (
-                <p className="px-3 mb-2 text-xs font-medium text-gray-400 uppercase tracking-wider">
+                <p className="px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">
                   Gestão
                 </p>
               )}
@@ -110,9 +116,11 @@ export const AppSidebar = () => {
               ))}
             </div>
           </nav>
-        </div>
+        </ScrollArea>
 
+        {/* Footer Section with Collapse Button and Profile */}
         <div className="p-3 border-t border-gray-100">
+          {/* Collapse Toggle Button */}
           <Button
             variant="ghost"
             size="sm"
@@ -129,6 +137,7 @@ export const AppSidebar = () => {
             )}
           </Button>
 
+          {/* Profile Section */}
           <Link
             to="/profile"
             className={cn(
@@ -156,4 +165,4 @@ export const AppSidebar = () => {
       </div>
     </div>
   );
-}
+};

@@ -17,10 +17,12 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <div className="flex min-h-screen bg-background text-foreground">
-        <BrowserRouter>
-          <AppSidebar />
-          <main className="flex-1 overflow-y-auto"> {/* Adicionado overflow-y-auto */}
+      <BrowserRouter>
+        <div className="flex h-screen w-full overflow-hidden bg-background text-foreground">
+          <div className="h-full flex-shrink-0">
+            <AppSidebar />
+          </div>
+          <main className="flex-1 overflow-y-auto relative">
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/projects" element={<Projects />} />
@@ -31,8 +33,8 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
-        </BrowserRouter>
-      </div>
+        </div>
+      </BrowserRouter>
       <Toaster />
       <Sonner />
     </TooltipProvider>
