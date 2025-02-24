@@ -49,19 +49,19 @@ export const AppSidebar = () => {
     <Link
       to={item.href}
       className={cn(
-        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 group",
+        "flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-200 group",
         "text-gray-500 hover:text-gray-900",
-        location.pathname === item.href && "text-customBlue bg-blue-50",
+        location.pathname === item.href && "text-customBlue",
         className
       )}
     >
       <div className={cn(
-        "p-2 rounded-lg transition-all duration-200",
+        "w-12 h-12 flex items-center justify-center rounded-lg transition-all duration-200",
         location.pathname === item.href 
           ? "bg-customBlue text-white" 
-          : "bg-gray-50 text-gray-500 group-hover:bg-customBlue group-hover:text-white"
+          : "text-gray-500 group-hover:bg-customBlue group-hover:text-white"
       )}>
-        <item.icon size={18} />
+        <item.icon size={20} />
       </div>
       <span className={cn(
         "transition-all duration-200",
@@ -73,15 +73,15 @@ export const AppSidebar = () => {
   );
 
   return (
-    <div className="relative h-screen">
+    <div className="fixed top-0 left-0 h-screen z-50">
       <div
         ref={sidebarRef}
         className={cn(
-          "h-screen bg-white shadow-lg transition-all duration-200 flex flex-col",
-          collapsed ? "w-[4.5rem]" : "w-64"
+          "h-full bg-white shadow-lg transition-all duration-200 flex flex-col",
+          collapsed ? "w-[5rem]" : "w-64"
         )}
       >
-        <div className="flex items-center justify-center h-16 px-4">
+        <div className="h-32 flex items-center justify-center px-4">
           {!collapsed && (
             <img
               src="/lovable-uploads/28745dc3-1b1b-490b-8612-41cb26f8c61d.png"
@@ -91,7 +91,7 @@ export const AppSidebar = () => {
           )}
         </div>
 
-        <ScrollArea className="flex-1 px-3 py-4">
+        <div className="flex-1 px-3 space-y-6">
           <nav className="space-y-6">
             <div className="space-y-2">
               {menuItems.map((item) => (
@@ -101,7 +101,7 @@ export const AppSidebar = () => {
 
             <div className="space-y-2">
               {!collapsed && (
-                <p className="px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">
+                <p className="px-3 mb-2 text-xs font-medium text-gray-400 uppercase tracking-wider">
                   Gestão
                 </p>
               )}
@@ -110,7 +110,7 @@ export const AppSidebar = () => {
               ))}
             </div>
           </nav>
-        </ScrollArea>
+        </div>
 
         <div className="p-3 border-t border-gray-100">
           <Button
@@ -156,4 +156,4 @@ export const AppSidebar = () => {
       </div>
     </div>
   );
-};
+}

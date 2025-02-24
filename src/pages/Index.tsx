@@ -1,5 +1,7 @@
+
 import { NewProjectButton } from "@/components/projects/NewProjectButton";
 import { NotificationsPopover } from "@/components/notifications/NotificationsPopover";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 export default function Index() {
   return (
