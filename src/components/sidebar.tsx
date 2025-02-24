@@ -49,7 +49,7 @@ export const AppSidebar = () => {
     <Link
       to={item.href}
       className={cn(
-        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 group",
         "text-gray-500 hover:text-gray-900",
         location.pathname === item.href && "text-customBlue bg-blue-50",
         className
@@ -57,8 +57,9 @@ export const AppSidebar = () => {
     >
       <div className={cn(
         "p-2 rounded-lg transition-all duration-200",
-        "group-hover:bg-customBlue group-hover:text-white",
-        location.pathname === item.href ? "bg-customBlue text-white" : "bg-gray-50"
+        location.pathname === item.href 
+          ? "bg-customBlue text-white" 
+          : "bg-gray-50 text-gray-500 group-hover:bg-customBlue group-hover:text-white"
       )}>
         <item.icon size={18} />
       </div>

@@ -1,257 +1,153 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Search, Filter, Clock, CheckCircle2, AlertCircle } from "lucide-react";
 import {
   Table,
-  TableHeader,
   TableBody,
-  TableHead,
-  TableRow,
   TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Check, X, Search } from "lucide-react";
-import { cn } from "@/lib/utils";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
-import { toast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom";
-import { Input } from "@/components/ui/input";
 
-interface Validation {
-  id: number;
-  project: string;
-  requester: string;
-  status: "Pendente" | "Aprovado" | "Rejeitado";
-  date: string;
-}
-
-const mockValidations: Validation[] = [
+const mockValidations = [
   {
     id: 1,
+    title: "Validação de Relatório Final",
     project: "INOVC+",
-    requester: "João Silva",
-    status: "Pendente",
-    date: "2024-04-25",
+    requestedBy: "João Silva",
+    date: "2024-03-15",
+    status: "pending",
+    type: "report",
   },
   {
     id: 2,
+    title: "Aprovação de Orçamento",
     project: "DreamFAB",
-    requester: "Maria Santos",
-    status: "Aprovado",
-    date: "2024-04-20",
+    requestedBy: "Maria Santos",
+    date: "2024-03-14",
+    status: "approved",
+    type: "budget",
   },
   {
     id: 3,
+    title: "Validação de Milestone",
     project: "IAMFat",
-    requester: "Pedro Costa",
-    status: "Rejeitado",
-    date: "2024-04-18",
+    requestedBy: "Pedro Costa",
+    date: "2024-03-13",
+    status: "rejected",
+    type: "milestone",
   },
 ];
 
-const Validations = () => {
-  const [validations, setValidations] = useState<Validation[]>(mockValidations);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const filteredValidations = validations.filter(validation =>
-    validation.project.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    validation.requester.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const handleApprove = (id: number) => {
-    setValidations(
-      validations.map((validation) =>
-        validation.id === id ? { ...validation, status: "Aprovado" } : validation
-      )
-    );
-    toast({
-      title: "Aprovado!",
-      description: "Validação aprovada com sucesso.",
-    });
-  };
-
-  const handleReject = (id: number) => {
-    setValidations(
-      validations.map((validation) =>
-        validation.id === id ? { ...validation, status: "Rejeitado" } : validation
-      )
-    );
-    toast({
-      title: "Rejeitado!",
-      description: "Validação rejeitada.",
-    });
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "Aprovado":
-        return (
-          <Badge variant="default" className="bg-customBlue text-white">
-            {status}
-          </Badge>
-        );
-      case "Rejeitado":
-        return (
-          <Badge variant="destructive">
-            {status}
-          </Badge>
-        );
-      default:
-        return (
-          <Badge variant="secondary">
-            {status}
-          </Badge>
-        );
-    }
-  };
-
+export default function Validations() {
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] p-8 animate-fade-in">
-      <div className="flex items-center justify-between mb-8">
+    <div className="container py-8 space-y-8 animate-fade-in">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Validações</h1>
-          <p className="text-muted-foreground mt-1">Gerencie as solicitações de validação dos projetos</p>
+          <p className="text-sm text-gray-500 mt-1">
+            Gerencie as validações pendentes dos projetos
+          </p>
         </div>
       </div>
 
-      <div className="mb-6">
-        <div className="relative">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="p-4 hover:shadow-md transition-all duration-200 border border-gray-100/50">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-lg bg-yellow-50 ring-1 ring-yellow-500/10">
+              <Clock className="h-6 w-6 text-yellow-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-gray-900">5</p>
+              <p className="text-sm font-medium text-gray-500">Pendentes</p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-4 hover:shadow-md transition-all duration-200 border border-gray-100/50">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-lg bg-green-50 ring-1 ring-green-500/10">
+              <CheckCircle2 className="h-6 w-6 text-green-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-gray-900">12</p>
+              <p className="text-sm font-medium text-gray-500">Aprovadas</p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-4 hover:shadow-md transition-all duration-200 border border-gray-100/50">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-lg bg-red-50 ring-1 ring-red-500/10">
+              <AlertCircle className="h-6 w-6 text-red-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-gray-900">3</p>
+              <p className="text-sm font-medium text-gray-500">Rejeitadas</p>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      <div className="flex items-center gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100/50">
+        <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
-            type="text"
-            placeholder="Pesquisar por projeto ou solicitante..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 max-w-md"
+            placeholder="Buscar validações..."
+            className="pl-9 bg-gray-50/50 border-gray-100"
           />
         </div>
+        <Button variant="outline" className="gap-2">
+          <Filter className="h-4 w-4" />
+          Filtros
+        </Button>
       </div>
 
-      <Card className="flex-1 overflow-hidden">
-        <CardHeader className="bg-customBlue-subtle py-4">
-          <CardTitle className="text-customBlue">Solicitações de Validação</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="overflow-auto h-[calc(100vh-20rem)]">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-gray-50">
-                  <TableHead>Projeto</TableHead>
-                  <TableHead>Solicitante</TableHead>
-                  <TableHead>Data</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead className="text-right pr-6">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredValidations.map((validation) => (
-                  <TableRow key={validation.id} className="hover:bg-gray-50/50">
-                    <TableCell>
-                      <Link 
-                        to={`/projects/${validation.id}`} 
-                        className="font-medium text-customBlue hover:underline"
-                      >
-                        {validation.project}
-                      </Link>
-                    </TableCell>
-                    <TableCell>{validation.requester}</TableCell>
-                    <TableCell>
-                      {new Date(validation.date).toLocaleDateString("pt-BR")}
-                    </TableCell>
-                    <TableCell>{getStatusBadge(validation.status)}</TableCell>
-                    <TableCell className="text-right">
-                      {validation.status === "Pendente" && (
-                        <div className="flex justify-end gap-2">
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                              >
-                                <Check size={16} className="mr-1" />
-                                Aprovar
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Confirmar Aprovação</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Tem certeza que deseja aprovar esta validação?
-                                  Esta ação não pode ser desfeita.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleApprove(validation.id)}
-                                  className="bg-green-600 hover:bg-green-700"
-                                >
-                                  Confirmar
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                              >
-                                <X size={16} className="mr-1" />
-                                Rejeitar
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Confirmar Rejeição</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Tem certeza que deseja rejeitar esta validação?
-                                  Esta ação não pode ser desfeita.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleReject(validation.id)}
-                                  className="bg-red-600 hover:bg-red-700"
-                                >
-                                  Confirmar
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {filteredValidations.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                      Nenhuma validação encontrada
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
+      <Card className="border-gray-100/50">
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="w-[300px]">Título</TableHead>
+              <TableHead>Projeto</TableHead>
+              <TableHead>Solicitante</TableHead>
+              <TableHead>Data</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {mockValidations.map((validation) => (
+              <TableRow key={validation.id} className="hover:bg-gray-50/50">
+                <TableCell className="font-medium">{validation.title}</TableCell>
+                <TableCell>{validation.project}</TableCell>
+                <TableCell>{validation.requestedBy}</TableCell>
+                <TableCell>{new Date(validation.date).toLocaleDateString('pt-BR')}</TableCell>
+                <TableCell>
+                  <Badge variant="outline" className={cn(
+                    "capitalize",
+                    validation.status === 'pending' && "border-yellow-500/30 text-yellow-700 bg-yellow-50/50",
+                    validation.status === 'approved' && "border-green-500/30 text-green-700 bg-green-50/50",
+                    validation.status === 'rejected' && "border-red-500/30 text-red-700 bg-red-50/50"
+                  )}>
+                    {validation.status === 'pending' && 'Pendente'}
+                    {validation.status === 'approved' && 'Aprovado'}
+                    {validation.status === 'rejected' && 'Rejeitado'}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button variant="ghost" size="sm">
+                    Ver detalhes
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </Card>
     </div>
   );
-};
-
-export default Validations;
+}

@@ -50,7 +50,6 @@ const Users = () => {
 
   return (
     <div className="container space-y-8 py-8 animate-fade-in">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Utilizadores</h1>
@@ -58,27 +57,26 @@ const Users = () => {
             Gerencie os utilizadores do sistema
           </p>
         </div>
-        <Button>
+        <Button className="bg-customBlue hover:bg-customBlue/90">
           <Plus className="h-4 w-4 mr-2" />
           Novo Utilizador
         </Button>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-4 hover:shadow-lg transition-shadow">
+        <Card className="p-4 hover:shadow-lg transition-all duration-200 border border-gray-100/50">
           <div className="flex flex-col gap-2">
-            <div className="p-2 w-fit rounded-lg bg-blue-100/50 ring-1 ring-blue-500/10">
-              <UsersIcon className="h-5 w-5 text-blue-600" />
+            <div className="p-2 w-fit rounded-lg bg-blue-50 ring-1 ring-blue-500/10">
+              <UsersIcon className="h-5 w-5 text-customBlue" />
             </div>
             <p className="text-2xl font-bold text-gray-900">{mockUsers.length}</p>
             <p className="text-sm font-medium text-gray-500">Total Utilizadores</p>
           </div>
         </Card>
         
-        <Card className="p-4 hover:shadow-lg transition-shadow">
+        <Card className="p-4 hover:shadow-lg transition-all duration-200 border border-gray-100/50">
           <div className="flex flex-col gap-2">
-            <div className="p-2 w-fit rounded-lg bg-green-100/50 ring-1 ring-green-500/10">
+            <div className="p-2 w-fit rounded-lg bg-green-50 ring-1 ring-green-500/10">
               <UserCheck className="h-5 w-5 text-green-600" />
             </div>
             <p className="text-2xl font-bold text-gray-900">
@@ -88,9 +86,9 @@ const Users = () => {
           </div>
         </Card>
 
-        <Card className="p-4 hover:shadow-lg transition-shadow">
+        <Card className="p-4 hover:shadow-lg transition-all duration-200 border border-gray-100/50">
           <div className="flex flex-col gap-2">
-            <div className="p-2 w-fit rounded-lg bg-yellow-100/50 ring-1 ring-yellow-500/10">
+            <div className="p-2 w-fit rounded-lg bg-yellow-50 ring-1 ring-yellow-500/10">
               <UserCog className="h-5 w-5 text-yellow-600" />
             </div>
             <p className="text-2xl font-bold text-gray-900">
@@ -100,9 +98,9 @@ const Users = () => {
           </div>
         </Card>
 
-        <Card className="p-4 hover:shadow-lg transition-shadow">
+        <Card className="p-4 hover:shadow-lg transition-all duration-200 border border-gray-100/50">
           <div className="flex flex-col gap-2">
-            <div className="p-2 w-fit rounded-lg bg-purple-100/50 ring-1 ring-purple-500/10">
+            <div className="p-2 w-fit rounded-lg bg-purple-50 ring-1 ring-purple-500/10">
               <Activity className="h-5 w-5 text-purple-600" />
             </div>
             <p className="text-2xl font-bold text-gray-900">12</p>
@@ -111,19 +109,18 @@ const Users = () => {
         </Card>
       </div>
 
-      {/* Filters */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100/50">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Buscar utilizadores..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
+            className="pl-9 bg-gray-50/50 border-gray-100"
           />
         </div>
         <Select value={roleFilter} onValueChange={setRoleFilter}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[180px] bg-gray-50/50 border-gray-100">
             <SelectValue placeholder="Filtrar por cargo" />
           </SelectTrigger>
           <SelectContent>
@@ -135,8 +132,7 @@ const Users = () => {
         </Select>
       </div>
 
-      {/* Users Grid */}
-      <div className="overflow-auto">
+      <div className="overflow-hidden bg-white rounded-lg border border-gray-100/50 shadow-sm">
         <UserGrid users={filteredUsers} />
       </div>
     </div>
