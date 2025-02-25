@@ -378,7 +378,7 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-gray-900">Pacotes de Trabalho</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Workpackages</h3>
               <Button
                 onClick={addWorkPackage}
                 variant="outline"
@@ -386,7 +386,7 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
                 className="rounded-md border-gray-200 text-customBlue hover:bg-customBlue/10"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Adicionar Pacote
+                Adicionar Workpackage
               </Button>
             </div>
             <div className="space-y-6">

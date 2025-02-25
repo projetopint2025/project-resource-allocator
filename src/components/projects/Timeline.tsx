@@ -1,4 +1,3 @@
-
 import { type WorkPackage, type Task } from "@/types/project";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -34,46 +33,48 @@ export function Timeline({ workPackages, timelineYear, onSelectTask }: TimelineP
   };
 
   return (
-    <Card className="overflow-hidden border-none shadow-sm">
-      <div className="p-4 space-y-6">
-        <div className="grid grid-cols-12 gap-2">
+    <div className="flex flex-col h-full w-full">
+      <div className="sticky top-0 bg-white/70 backdrop-blur-sm z-10 border-b border-white/30 shadow-sm">
+        <div className="grid grid-cols-12 gap-2 px-6 py-4">
           {months.map((month) => (
-            <div key={month} className="text-xs font-medium text-gray-400 text-center">
+            <div key={month} className="text-xs font-medium text-gray-500 text-center">
               {month}
             </div>
           ))}
         </div>
+      </div>
 
+      <div className="overflow-y-auto flex-1 px-6 py-4">
         <div className="space-y-8">
           {workPackages.map((wp) => (
             <div key={wp.id} className="space-y-3">
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold text-gray-700">{wp.name}</h3>
-                <Badge variant="outline" className="text-[10px] bg-gray-50/80 px-1.5 py-0">
+                <h3 className="text-base font-semibold text-gray-700">{wp.name}</h3>
+                <Badge className="bg-blue-50/70 text-customBlue border-blue-200 text-[10px] px-2 py-0.5 backdrop-blur-sm shadow-sm">
                   {wp.tasks.length}
                 </Badge>
-                <div className="h-[1px] flex-1 bg-gray-100"></div>
+                <div className="h-[1px] flex-1 bg-gradient-to-r from-gray-200 via-gray-200 to-transparent"></div>
               </div>
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {wp.tasks.map((task) => {
                   const position = getTaskPosition(task.startDate, task.endDate);
                   if (!position) return null;
                   
                   return (
-                    <div key={task.id} className="relative grid grid-cols-12 gap-2 items-center group hover:bg-gray-50/80 p-1.5 rounded-md transition-all duration-200">
+                    <div key={task.id} className="relative grid grid-cols-12 gap-2 items-center group hover:bg-white/40 p-2 rounded-lg transition-all duration-200 backdrop-blur-[1px] hover:backdrop-blur-sm hover:shadow-md">
                       <div
                         className="col-span-3 cursor-pointer"
                         onClick={() => onSelectTask(task)}
                       >
                         <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-medium text-gray-600 group-hover:text-customBlue transition-colors line-clamp-1">
+                          <span className="text-sm font-medium text-gray-600 group-hover:text-customBlue transition-colors line-clamp-1 group-hover:font-semibold">
                             {task.name}
                           </span>
-                          <Badge variant="outline" className={cn(
-                            'text-[10px] px-1.5 py-0 whitespace-nowrap font-medium',
+                          <Badge className={cn(
+                            'text-[10px] px-2 py-0.5 whitespace-nowrap font-medium backdrop-blur-sm shadow-sm',
                             task.status === 'completed' 
-                              ? 'border-green-500/30 text-green-700 bg-green-50/50' 
-                              : 'border-blue-500/30 text-blue-700 bg-blue-50/50'
+                              ? 'bg-emerald-50/70 text-emerald-600 border-emerald-200' 
+                              : 'bg-blue-50/70 text-customBlue border-blue-200'
                           )}>
                             {task.status === 'completed' ? 'Concluído' : 'Em Progresso'}
                           </Badge>
@@ -87,11 +88,11 @@ export function Timeline({ workPackages, timelineYear, onSelectTask }: TimelineP
                         </div>
                         <div
                           className={cn(
-                            "absolute h-6 rounded-md transition-all duration-200",
+                            "absolute h-6 rounded-full transition-all duration-300",
                             task.status === 'completed' 
-                              ? 'bg-green-100 border border-green-500/30' 
-                              : 'bg-blue-50 border border-blue-500/30',
-                            "top-1/2 -translate-y-1/2 shadow-sm group-hover:shadow-md"
+                              ? 'bg-gradient-to-r from-emerald-100 to-emerald-50 border border-emerald-300/30' 
+                              : 'bg-gradient-to-r from-blue-100 to-blue-50 border border-blue-300/30',
+                            "top-1/2 -translate-y-1/2 shadow-md group-hover:shadow-lg group-hover:h-7"
                           )}
                           style={{
                             left: `${((position.gridColumnStart - 1) / 12) * 100}%`,
@@ -108,6 +109,6 @@ export function Timeline({ workPackages, timelineYear, onSelectTask }: TimelineP
           ))}
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

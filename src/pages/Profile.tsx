@@ -64,7 +64,7 @@ const ProfilePage = () => {
     skills: ["Gestão de Projetos", "Agile", "Scrum", "Análise de Dados", "Liderança"],
     languages: ["Português", "Inglês", "Espanhol"],
     location: "Lisboa, Portugal",
-    bio: "Project Manager com mais de 6 anos de experiência na gestão de projetos tecnológicos e de inovação. Especialista em metodologias ágeis e desenvolvimento de equipas.",
+    bio: "Project Manager com mais de 6 anos de experiência na gestão de projetos tecnológicos e de inovação. Especialista em metodologias ágeis e desenvolvimento de equipes.",
     avatar: ""  // URL da imagem do avatar
   };
   

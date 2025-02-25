@@ -22,7 +22,7 @@ export function TimelineTab({
   onPageChange,
 }: TimelineTabProps) {
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-3 space-y-10">
       <Timeline
         workPackages={project.workPackages}
         timelineYear={timelineYear}
