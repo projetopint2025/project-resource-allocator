@@ -1,16 +1,33 @@
+
 import { type WorkPackage, type Task } from "@/types/project";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { TaskSidebar } from "@/components/projects/tasks/TaskSidebar";
+import { WorkPackageSidebar } from "@/components/projects/workpackages/WorkPackageSidebar";
+import { Edit } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface TimelineProps {
   workPackages: WorkPackage[];
   timelineYear: number;
-  onSelectTask: (task: Task) => void;
+  onSelectTask?: (task: Task) => void;
+  onUpdateWorkPackage?: (workPackage: WorkPackage) => void;
+  onUpdateTask?: (task: Task) => void;
 }
 
-export function Timeline({ workPackages, timelineYear, onSelectTask }: TimelineProps) {
+export function Timeline({ 
+  workPackages, 
+  timelineYear, 
+  onSelectTask,
+  onUpdateWorkPackage,
+  onUpdateTask
+}: TimelineProps) {
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [selectedWorkPackage, setSelectedWorkPackage] = useState<WorkPackage | null>(null);
+  
   const months = [
     "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
     "Jul", "Ago", "Set", "Out", "Nov", "Dez"
@@ -32,6 +49,23 @@ export function Timeline({ workPackages, timelineYear, onSelectTask }: TimelineP
     };
   };
 
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    if (onSelectTask) onSelectTask(task);
+  };
+
+  const handleWorkPackageClick = (wp: WorkPackage) => {
+    setSelectedWorkPackage(wp);
+  };
+
+  const handleUpdateTask = (task: Task) => {
+    if (onUpdateTask) onUpdateTask(task);
+  };
+
+  const handleUpdateWorkPackage = (wp: WorkPackage) => {
+    if (onUpdateWorkPackage) onUpdateWorkPackage(wp);
+  };
+
   return (
     <div className="flex flex-col h-full w-full">
       <div className="sticky top-0 bg-white/70 backdrop-blur-sm z-10 border-b border-white/30 shadow-sm">
@@ -49,7 +83,23 @@ export function Timeline({ workPackages, timelineYear, onSelectTask }: TimelineP
           {workPackages.map((wp) => (
             <div key={wp.id} className="space-y-3">
               <div className="flex items-center gap-2">
-                <h3 className="text-base font-semibold text-gray-700">{wp.name}</h3>
+                <h3 
+                  className="text-base font-semibold text-gray-700 cursor-pointer hover:text-customBlue transition-colors flex items-center gap-2"
+                  onClick={() => handleWorkPackageClick(wp)}
+                >
+                  {wp.name}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 rounded-full text-gray-400 hover:text-customBlue hover:bg-blue-50"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleWorkPackageClick(wp);
+                    }}
+                  >
+                    <Edit className="h-3 w-3" />
+                  </Button>
+                </h3>
                 <Badge className="bg-blue-50/70 text-customBlue border-blue-200 text-[10px] px-2 py-0.5 backdrop-blur-sm shadow-sm">
                   {wp.tasks.length}
                 </Badge>
@@ -64,7 +114,7 @@ export function Timeline({ workPackages, timelineYear, onSelectTask }: TimelineP
                     <div key={task.id} className="relative grid grid-cols-12 gap-2 items-center group hover:bg-white/40 p-2 rounded-lg transition-all duration-200 backdrop-blur-[1px] hover:backdrop-blur-sm hover:shadow-md">
                       <div
                         className="col-span-3 cursor-pointer"
-                        onClick={() => onSelectTask(task)}
+                        onClick={() => handleTaskClick(task)}
                       >
                         <div className="flex items-center gap-1.5">
                           <span className="text-sm font-medium text-gray-600 group-hover:text-customBlue transition-colors line-clamp-1 group-hover:font-semibold">
@@ -109,6 +159,26 @@ export function Timeline({ workPackages, timelineYear, onSelectTask }: TimelineP
           ))}
         </div>
       </div>
+
+      {/* Task Sidebar */}
+      {selectedTask && (
+        <TaskSidebar
+          task={selectedTask}
+          open={!!selectedTask}
+          onClose={() => setSelectedTask(null)}
+          onUpdate={handleUpdateTask}
+        />
+      )}
+
+      {/* WorkPackage Sidebar */}
+      {selectedWorkPackage && (
+        <WorkPackageSidebar
+          workPackage={selectedWorkPackage}
+          open={!!selectedWorkPackage}
+          onClose={() => setSelectedWorkPackage(null)}
+          onUpdate={handleUpdateWorkPackage}
+        />
+      )}
     </div>
   );
 }

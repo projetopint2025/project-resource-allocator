@@ -1,7 +1,7 @@
+
 import { useState, useEffect, useRef } from "react";
 import {
   type Task,
-  type Material,
   type Resource,
   type TaskStatus,
 } from "@/types/project";
@@ -29,7 +29,6 @@ import {
 import {
   CalendarDays,
   Users,
-  Package,
   Trash2,
   Plus,
   Check,
@@ -82,29 +81,6 @@ export function TaskSidebar({
     onUpdate(updatedTask);
   };
 
-  const handleAddMaterial = () => {
-    handleUpdateTask({
-      materials: [
-        ...task.materials,
-        { id: Math.floor(Date.now()), name: "", units: 0, unitPrice: 0 },
-      ],
-    });
-  };
-
-  const handleUpdateMaterial = (id: number, updates: Partial<Material>) => {
-    handleUpdateTask({
-      materials: task.materials.map((m) =>
-        m.id === id ? { ...m, ...updates } : m
-      ),
-    });
-  };
-
-  const handleRemoveMaterial = (id: number) => {
-    handleUpdateTask({
-      materials: task.materials.filter((m) => m.id !== id),
-    });
-  };
-
   const handleAddResource = () => {
     if (selectedResource) {
       const resourceToAdd = availableResources.find(
@@ -151,13 +127,6 @@ export function TaskSidebar({
     if (newStatus === "completed" && onMarkCompleted) {
       onMarkCompleted(task.id);
     }
-  };
-
-  const getTotalMaterialsCost = () => {
-    return task.materials.reduce(
-      (total, material) => total + material.units * material.unitPrice,
-      0
-    );
   };
 
   // Meses fixos em português
@@ -423,110 +392,6 @@ export function TaskSidebar({
                 ))}
               </div>
             )}
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-full bg-emerald-50/70 flex items-center justify-center shadow-sm">
-                    <Package className="h-4 w-4 text-emerald-600" />
-                  </div>
-                  <h3 className="text-sm font-medium text-gray-900">Materiais</h3>
-                </div>
-                <Button
-                  size="sm"
-                  className="rounded-full bg-customBlue text-white hover:bg-customBlue/90 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out"
-                  onClick={handleAddMaterial}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Adicionar Material
-                </Button>
-              </div>
-              <Card className="glass-card border-white/20 shadow-xl rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 ease-in-out">
-                <Table>
-                  <TableHeader className="bg-white/20 backdrop-blur-sm border-b border-white/20">
-                    <TableRow className="hover:bg-transparent">
-                      <TableHead className="text-sm font-medium text-gray-700 py-4">Nome</TableHead>
-                      <TableHead className="text-sm font-medium text-gray-700 py-4 text-right">Unidades</TableHead>
-                      <TableHead className="text-sm font-medium text-gray-700 py-4 text-right">Preço Unit.</TableHead>
-                      <TableHead className="text-sm font-medium text-gray-700 py-4 text-right">Total</TableHead>
-                      <TableHead className="w-[50px] text-sm font-medium text-gray-700 py-4"></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {task.materials?.map((material) => (
-                      <TableRow key={material.id} className="group border-b border-white/10 hover:bg-white/40 backdrop-blur-sm transition-all duration-300 ease-in-out hover:shadow-md">
-                        <TableCell>
-                          <Input
-                            value={material.name}
-                            onChange={(e) =>
-                              handleUpdateMaterial(material.id, { name: e.target.value })
-                            }
-                            className="bg-transparent border-none p-0 h-8 text-gray-900 hover:text-customBlue transition-colors duration-300 ease-in-out focus:ring-0"
-                          />
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Input
-                            type="number"
-                            value={material.units}
-                            onChange={(e) =>
-                              handleUpdateMaterial(material.id, { units: Number(e.target.value) || 0 })
-                            }
-                            className="bg-transparent border-none p-0 h-8 text-right w-20 text-gray-900 focus:ring-0"
-                          />
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Input
-                            type="number"
-                            value={material.unitPrice}
-                            onChange={(e) =>
-                              handleUpdateMaterial(material.id, { unitPrice: Number(e.target.value) || 0 })
-                            }
-                            className="bg-transparent border-none p-0 h-8 text-right w-24 text-gray-900 focus:ring-0"
-                          />
-                        </TableCell>
-                        <TableCell className="text-right font-medium text-gray-900">
-                          {(material.units * material.unitPrice).toLocaleString("pt-PT", {
-                            style: "currency",
-                            currency: "EUR",
-                          })}
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-gray-500 hover:text-customBlue hover:bg-white/60 rounded-full transition-all duration-300 ease-in-out shadow-sm hover:shadow-md"
-                            onClick={() => handleRemoveMaterial(material.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                    {task.materials.length === 0 && (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center py-6 text-gray-500">
-                          Nenhum material adicionado
-                        </TableCell>
-                      </TableRow>
-                    )}
-                    {task.materials.length > 0 && (
-                      <TableRow className="bg-white/20 backdrop-blur-sm">
-                        <TableCell colSpan={3} className="text-right font-medium text-gray-700">
-                          Total
-                        </TableCell>
-                        <TableCell className="text-right font-medium text-customBlue">
-                          {getTotalMaterialsCost().toLocaleString("pt-PT", {
-                            style: "currency",
-                            currency: "EUR",
-                          })}
-                        </TableCell>
-                        <TableCell />
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </Card>
-            </div>
             
             <div className="pt-4 flex justify-end">
               <Button 

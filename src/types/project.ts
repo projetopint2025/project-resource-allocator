@@ -1,3 +1,4 @@
+
 export type TaskType = 'research' | 'development' | 'testing' | 'documentation' | 'management';
 
 export type ProjectStatus = 'completed' | 'in-progress' | 'pending';
@@ -30,7 +31,7 @@ export interface Task {
   rationale: string;
   assignedTo: string;
   resources: Resource[];
-  materials: Material[];
+  materials: Material[]; // Mantido para compatibilidade, mas não deve ser usado
 }
 
 export interface WorkPackage {
@@ -40,6 +41,7 @@ export interface WorkPackage {
   endDate: string;
   status: 'completed' | 'in-progress';
   tasks: Task[];
+  materials?: Material[]; // Adicionando materiais ao WorkPackage
 }
 
 export interface Project {
