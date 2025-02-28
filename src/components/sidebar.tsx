@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import {
   Home,
@@ -15,15 +16,17 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 
+interface MenuItem {
+  icon: React.ElementType;
+  label: string;
+  href: string;
+}
+
 // Menu items for main navigation
-const menuItems = [
+const menuItems: MenuItem[] = [
   { icon: Home, label: "Início", href: "/" },
   { icon: FolderKanban, label: "Projetos", href: "/projects" },
   { icon: Users, label: "Utilizadores", href: "/users" },
-];
-
-// Management section items
-const managementItems = [
   { icon: Settings, label: "Validações", href: "/validations" },
 ];
 
@@ -47,7 +50,7 @@ export const AppSidebar = () => {
   }, [sidebarRef, collapsed]);
 
   // Reusable menu item component
-  const MenuItem = ({ item, className = "" }) => (
+  const MenuItem = ({ item, className = "" }: { item: MenuItem; className?: string }) => (
     <Link
       to={item.href}
       className={cn(
@@ -58,12 +61,12 @@ export const AppSidebar = () => {
       )}
     >
       <div className={cn(
-        "p-2 rounded-lg transition-all duration-200",
+        "w-12 h-12 flex items-center justify-center rounded-lg transition-all duration-200",
         location.pathname === item.href 
           ? "bg-customBlue text-white" 
-          : "bg-gray-50 text-gray-500 group-hover:bg-customBlue group-hover:text-white"
+          : "text-gray-500 group-hover:bg-customBlue group-hover:text-white"
       )}>
-        <item.icon size={18} />
+        <item.icon size={20} />
       </div>
       <span className={cn(
         "transition-all duration-200",
@@ -75,50 +78,41 @@ export const AppSidebar = () => {
   );
 
   return (
-    <div className="relative h-screen">
+    <div className="fixed top-0 left-0 h-screen z-50">
       <div
         ref={sidebarRef}
         className={cn(
-          "h-screen bg-white shadow-lg transition-all duration-200 flex flex-col",
-          collapsed ? "w-[4.5rem]" : "w-64"
+          "h-full bg-white shadow-lg transition-all duration-200 flex flex-col",
+          collapsed ? "w-20" : "w-64"
         )}
       >
         {/* Logo Section */}
-        <div className="flex items-center justify-center h-16 px-4 mt-5">
-          {!collapsed && (
+        <div className="h-32 flex items-center justify-center px-4">
+          {!collapsed ? (
             <img
               src="/lovable-uploads/28745dc3-1b1b-490b-8612-41cb26f8c61d.png"
               alt="STAR Institute"
               className="h-8 transition-all duration-200"
             />
+          ) : (
+            <div className="h-10 w-10 rounded-lg bg-customBlue flex items-center justify-center">
+              <span className="text-white font-bold text-lg">S</span>
+            </div>
           )}
         </div>
 
         {/* Main Navigation Content */}
-        <ScrollArea className="flex-1 px-3 py-4 mt-5">
+        <div className="flex-1 px-3 space-y-6">
           <nav className="space-y-6">
-            {/* Main Menu Items */}
             <div className="space-y-2">
               {menuItems.map((item) => (
                 <MenuItem key={item.href} item={item} />
               ))}
             </div>
-
-            {/* Management Section */}
-            <div className="space-y-2">
-              {!collapsed && (
-                <p className="px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  Gestão
-                </p>
-              )}
-              {managementItems.map((item) => (
-                <MenuItem key={item.href} item={item} />
-              ))}
-            </div>
           </nav>
-        </ScrollArea>
+        </div>
 
-        {/* Footer Section with Collapse Button and Profile */}
+        {/* Footer Section */}
         <div className="p-3 border-t border-gray-100">
           {/* Collapse Toggle Button */}
           <Button
@@ -127,13 +121,16 @@ export const AppSidebar = () => {
             onClick={toggleCollapse}
             className={cn(
               "w-full rounded-lg hover:bg-gray-50 transition-colors duration-200",
-              collapsed ? "justify-center" : "justify-start"
+              collapsed ? "justify-center" : "justify-between"
             )}
           >
             {collapsed ? (
               <ChevronRight className="h-5 w-5 text-gray-500" />
             ) : (
-              <ChevronLeft className="h-5 w-5 text-gray-500" />
+              <>
+                <span className="text-sm text-gray-500">Recolher menu</span>
+                <ChevronLeft className="h-5 w-5 text-gray-500" />
+              </>
             )}
           </Button>
 
@@ -155,9 +152,9 @@ export const AppSidebar = () => {
             {!collapsed && (
               <div className="min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  Vasco Fernandes
+                  João Silva
                 </p>
-                <p className="text-xs text-gray-500">Project Manager</p>
+                <p className="text-xs text-gray-500">Administrador</p>
               </div>
             )}
           </Link>
