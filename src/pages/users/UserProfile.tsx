@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -8,9 +7,12 @@ import {
   BarChart4,
   Phone, 
   Mail, 
-  MapPin,
+  MapPin, 
+  File, 
   Clock, 
   Calendar as CalendarIcon,
+  ClipboardList,
+  Award,
   Briefcase,
   ChevronRight,
   Sparkles,
@@ -18,13 +20,6 @@ import {
   ArrowLeft,
   BarChart,
   FileText,
-  Building,
-  ClockIcon,
-  Clock3,
-  TimerIcon,
-  Timer,
-  User,
-  Clock4,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -43,7 +38,7 @@ const mockUsers = [
     id: 1,
     name: "João Silva",
     role: "Gestor",
-    level: "Integral",
+    level: "Sénior",
     department: "Recursos Humanos",
     photo: "",
     email: "joao.silva@star.pt",
@@ -61,6 +56,10 @@ const mockUsers = [
       { id: 1, name: "INOVC+", role: "Gestor de RH", allocation: 0.6 },
       { id: 3, name: "IAMFat", role: "Gestor de Equipa", allocation: 0.4 },
     ],
+    achievements: [
+      { id: 1, title: "Certificação em Gestão de RH", date: "2023-09-10", description: "Obteve certificação internacional em gestão de recursos humanos" },
+      { id: 2, title: "Reconhecimento Anual", date: "2023-01-15", description: "Reconhecido pela excelência na gestão da equipa" },
+    ],
     workHistory: [
       { id: 1, company: "HR Solutions", role: "Coordenador de RH", period: "2017-2020" },
       { id: 2, company: "Talent Co.", role: "Técnico de RH", period: "2015-2017" },
@@ -72,7 +71,7 @@ const mockUsers = [
     id: 2,
     name: "Ana Martins",
     role: "Administradora",
-    level: "Parcial",
+    level: "Sénior",
     department: "Direção",
     photo: "",
     email: "ana.martins@star.pt",
@@ -91,6 +90,10 @@ const mockUsers = [
       { id: 4, name: "Agenda GreenAuto", role: "Supervisora", allocation: 0.3 },
       { id: 1, name: "INOVC+", role: "Consultora Executiva", allocation: 0.2 },
     ],
+    achievements: [
+      { id: 1, title: "MBA Executivo", date: "2021-06-15", description: "Conclusão de MBA com distinção pela Universidade Nova" },
+      { id: 2, title: "Prémio Liderança", date: "2022-11-20", description: "Reconhecida como líder do ano no setor tecnológico" },
+    ],
     workHistory: [
       { id: 1, company: "Tech Innovations", role: "Diretora de Operações", period: "2015-2018" },
       { id: 2, company: "Global Systems", role: "Gestora Sénior", period: "2013-2015" },
@@ -101,7 +104,7 @@ const mockUsers = [
     id: 3,
     name: "Maria Costa",
     role: "UI/UX Designer",
-    level: "Integral",
+    level: "Sénior",
     department: "Design",
     photo: "",
     email: "maria.costa@star.pt",
@@ -119,6 +122,10 @@ const mockUsers = [
       { id: 1, name: "INOVC+", role: "Lead Designer", allocation: 0.5 },
       { id: 4, name: "Agenda GreenAuto", role: "UI Designer", allocation: 0.5 },
     ],
+    achievements: [
+      { id: 1, title: "Prémio de Design", date: "2023-05-18", description: "Venceu o prémio nacional de design de interfaces" },
+      { id: 2, title: "Curso Avançado", date: "2022-11-10", description: "Concluiu o curso avançado de Design Systems" },
+    ],
     workHistory: [
       { id: 1, company: "DesignHub", role: "Designer Pleno", period: "2019-2021" },
       { id: 2, company: "CreativeMinds", role: "Designer Junior", period: "2017-2019" },
@@ -129,7 +136,7 @@ const mockUsers = [
     id: 4,
     name: "Pedro Santos",
     role: "Desenvolvedor",
-    level: "Parcial",
+    level: "Pleno",
     department: "Desenvolvimento",
     photo: "",
     email: "pedro.santos@star.pt",
@@ -147,6 +154,10 @@ const mockUsers = [
       { id: 1, name: "INOVC+", role: "Desenvolvedor Frontend", allocation: 0.7 },
       { id: 2, name: "DreamFAB", role: "Desenvolvedor Backend", allocation: 0.3 },
     ],
+    achievements: [
+      { id: 1, title: "Certificação React", date: "2022-08-25", description: "Obteve certificação avançada em React" },
+      { id: 2, title: "Hackathon Winner", date: "2023-03-12", description: "Vencedor do hackathon interno da empresa" },
+    ],
     workHistory: [
       { id: 1, company: "WebTech", role: "Desenvolvedor Junior", period: "2020-2022" },
       { id: 2, company: "CodeCraft", role: "Estagiário", period: "2019-2020" },
@@ -157,7 +168,7 @@ const mockUsers = [
     id: 5,
     name: "Sofia Oliveira",
     role: "Gestora de Projetos",
-    level: "Integral",
+    level: "Sénior",
     department: "Gestão",
     photo: "",
     email: "sofia.oliveira@star.pt",
@@ -175,6 +186,10 @@ const mockUsers = [
       { id: 3, name: "IAMFat", role: "Gestora de Projeto", allocation: 0.6 },
       { id: 4, name: "Agenda GreenAuto", role: "Coordenadora", allocation: 0.4 },
     ],
+    achievements: [
+      { id: 1, title: "Certificação PMP", date: "2021-05-10", description: "Obteve certificação Project Management Professional" },
+      { id: 2, title: "Projeto Destaque", date: "2022-12-05", description: "Liderou o projeto do ano com entrega antecipada" },
+    ],
     workHistory: [
       { id: 1, company: "Project Solutions", role: "Gestora de Projetos", period: "2016-2019" },
       { id: 2, company: "AgileWorks", role: "Scrum Master", period: "2014-2016" },
@@ -185,7 +200,7 @@ const mockUsers = [
     id: 6,
     name: "Rui Ferreira",
     role: "Técnico de Suporte",
-    level: "Parcial",
+    level: "Pleno",
     department: "Suporte",
     photo: "",
     email: "rui.ferreira@star.pt",
@@ -200,6 +215,9 @@ const mockUsers = [
       { name: "Sistemas Operativos", level: 85 },
     ],
     projects: [],
+    achievements: [
+      { id: 1, title: "Técnico do Mês", date: "2022-04-10", description: "Reconhecido pela excelência no atendimento ao cliente" }
+    ],
     workHistory: [
       { id: 1, company: "TechSupport", role: "Técnico Jr", period: "2019-2021" },
       { id: 2, company: "ITHelp", role: "Estagiário", period: "2018-2019" }
@@ -210,7 +228,7 @@ const mockUsers = [
     id: 7,
     name: "Carla Mendes",
     role: "Especialista de Marketing",
-    level: "Integral",
+    level: "Pleno",
     department: "Marketing",
     photo: "",
     email: "carla.mendes@star.pt",
@@ -225,6 +243,9 @@ const mockUsers = [
       { name: "Analytics", level: 75 },
     ],
     projects: [],
+    achievements: [
+      { id: 1, title: "Campanha Premiada", date: "2022-10-20", description: "Desenvolveu campanha digital que ganhou prémio nacional" }
+    ],
     workHistory: [
       { id: 1, company: "DigitalMarketing", role: "Social Media Manager", period: "2018-2020" },
       { id: 2, company: "CreativeAgency", role: "Assistente de Marketing", period: "2016-2018" }
@@ -400,104 +421,243 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] p-6 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header com Navegação e Ações */}
-        <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-          <Button 
-            onClick={() => navigate('/users')} 
-            variant="ghost" 
-            size="sm" 
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Voltar para utilizadores</span>
-          </Button>
-          
-          <div className="flex flex-wrap gap-3">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-8 custom-blue-blur">
+      <div className="max-w-8xl mx-auto space-y-8">
+        {/* Cabeçalho Simplificado */}
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-2">
+            <Button 
+              onClick={() => navigate('/users')} 
+              variant="ghost" 
+              size="sm" 
+              className="rounded-full h-8 w-8 p-0 bg-white/60 hover:bg-white/80 shadow-sm hover:shadow-md transition-all duration-300 ease-in-out"
+            >
+              <ArrowLeft className="h-4 w-4 text-gray-700" />
+            </Button>
+            <span className="text-sm text-gray-500">Voltar para utilizadores</span>
+          </div>
+          <div className="flex items-center gap-3">
             <Button 
               onClick={() => navigate(`/users/${id}/report`)}
-              variant="outline"
-              className="flex items-center gap-2"
+              className="rounded-full px-6 py-2 bg-white/80 hover:bg-white/90 text-customBlue border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out"
             >
-              <BarChart className="w-4 h-4" />
+              <BarChart className="w-4 h-4 mr-2" />
               Ver Alocação
             </Button>
             <Button 
               onClick={() => navigate(`/users/${id}/generate-report`)}
-              className="flex items-center gap-2 bg-customBlue hover:bg-customBlue/90"
+              className="rounded-full px-6 py-2 bg-gradient-to-r from-customBlue to-blue-500 text-white shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:-translate-y-1"
             >
-              <FileText className="w-4 h-4" />
+              <FileText className="w-4 h-4 mr-2" />
               Gerar Relatório
             </Button>
           </div>
         </div>
         
-        {/* Perfil Principal - Estilo LinkedIn */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Coluna de Perfil e Informações */}
-          <div className="lg:col-span-1 space-y-6">
+        {/* Perfil Principal */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Coluna Principal - Informações */}
+          <div className="lg:col-span-2 space-y-8">
             {/* Card de Perfil */}
-            <Card className="overflow-hidden border-none shadow-md">
-              {/* Banner personalizado - Estilo LinkedIn */}
-              <div className="h-24 bg-gradient-to-r from-blue-500 to-customBlue"></div>
-              
-              <div className="px-6 pb-6 pt-0 relative">
-                <Avatar className="h-24 w-24 border-4 border-white absolute -top-12">
+            <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20 hover:shadow-2xl transition-all duration-300 ease-in-out overflow-hidden">
+              <div className="h-40 bg-gradient-to-r from-blue-500 to-customBlue" />
+              <div className="px-8 pb-6 pt-20 relative">
+                <Avatar className="w-32 h-32 border-4 border-white shadow-xl absolute -top-16 left-8">
                   <AvatarImage src={currentUser.photo} alt={currentUser.name} />
-                  <AvatarFallback className="bg-gradient-to-br from-customBlue to-blue-600 text-white text-3xl">
+                  <AvatarFallback className="bg-gradient-to-br from-customBlue to-blue-600 text-white text-2xl">
                     {currentUser.name.split(' ').map(name => name[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
                 
-                <div className="mt-14 space-y-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h1 className="text-2xl font-bold text-gray-900">{currentUser.name}</h1>
-                      <p className="text-gray-700">{currentUser.role} · {currentUser.department}</p>
-                      
-                      <div className="flex items-center gap-2 mt-1">
-                        <Badge className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-none">
-                          {currentUser.level}
-                        </Badge>
-                        <span className="text-gray-500 text-sm">{currentUser.location}</span>
-                      </div>
+                <div className="space-y-4">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">{currentUser.name}</h2>
+                    <div className="flex items-center gap-2">
+                      <p className="text-gray-600">{currentUser.role}</p>
+                      <span className="text-gray-400">•</span>
+                      <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100">
+                        {currentUser.level}
+                      </Badge>
                     </div>
                   </div>
                   
-                  <p className="text-gray-600 text-sm mt-3">{currentUser.bio}</p>
+                  <p className="text-gray-700 leading-relaxed">{currentUser.bio}</p>
                   
-                  <div className="space-y-3 pt-4 mt-4 border-t border-gray-100">
-                    <div className="flex items-center text-gray-600 text-sm">
-                      <Mail className="h-4 w-4 text-gray-400 mr-3" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Mail className="w-4 h-4 text-customBlue" />
                       <span>{currentUser.email}</span>
                     </div>
-                    <div className="flex items-center text-gray-600 text-sm">
-                      <Phone className="h-4 w-4 text-gray-400 mr-3" />
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Phone className="w-4 h-4 text-customBlue" />
                       <span>{currentUser.phone}</span>
                     </div>
-                    <div className="flex items-center text-gray-600 text-sm">
-                      <CalendarIcon className="h-4 w-4 text-gray-400 mr-3" />
-                      <span>Entrou em {formatDate(currentUser.joinDate)}</span>
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <MapPin className="w-4 h-4 text-customBlue" />
+                      <span>{currentUser.location}</span>
                     </div>
-                    <div className="flex items-center text-gray-600 text-sm">
-                      <Clock className="h-4 w-4 text-gray-400 mr-3" />
-                      <span>{calculateTimeInCompany(currentUser.joinDate)}</span>
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <CalendarIcon className="w-4 h-4 text-customBlue" />
+                      <span>Entrou em {formatDate(currentUser.joinDate)}</span>
                     </div>
                   </div>
                 </div>
               </div>
             </Card>
             
-            {/* Carga de Trabalho Card */}
-            <Card className="border-none shadow-md">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-semibold text-gray-900">Carga de Trabalho</CardTitle>
+            {/* Tabs de Conteúdo */}
+            <Tabs defaultValue="projects" className="w-full">
+              <TabsList className="grid grid-cols-3 mb-6 bg-white/40 backdrop-blur-sm rounded-lg p-1 shadow-md">
+                <TabsTrigger value="projects" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-300">
+                  <Briefcase className="w-4 h-4 mr-2" />
+                  Projetos
+                </TabsTrigger>
+                <TabsTrigger value="skills" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-300">
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Competências
+                </TabsTrigger>
+                <TabsTrigger value="achievements" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-300">
+                  <Award className="w-4 h-4 mr-2" />
+                  Conquistas
+                </TabsTrigger>
+              </TabsList>
+              
+              {/* Conteúdo dos Projetos */}
+              <TabsContent value="projects" className="mt-0">
+                <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20 transition-all duration-300 ease-in-out overflow-hidden">
+                  <CardHeader className="px-6 py-4 border-b border-white/10 bg-white/20 backdrop-blur-sm">
+                    <CardTitle className="text-lg font-semibold text-gray-900">Projetos Atuais</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6 space-y-6">
+                    {currentUser.projects.map((project) => (
+                      <div key={project.id} className="bg-white/60 backdrop-blur-sm rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out">
+                        <div className="flex justify-between items-start flex-wrap gap-2">
+                          <div>
+                            <h3 className="font-semibold text-lg text-gray-900">{project.name}</h3>
+                            <p className="text-gray-600 text-sm">{project.role}</p>
+                          </div>
+                          <Badge className={cn(
+                            "px-3 py-1 rounded-full text-xs whitespace-nowrap",
+                            project.allocation <= 0.3 ? "bg-green-50 text-green-600 border-green-200" :
+                            project.allocation <= 0.7 ? "bg-blue-50 text-blue-600 border-blue-200" :
+                            "bg-amber-50 text-amber-600 border-amber-200"
+                          )}>
+                            {(project.allocation * 100).toFixed(0)}% alocação
+                          </Badge>
+                        </div>
+                        <div className="mt-4">
+                          <div className="flex justify-between items-center mb-1 text-xs text-gray-500">
+                            <span>Alocação</span>
+                            <span>{(project.allocation * 100).toFixed(0)}%</span>
+                          </div>
+                          <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                            <div 
+                              className={cn(
+                                "h-full rounded-full",
+                                project.allocation <= 0.3 ? "bg-green-500" :
+                                project.allocation <= 0.7 ? "bg-blue-500" :
+                                "bg-amber-500"
+                              )}
+                              style={{ width: `${project.allocation * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    
+                    {currentUser.projects.length === 0 && (
+                      <div className="text-center py-8">
+                        <div className="bg-gray-50 rounded-full w-16 h-16 mx-auto flex items-center justify-center mb-4">
+                          <Briefcase className="w-8 h-8 text-gray-400" />
+                        </div>
+                        <h3 className="text-gray-700 font-medium">Sem projetos ativos</h3>
+                        <p className="text-gray-500 text-sm mt-1">O colaborador não está alocado a nenhum projeto atualmente.</p>
+                      </div>
+                    )}
+                  </CardContent>
+                  <CardFooter className="px-6 py-4 border-t border-white/10 bg-white/10 backdrop-blur-sm">
+                    <Button variant="ghost" className="text-customBlue hover:bg-white/60 w-full justify-center rounded-lg shadow-sm hover:shadow-md transition-all duration-300 ease-in-out" size="sm">
+                      Ver histórico completo
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </TabsContent>
+              
+              {/* Conteúdo das Competências */}
+              <TabsContent value="skills" className="mt-0">
+                <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20 transition-all duration-300 ease-in-out overflow-hidden">
+                  <CardHeader className="px-6 py-4 border-b border-white/10 bg-white/20 backdrop-blur-sm">
+                    <CardTitle className="text-lg font-semibold text-gray-900">Competências e Habilidades</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6 space-y-6">
+                    {currentUser.skills.map((skill, index) => (
+                      <div key={index} className="space-y-2">
+                        <div className="flex justify-between items-center flex-wrap gap-2">
+                          <h3 className="font-medium text-gray-900">{skill.name}</h3>
+                          <span className="text-sm text-gray-600">{skill.level}%</span>
+                        </div>
+                        <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-gradient-to-r from-customBlue to-blue-500 rounded-full"
+                            style={{ width: `${skill.level}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                    
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-6">
+                      {["JavaScript", "HTML/CSS", "Git", "Scrum", "Jest", "Python", "Docker", "AWS", "Figma"].map((tag, index) => (
+                        <Badge key={index} variant="outline" className="justify-center bg-white/70 text-gray-700 border-gray-200 hover:bg-white/90 py-1">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              {/* Conteúdo das Conquistas */}
+              <TabsContent value="achievements" className="mt-0">
+                <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20 transition-all duration-300 ease-in-out overflow-hidden">
+                  <CardHeader className="px-6 py-4 border-b border-white/10 bg-white/20 backdrop-blur-sm">
+                    <CardTitle className="text-lg font-semibold text-gray-900">Conquistas e Certificações</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-6 relative before:absolute before:inset-y-0 before:left-3 before:w-0.5 before:bg-gray-200">
+                      {currentUser.achievements.map((achievement, index) => (
+                        <div key={achievement.id} className="flex gap-4 relative">
+                          <div className="w-6 h-6 rounded-full bg-white shadow-md border-2 border-customBlue flex-shrink-0 z-10">
+                            <Award className="w-3 h-3 text-customBlue absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                          </div>
+                          <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out flex-grow">
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                              <h3 className="font-semibold text-gray-900">{achievement.title}</h3>
+                              <span className="text-sm text-gray-500 whitespace-nowrap">{formatDate(achievement.date)}</span>
+                            </div>
+                            <p className="text-gray-700 mt-1">{achievement.description}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+          
+          {/* Coluna Lateral - Informações Adicionais */}
+          <div className="space-y-8">
+            {/* Estatísticas Rápidas */}
+            <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20 hover:shadow-2xl transition-all duration-300 ease-in-out overflow-hidden">
+              <CardHeader className="px-6 py-4 border-b border-white/10 bg-white/20 backdrop-blur-sm">
+                <CardTitle className="text-lg font-semibold text-gray-900">Resumo</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-500">Ocupação atual</span>
+              <CardContent className="p-6 space-y-6">
+                {/* Carga de Trabalho */}
+                <div className="space-y-2">
+                  <div className="flex justify-between flex-wrap gap-2">
+                    <h3 className="text-sm font-medium text-gray-700">Carga de Trabalho</h3>
                     <span className={cn(
                       "text-sm font-medium",
                       totalAllocation <= 0.5 ? "text-green-600" :
@@ -511,136 +671,59 @@ const UserProfile = () => {
                   <Progress 
                     value={Math.min(totalAllocation * 100, 100)} 
                     className={cn(
-                      "h-2",
-                      totalAllocation <= 0.5 ? "bg-green-100 [&>div]:bg-green-500" :
-                      totalAllocation <= 0.8 ? "bg-blue-100 [&>div]:bg-blue-500" :
-                      totalAllocation <= 1.0 ? "bg-amber-100 [&>div]:bg-amber-500" :
-                      "bg-red-100 [&>div]:bg-red-500"
+                      "h-2 bg-gray-100",
+                      totalAllocation <= 0.5 ? "[&>div]:bg-green-500" :
+                      totalAllocation <= 0.8 ? "[&>div]:bg-blue-500" :
+                      totalAllocation <= 1.0 ? "[&>div]:bg-amber-500" :
+                      "[&>div]:bg-red-500"
                     )}
                   />
-                  <p className="text-xs text-gray-500">Baseado em {currentUser.projects.length} projeto(s) ativo(s)</p>
-                </div>
-              </CardContent>
-            </Card>
-            
-            {/* Experiência Profissional */}
-            <Card className="border-none shadow-md">
-              <CardHeader className="pb-2">
-                <div className="flex items-center">
-                  <Briefcase className="h-5 w-5 text-gray-400 mr-2" />
-                  <CardTitle className="text-lg font-semibold text-gray-900">Experiência</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {currentUser.workHistory.map((work) => (
-                    <div key={work.id} className="relative pl-5 before:absolute before:left-0 before:top-2 before:bottom-0 before:w-0.5 before:bg-gray-200">
-                      <div className="absolute left-0 top-1 w-2.5 h-2.5 rounded-full bg-blue-100 border-2 border-customBlue -translate-x-1"></div>
-                      <h3 className="font-medium text-gray-900">{work.role}</h3>
-                      <p className="text-sm text-gray-700 mt-0.5">{work.company}</p>
-                      <p className="text-sm text-gray-500 mt-0.5">{work.period}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          
-          {/* Conteúdo Principal - Projetos e Competências */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Projetos Card */}
-            <Card className="border-none shadow-md">
-              <CardHeader className="pb-3">
-                <div className="flex items-center">
-                  <Briefcase className="h-5 w-5 text-gray-400 mr-2" />
-                  <CardTitle className="text-lg font-semibold text-gray-900">Projetos Atuais</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-5">
-                  {currentUser.projects.length > 0 ? (
-                    currentUser.projects.map((project) => (
-                      <div key={project.id} className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <div className="flex flex-wrap justify-between gap-2">
-                          <div>
-                            <h3 className="font-medium text-gray-900">{project.name}</h3>
-                            <p className="text-sm text-gray-600 mt-1">{project.role}</p>
-                          </div>
-                          <Badge className={cn(
-                            "self-start",
-                            project.allocation <= 0.3 ? "bg-green-50 text-green-700" :
-                            project.allocation <= 0.7 ? "bg-blue-50 text-blue-700" :
-                            "bg-amber-50 text-amber-700"
-                          )}>
-                            {(project.allocation * 100).toFixed(0)}% alocação
-                          </Badge>
-                        </div>
-                        
-                        <div className="mt-3">
-                          <div className="flex justify-between text-xs text-gray-500 mb-1">
-                            <span>Alocação</span>
-                            <span>{(project.allocation * 100).toFixed(0)}%</span>
-                          </div>
-                          <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
-                            <div 
-                              className={cn(
-                                "h-full rounded-full",
-                                project.allocation <= 0.3 ? "bg-green-500" :
-                                project.allocation <= 0.7 ? "bg-blue-500" :
-                                "bg-amber-500"
-                              )}
-                              style={{ width: `${project.allocation * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-10 px-4">
-                      <div className="mx-auto bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center mb-4">
-                        <Briefcase className="h-8 w-8 text-gray-400" />
-                      </div>
-                      <h3 className="text-gray-700 font-medium">Sem projetos ativos</h3>
-                      <p className="text-gray-500 text-sm mt-2 max-w-md mx-auto">
-                        O colaborador não está alocado a nenhum projeto atualmente.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-            
-            {/* Competências Card */}
-            <Card className="border-none shadow-md">
-              <CardHeader className="pb-3">
-                <div className="flex items-center">
-                  <Sparkles className="h-5 w-5 text-gray-400 mr-2" />
-                  <CardTitle className="text-lg font-semibold text-gray-900">Competências</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-5 sm:grid-cols-2">
-                  {currentUser.skills.map((skill, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="flex justify-between items-baseline">
-                        <h3 className="font-medium text-gray-700">{skill.name}</h3>
-                        <span className="text-xs text-gray-500">{skill.level}%</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-customBlue to-blue-400 rounded-full"
-                          style={{ width: `${skill.level}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
+                  <p className="text-xs text-gray-500">Baseado nos projetos ativos</p>
                 </div>
                 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-8">
-                  {["JavaScript", "HTML/CSS", "Git", "Scrum", "Jest", "Python", "Docker", "AWS", "Figma"].map((tag, index) => (
-                    <Badge key={index} variant="outline" className="flex items-center justify-center text-xs py-1 bg-white border-gray-200 text-gray-700">
-                      {tag}
-                    </Badge>
+                {/* Tempo na Empresa */}
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-customBlue flex-shrink-0">
+                    <Clock className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-900">Tempo na Empresa</h3>
+                    <p className="text-gray-700 break-words">{calculateTimeInCompany(currentUser.joinDate)}</p>
+                  </div>
+                </div>
+                
+                {/* Departamento */}
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-customBlue flex-shrink-0">
+                    <Briefcase className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-900">Departamento</h3>
+                    <p className="text-gray-700">{currentUser.department}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Experiência Anterior */}
+            <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20 hover:shadow-2xl transition-all duration-300 ease-in-out overflow-hidden">
+              <CardHeader className="px-6 py-4 border-b border-white/10 bg-white/20 backdrop-blur-sm">
+                <CardTitle className="text-lg font-semibold text-gray-900">Experiência Anterior</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  {currentUser.workHistory.map((work) => (
+                    <div key={work.id} className="bg-white/60 backdrop-blur-sm rounded-xl p-4 hover:shadow-md transition-all duration-300 ease-in-out">
+                      <h3 className="font-medium text-gray-900">{work.role}</h3>
+                      <div className="flex items-center gap-1 text-sm text-gray-600 mt-1 flex-wrap">
+                        <Briefcase className="w-3 h-3 flex-shrink-0" />
+                        <span>{work.company}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm text-gray-600 mt-1 flex-wrap">
+                        <Calendar className="w-3 h-3 flex-shrink-0" />
+                        <span>{work.period}</span>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </CardContent>
