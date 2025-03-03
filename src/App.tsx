@@ -14,6 +14,8 @@ import NotFound from "@/pages/NotFound";
 import UserProfile from "@/pages/users/UserProfile";
 import UserReport from "@/pages/users/UserReport";
 import GenerateReport from "@/pages/users/GenerateReport";
+import ImportUsers from "./components/ImportUsers";
+import JsonViewer from "./components/jsonviewer";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +39,8 @@ const App = () => (
               <Route path="/user/:id" element={<UserProfile />} />
               <Route path="/validations" element={<Validations />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/import-users" element={<ImportUsers />} />
+              <Route path="/users/json-viewer" element={<JsonViewer />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
