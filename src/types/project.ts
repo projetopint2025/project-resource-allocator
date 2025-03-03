@@ -20,6 +20,14 @@ export interface Resource {
   allocation: number[];
 }
 
+export interface Entregavel {
+  id: string;
+  nome: string;
+  descricao?: string;
+  data?: string;
+  anexo?: string;
+}
+
 export interface Task {
   id: number;
   name: string;
@@ -32,6 +40,7 @@ export interface Task {
   assignedTo: string;
   resources: Resource[];
   materials: Material[]; // Mantido para compatibilidade, mas não deve ser usado
+  entregaveis?: Entregavel[]; // Novo campo para entregáveis
 }
 
 export interface WorkPackage {
