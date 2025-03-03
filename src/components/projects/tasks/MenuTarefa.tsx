@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { X, Upload, Check, AlertCircle, FileText, Calendar } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/components/ui/sheet";
@@ -8,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { type Task, type Entregavel } from "@/types/project";
+import { type Task, type Entregavel, type TaskStatus } from "@/types/project";
 import { format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -36,7 +35,7 @@ export function MenuTarefa({ task, open, onClose, onUpdate }: MenuTarefaProps) {
   const handleToggleStatus = () => {
     const updatedTask = {
       ...localTask,
-      status: localTask.status === "completed" ? "pending" : "completed"
+      status: localTask.status === "completed" ? ("pending" as TaskStatus) : ("completed" as TaskStatus)
     };
     setLocalTask(updatedTask);
     onUpdate(updatedTask);
