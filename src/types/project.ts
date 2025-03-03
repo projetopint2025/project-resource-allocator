@@ -1,4 +1,3 @@
-
 export type TaskType = 'research' | 'development' | 'testing' | 'documentation' | 'management';
 
 export type ProjectStatus = 'completed' | 'in-progress' | 'pending';
@@ -32,16 +31,16 @@ export interface Entregavel {
 export interface Task {
   id: number;
   name: string;
-  type: TaskType;
+  type?: TaskType; // Tornando o tipo opcional
   description: string;
   startDate: string;
   endDate: string;
   status: TaskStatus;
-  rationale: string;
-  assignedTo: string;
+  rationale?: string; // Tornando a razão opcional
+  assignedTo?: string; // Tornando a atribuição opcional
   resources: Resource[];
   materials: Material[]; // Mantido para compatibilidade, mas não deve ser usado
-  entregaveis?: Entregavel[]; // Novo campo para entregáveis
+  entregaveis?: Entregavel[]; // Entregáveis serão definidos posteriormente
 }
 
 export interface WorkPackage {

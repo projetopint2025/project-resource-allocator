@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import {
   type WorkPackage,
@@ -41,11 +42,15 @@ import {
   Link,
   FileText,
   Video,
-  File
+  File,
+  Pencil,
+  Clock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { format } from "date-fns";
+import { pt } from "date-fns/locale";
 
 interface WorkPackageSidebarProps {
   workPackage: WorkPackage;
@@ -53,14 +58,6 @@ interface WorkPackageSidebarProps {
   onClose: () => void;
   onUpdate: (workPackage: WorkPackage) => void;
 }
-
-const taskTypes = [
-  { value: "research", label: "Pesquisa" },
-  { value: "development", label: "Desenvolvimento" },
-  { value: "testing", label: "Testes" },
-  { value: "documentation", label: "Documentação" },
-  { value: "management", label: "Gestão" },
-];
 
 const attachmentTypes = [
   { value: "link", label: "Link", icon: Link },
@@ -79,19 +76,11 @@ export function WorkPackageSidebar({
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [newTask, setNewTask] = useState<Partial<Task>>({
     name: "",
-    type: "development",
     description: "",
     startDate: "",
     endDate: "",
     status: "pending" as TaskStatus,
   });
-  const [newEntregavel, setNewEntregavel] = useState<Partial<Entregavel>>({
-    nome: "",
-    descricao: "",
-    data: "",
-    tipoAnexo: "document"
-  });
-  const [showEntregavelForm, setShowEntregavelForm] = useState(false);
   const [newMaterial, setNewMaterial] = useState({
     name: "",
     units: 0,
@@ -110,7 +99,6 @@ export function WorkPackageSidebar({
     setIsAddingTask(false);
     setNewTask({
       name: "",
-      type: "development",
       description: "",
       startDate: "",
       endDate: "",
@@ -127,22 +115,9 @@ export function WorkPackageSidebar({
   const handleAddTask = () => {
     if (!newTask.name || !newTask.startDate || !newTask.endDate) return;
 
-    let entregaveis: Entregavel[] | undefined = undefined;
-    
-    if (showEntregavelForm && newEntregavel.nome) {
-      entregaveis = [{
-        id: crypto.randomUUID(),
-        nome: newEntregavel.nome || "",
-        descricao: newEntregavel.descricao,
-        data: newEntregavel.data,
-        tipoAnexo: newEntregavel.tipoAnexo
-      }];
-    }
-
     const newTaskObject: Task = {
       id: Date.now(),
       name: newTask.name || "",
-      type: newTask.type as any || "development",
       description: newTask.description || "",
       startDate: newTask.startDate || "",
       endDate: newTask.endDate || "",
@@ -151,7 +126,6 @@ export function WorkPackageSidebar({
       assignedTo: "",
       resources: [],
       materials: [],
-      entregaveis: entregaveis
     };
 
     handleUpdateWorkPackage({
@@ -160,19 +134,11 @@ export function WorkPackageSidebar({
 
     setNewTask({
       name: "",
-      type: "development",
       description: "",
       startDate: "",
       endDate: "",
       status: "pending" as TaskStatus,
     });
-    setNewEntregavel({
-      nome: "",
-      descricao: "",
-      data: "",
-      tipoAnexo: "document"
-    });
-    setShowEntregavelForm(false);
     setIsAddingTask(false);
   };
 
@@ -180,19 +146,11 @@ export function WorkPackageSidebar({
     setIsAddingTask(false);
     setNewTask({
       name: "",
-      type: "development",
       description: "",
       startDate: "",
       endDate: "",
       status: "pending" as TaskStatus,
     });
-    setNewEntregavel({
-      nome: "",
-      descricao: "",
-      data: "",
-      tipoAnexo: "document"
-    });
-    setShowEntregavelForm(false);
   };
 
   const handleRemoveTask = (taskId: number) => {
@@ -250,6 +208,14 @@ export function WorkPackageSidebar({
     );
   };
 
+  const formatDate = (dateString: string) => {
+    try {
+      return format(new Date(dateString), "dd MMM yyyy", { locale: pt });
+    } catch (e) {
+      return dateString;
+    }
+  };
+
   return (
     <Sheet open={open} onOpenChange={onClose}>
       <SheetContent
@@ -257,17 +223,26 @@ export function WorkPackageSidebar({
         className="w-full lg:w-[600px] p-0 overflow-y-auto sm:max-w-none bg-gradient-to-b from-gray-50 to-gray-100 shadow-2xl border-l border-white/20 rounded-l-2xl"
       >
         <div className="h-full flex flex-col">
-          <div className="border-b border-white/20 p-6 bg-white/70 backdrop-blur-sm">
+          <div className="border-b border-white/20 p-6 bg-white/70 backdrop-blur-sm sticky top-0 z-10">
             <SheetHeader className="space-y-4">
               <div className="flex flex-col items-start gap-2">
                 <div className="flex items-center justify-between w-full">
-                  <Input
-                    ref={inputRef}
-                    value={workPackage.name}
-                    onChange={(e) => handleUpdateWorkPackage({ name: e.target.value })}
-                    className="text-xl font-semibold bg-transparent border-none p-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-900"
-                    autoFocus={false}
-                  />
+                  <div className="flex items-center gap-2">
+                    <Input
+                      ref={inputRef}
+                      value={workPackage.name}
+                      onChange={(e) => handleUpdateWorkPackage({ name: e.target.value })}
+                      className="text-xl font-semibold bg-transparent border-none p-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-900"
+                      autoFocus={false}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 rounded-full text-gray-400 hover:text-customBlue hover:bg-blue-50"
+                    >
+                      <Pencil className="h-3 w-3" />
+                    </Button>
+                  </div>
                   <Badge
                     variant="outline"
                     className={cn(
@@ -360,79 +335,59 @@ export function WorkPackageSidebar({
                   <Table>
                     <TableHeader className="bg-white/20 backdrop-blur-sm border-b border-white/20">
                       <TableRow className="hover:bg-transparent">
-                        <TableHead className="text-sm font-medium text-gray-700 py-4">Nome</TableHead>
-                        <TableHead className="text-sm font-medium text-gray-700 py-4">Tipo</TableHead>
+                        <TableHead className="text-sm font-medium text-gray-700 py-4">Nome da Tarefa</TableHead>
+                        <TableHead className="text-sm font-medium text-gray-700 py-4">Início</TableHead>
+                        <TableHead className="text-sm font-medium text-gray-700 py-4">Fim</TableHead>
                         <TableHead className="text-sm font-medium text-gray-700 py-4">Estado</TableHead>
-                        <TableHead className="text-sm font-medium text-gray-700 py-4">Período</TableHead>
-                        <TableHead className="text-sm font-medium text-gray-700 py-4 text-center">Entregável</TableHead>
-                        <TableHead className="w-[100px] text-sm font-medium text-gray-700 py-4"></TableHead>
+                        <TableHead className="w-[80px] text-sm font-medium text-gray-700 py-4"></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {isAddingTask && (
                         <TableRow className="group border-b border-white/10 bg-blue-50/40 backdrop-blur-sm transition-all duration-300 ease-in-out hover:shadow-md">
                           <TableCell>
-                            <Input
-                              value={newTask.name}
-                              onChange={(e) => setNewTask({ ...newTask, name: e.target.value })}
-                              placeholder="Nome da tarefa"
-                              className="border border-gray-200 rounded-md text-sm"
-                              autoFocus
-                            />
+                            <div className="space-y-2">
+                              <Input
+                                value={newTask.name}
+                                onChange={(e) => setNewTask({ ...newTask, name: e.target.value })}
+                                placeholder="Nome da tarefa"
+                                className="border border-gray-200 rounded-md text-sm w-full"
+                                autoFocus
+                              />
+                              <Textarea
+                                value={newTask.description}
+                                onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                                placeholder="Descrição (opcional)"
+                                className="border border-gray-200 rounded-md text-sm min-h-[60px] w-full"
+                              />
+                            </div>
                           </TableCell>
                           <TableCell>
-                            <Select
-                              value={newTask.type}
-                              onValueChange={(value: any) => setNewTask({ ...newTask, type: value })}
-                            >
-                              <SelectTrigger className="w-full text-sm border border-gray-200 rounded-md h-9">
-                                <SelectValue placeholder="Tipo" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {taskTypes.map((type) => (
-                                  <SelectItem key={type.value} value={type.value}>
-                                    {type.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-4 w-4 text-gray-400" />
+                              <Input
+                                type="date"
+                                value={newTask.startDate}
+                                onChange={(e) => setNewTask({ ...newTask, startDate: e.target.value })}
+                                className="border border-gray-200 rounded-md text-sm w-full"
+                              />
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-4 w-4 text-gray-400" />
+                              <Input
+                                type="date"
+                                value={newTask.endDate}
+                                onChange={(e) => setNewTask({ ...newTask, endDate: e.target.value })}
+                                className="border border-gray-200 rounded-md text-sm w-full"
+                              />
+                            </div>
                           </TableCell>
                           <TableCell>
                             <Badge className="bg-amber-50/70 text-amber-600 border-amber-200">
                               Pendente
                             </Badge>
-                          </TableCell>
-                          <TableCell className="space-y-2">
-                            <Input
-                              type="date"
-                              value={newTask.startDate}
-                              onChange={(e) => setNewTask({ ...newTask, startDate: e.target.value })}
-                              className="border border-gray-200 rounded-md text-sm mb-1 w-full"
-                              placeholder="Início"
-                            />
-                            <Input
-                              type="date"
-                              value={newTask.endDate}
-                              onChange={(e) => setNewTask({ ...newTask, endDate: e.target.value })}
-                              className="border border-gray-200 rounded-md text-sm w-full"
-                              placeholder="Fim"
-                            />
-                          </TableCell>
-                          <TableCell className="text-center">
-                            {!showEntregavelForm ? (
-                              <Button
-                                variant="ghost"
-                                onClick={() => setShowEntregavelForm(true)}
-                                className="text-xs text-customBlue hover:text-customBlue/80 rounded-full"
-                              >
-                                <Plus className="h-3 w-3 mr-1" />
-                                Adicionar
-                              </Button>
-                            ) : (
-                              <Badge className="bg-blue-50/70 text-customBlue border-blue-200">
-                                Definido
-                              </Badge>
-                            )}
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
@@ -458,77 +413,21 @@ export function WorkPackageSidebar({
                         </TableRow>
                       )}
                       
-                      {/* Deliverable Form (if showing) */}
-                      {isAddingTask && showEntregavelForm && (
-                        <TableRow className="group border-b border-white/10 bg-blue-50/20 backdrop-blur-sm">
-                          <TableCell colSpan={6} className="p-4">
-                            <div className="space-y-4 bg-white/50 p-4 rounded-xl">
-                              <h4 className="text-sm font-medium text-gray-900 mb-2">Entregável</h4>
-                              <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                  <Label htmlFor="entregavel-name" className="text-xs text-gray-700">Nome</Label>
-                                  <Input
-                                    id="entregavel-name"
-                                    value={newEntregavel.nome}
-                                    onChange={(e) => setNewEntregavel({ ...newEntregavel, nome: e.target.value })}
-                                    placeholder="Nome do entregável"
-                                    className="border border-gray-200 rounded-md text-sm"
-                                  />
-                                </div>
-                                <div className="space-y-2">
-                                  <Label htmlFor="entregavel-date" className="text-xs text-gray-700">Data de Entrega</Label>
-                                  <Input
-                                    id="entregavel-date"
-                                    type="date"
-                                    value={newEntregavel.data}
-                                    onChange={(e) => setNewEntregavel({ ...newEntregavel, data: e.target.value })}
-                                    className="border border-gray-200 rounded-md text-sm"
-                                  />
-                                </div>
-                              </div>
-                              <div className="space-y-2">
-                                <Label htmlFor="entregavel-desc" className="text-xs text-gray-700">Descrição</Label>
-                                <Textarea
-                                  id="entregavel-desc"
-                                  value={newEntregavel.descricao}
-                                  onChange={(e) => setNewEntregavel({ ...newEntregavel, descricao: e.target.value })}
-                                  placeholder="Descrição do entregável"
-                                  className="border border-gray-200 rounded-md text-sm min-h-[60px]"
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <Label htmlFor="entregavel-type" className="text-xs text-gray-700">Tipo de Anexo</Label>
-                                <Select
-                                  value={newEntregavel.tipoAnexo}
-                                  onValueChange={(value: any) => setNewEntregavel({ ...newEntregavel, tipoAnexo: value })}
-                                >
-                                  <SelectTrigger id="entregavel-type" className="border border-gray-200 rounded-md text-sm">
-                                    <SelectValue placeholder="Tipo de anexo" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {attachmentTypes.map((type) => (
-                                      <SelectItem key={type.value} value={type.value} className="flex items-center gap-2">
-                                        <div className="flex items-center gap-2">
-                                          <type.icon className="h-4 w-4" />
-                                          <span>{type.label}</span>
-                                        </div>
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      )}
-                      
                       {workPackage.tasks.map((task) => (
                         <TableRow key={task.id} className="group border-b border-white/10 hover:bg-white/40 backdrop-blur-sm transition-all duration-300 ease-in-out hover:shadow-md">
                           <TableCell className="font-medium text-gray-900 hover:text-customBlue transition-colors duration-300 ease-in-out">
-                            {task.name}
+                            <div>
+                              <p className="font-medium">{task.name}</p>
+                              {task.description && (
+                                <p className="text-xs text-gray-500 mt-1 line-clamp-2">{task.description}</p>
+                              )}
+                            </div>
                           </TableCell>
-                          <TableCell className="text-gray-600">
-                            {taskTypes.find(t => t.value === task.type)?.label || task.type}
+                          <TableCell className="text-gray-600 text-sm">
+                            {formatDate(task.startDate)}
+                          </TableCell>
+                          <TableCell className="text-gray-600 text-sm">
+                            {formatDate(task.endDate)}
                           </TableCell>
                           <TableCell>
                             <Badge className={cn(
@@ -545,18 +444,6 @@ export function WorkPackageSidebar({
                                 ? "Em Progresso" 
                                 : "Pendente"}
                             </Badge>
-                          </TableCell>
-                          <TableCell className="text-gray-600 text-sm">
-                            {new Date(task.startDate).toLocaleDateString('pt-BR')} - {new Date(task.endDate).toLocaleDateString('pt-BR')}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            {task.entregaveis && task.entregaveis.length > 0 ? (
-                              <Badge className="bg-green-50/70 text-green-600 border-green-200">
-                                {task.entregaveis.length}
-                              </Badge>
-                            ) : (
-                              <span className="text-xs text-gray-400">-</span>
-                            )}
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
@@ -579,6 +466,28 @@ export function WorkPackageSidebar({
                           </TableCell>
                         </TableRow>
                       ))}
+                      
+                      {workPackage.tasks.length === 0 && !isAddingTask && (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center py-10">
+                            <div className="flex flex-col items-center justify-center gap-3">
+                              <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center">
+                                <Clock className="h-6 w-6 text-gray-400" />
+                              </div>
+                              <p className="text-gray-500">Não há tarefas neste pacote de trabalho</p>
+                              <Button
+                                onClick={() => setIsAddingTask(true)}
+                                variant="outline"
+                                size="sm"
+                                className="rounded-full flex items-center gap-2 text-customBlue border-customBlue/30 hover:bg-customBlue/10 mt-2"
+                              >
+                                <Plus className="h-4 w-4" />
+                                <span>Adicionar Tarefa</span>
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
                     </TableBody>
                   </Table>
                 </Card>
