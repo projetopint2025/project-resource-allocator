@@ -26,6 +26,7 @@ export interface Entregavel {
   descricao?: string;
   data?: string;
   anexo?: string;
+  tipoAnexo?: string;
 }
 
 export interface Task {
@@ -51,6 +52,7 @@ export interface WorkPackage {
   status: 'completed' | 'in-progress';
   tasks: Task[];
   materials?: Material[]; // Adicionando materiais ao WorkPackage
+  description?: string;   // Adicionando descrição ao WorkPackage
 }
 
 export interface Project {
