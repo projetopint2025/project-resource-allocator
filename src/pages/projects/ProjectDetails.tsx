@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CalendarClock, Users, LineChart, DollarSign, ArrowLeft, Download, FileText, Calendar, Clock, ChevronRight, Search } from "lucide-react";
 import { type Project, type Task, TaskStatus, TaskType } from "@/types/project";
-import { TaskSidebar } from "@/components/projects/tasks/TaskSidebar";
+import { MenuTarefa } from "@/components/projects/tasks/MenuTarefa";
 import { Timeline } from "@/components/projects/Timeline";
 import {
   Tabs,
@@ -248,7 +248,6 @@ export function ProjectDetails() {
     console.log("Task updated:", updatedTask);
   };
   
-  // Calcular estatísticas do projeto
   const totalTasks = mockProject.workPackages.reduce(
     (acc, wp) => acc + wp.tasks.length, 0
   );
@@ -266,7 +265,6 @@ export function ProjectDetails() {
   const uniqueResourceIds = new Set(resources.map(r => r.id));
   const teamSize = uniqueResourceIds.size;
   
-  // Calcular duração em meses
   const startDate = new Date(mockProject.startDate);
   const endDate = new Date(mockProject.endDate);
   const durationInMonths = 
@@ -276,9 +274,7 @@ export function ProjectDetails() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-8 custom-blue-blur">
       <div className="max-w-8xl mx-auto space-y-8">
-        {/* Header com info básica */}
         <div className="flex flex-col md:flex-row gap-6 justify-between">
-          {/* Lado esquerdo - Informações principais */}
           <div className="space-y-4 flex-1">
             <div className="flex items-center gap-3">
               <Button
@@ -314,7 +310,6 @@ export function ProjectDetails() {
             </div>
           </div>
 
-          {/* Lado direito - Pesquisa e botões */}
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-4 justify-end">
               <div className="relative">
@@ -334,9 +329,7 @@ export function ProjectDetails() {
           </div>
         </div>
         
-        {/* Estatísticas do Projeto */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Card Work Packages */}
           <Card className="glass-card border-white/20 shadow-xl transition-all duration-300 ease-in-out hover:shadow-2xl hover:translate-y-[-2px] rounded-2xl">
             <CardContent className="p-5 flex items-center gap-4">
               <div className="h-10 w-10 rounded-full bg-blue-50/70 backdrop-blur-sm flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-300 hover:bg-blue-100/80">
@@ -349,7 +342,6 @@ export function ProjectDetails() {
             </CardContent>
           </Card>
           
-          {/* Card Tarefas */}
           <Card className="glass-card border-white/20 shadow-xl transition-all duration-300 ease-in-out hover:shadow-2xl hover:translate-y-[-2px] rounded-2xl">
             <CardContent className="p-5 flex items-center gap-4">
               <div className="h-10 w-10 rounded-full bg-purple-50/70 backdrop-blur-sm flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-300 hover:bg-purple-100/80">
@@ -372,7 +364,6 @@ export function ProjectDetails() {
             </CardContent>
           </Card>
           
-          {/* Card Período */}
           <Card className="glass-card border-white/20 shadow-xl transition-all duration-300 ease-in-out hover:shadow-2xl hover:translate-y-[-2px] rounded-2xl">
             <CardContent className="p-5 flex items-center gap-4">
               <div className="h-10 w-10 rounded-full bg-amber-50/70 backdrop-blur-sm flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-300 hover:bg-amber-100/80">
@@ -388,7 +379,6 @@ export function ProjectDetails() {
             </CardContent>
           </Card>
           
-          {/* Card Progresso */}
           <Card className="glass-card border-white/20 shadow-xl transition-all duration-300 ease-in-out hover:shadow-2xl hover:translate-y-[-2px] rounded-2xl">
             <CardContent className="p-5 flex items-start gap-4">
               <div className="h-10 w-10 rounded-full bg-emerald-50/70 backdrop-blur-sm flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-300 hover:bg-emerald-100/80">
@@ -534,26 +524,27 @@ export function ProjectDetails() {
               </CardHeader>
               <CardContent className="p-6 overflow-y-auto h-[440px]">
                 <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {/* Lista de recursos únicos */}
-                  {Array.from(uniqueResourceIds).map(id => {
-                    const resource = resources.find(r => r.id === id);
-                    if (!resource) return null;
-                    
-                    return (
-                      <Card key={id} className="glass-card border-white/20 p-4 shadow-md transition-all duration-300 ease-in-out hover:shadow-lg rounded-xl">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="font-medium">{resource.name}</h3>
-                            <p className="text-sm text-gray-500">{resource.role}</p>
-                            <p className="text-xs text-gray-400">Desde {new Date(resource.joinDate).toLocaleDateString('pt-BR')}</p>
+                  {
+                    Array.from(uniqueResourceIds).map(id => {
+                      const resource = resources.find(r => r.id === id);
+                      if (!resource) return null;
+                      
+                      return (
+                        <Card key={id} className="glass-card border-white/20 p-4 shadow-md transition-all duration-300 ease-in-out hover:shadow-lg rounded-xl">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h3 className="font-medium">{resource.name}</h3>
+                              <p className="text-sm text-gray-500">{resource.role}</p>
+                              <p className="text-xs text-gray-400">Desde {new Date(resource.joinDate).toLocaleDateString('pt-BR')}</p>
+                            </div>
+                            <Badge className="bg-blue-50/70 text-customBlue border-blue-200 backdrop-blur-sm shadow-sm">
+                              {resource.profile}
+                            </Badge>
                           </div>
-                          <Badge className="bg-blue-50/70 text-customBlue border-blue-200 backdrop-blur-sm shadow-sm">
-                            {resource.profile}
-                          </Badge>
-                        </div>
-                      </Card>
-                    );
-                  })}
+                        </Card>
+                      );
+                    })
+                  }
                 </div>
               </CardContent>
             </Card>
@@ -575,9 +566,9 @@ export function ProjectDetails() {
         </Tabs>
       </div>
       
-      {/* Sidebar para tarefas selecionadas */}
-      {selectedTask && (
-        <TaskSidebar
+      {
+        selectedTask && (
+        <MenuTarefa
           task={selectedTask}
           open={!!selectedTask}
           onClose={() => setSelectedTask(null)}

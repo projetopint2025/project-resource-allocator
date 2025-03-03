@@ -1,11 +1,10 @@
-
 import { type WorkPackage, type Task } from "@/types/project";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { TaskSidebar } from "@/components/projects/tasks/TaskSidebar";
+import { MenuTarefa } from "@/components/projects/tasks/MenuTarefa";
 import { WorkPackageSidebar } from "@/components/projects/workpackages/WorkPackageSidebar";
 import { Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -54,12 +53,12 @@ export function Timeline({
     if (onSelectTask) onSelectTask(task);
   };
 
-  const handleWorkPackageClick = (wp: WorkPackage) => {
-    setSelectedWorkPackage(wp);
-  };
-
   const handleUpdateTask = (task: Task) => {
     if (onUpdateTask) onUpdateTask(task);
+  };
+
+  const handleWorkPackageClick = (wp: WorkPackage) => {
+    setSelectedWorkPackage(wp);
   };
 
   const handleUpdateWorkPackage = (wp: WorkPackage) => {
@@ -162,7 +161,7 @@ export function Timeline({
 
       {/* Task Sidebar */}
       {selectedTask && (
-        <TaskSidebar
+        <MenuTarefa
           task={selectedTask}
           open={!!selectedTask}
           onClose={() => setSelectedTask(null)}

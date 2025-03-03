@@ -1,3 +1,4 @@
+
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,13 @@ const JsonViewer = () => {
     );
   }
 
+  // Determine if we have a record object or an array
+  const isRecordObject = typeof jsonData === 'object' && !Array.isArray(jsonData);
+  const recordEntries = isRecordObject ? Object.entries(jsonData) : [];
+  const totalRecords = isRecordObject 
+    ? recordEntries.reduce((sum, [_, data]) => sum + (Array.isArray(data) ? data.length : 0), 0)
+    : Array.isArray(jsonData) ? jsonData.length : 0;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-8">
       <div className="max-w-6xl mx-auto space-y-8">
@@ -50,7 +58,7 @@ const JsonViewer = () => {
           <div className="space-y-1">
             <h1 className="text-3xl font-bold text-gray-900">Visualização JSON</h1>
             <p className="text-sm text-gray-500">
-              {jsonData.length} registos encontrados
+              {totalRecords} registos encontrados
             </p>
           </div>
           <div className="flex gap-2">
@@ -84,9 +92,24 @@ const JsonViewer = () => {
         <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20">
           <CardContent className="p-6">
             <div className="bg-gray-900 rounded-lg p-4 overflow-auto max-h-[70vh] text-left">
-              <pre className="text-sm text-gray-100 font-mono" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                {JSON.stringify(jsonData, null, 2)}
-              </pre>
+              {isRecordObject ? (
+                <div className="space-y-6">
+                  {recordEntries.map(([sheetName, data]) => (
+                    <div key={sheetName} className="space-y-2">
+                      <h4 className="text-md font-semibold text-gray-300 border-b border-gray-700 pb-2">
+                        Sheet: {sheetName} ({Array.isArray(data) ? data.length : 0} registos)
+                      </h4>
+                      <pre className="text-sm text-gray-100 font-mono" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                        {JSON.stringify(data, null, 2)}
+                      </pre>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <pre className="text-sm text-gray-100 font-mono" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                  {JSON.stringify(jsonData, null, 2)}
+                </pre>
+              )}
             </div>
           </CardContent>
         </Card>

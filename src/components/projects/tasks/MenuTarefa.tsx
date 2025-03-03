@@ -1,326 +1,262 @@
 
 import { useState, useEffect } from "react";
-import { type Task } from "@/types/project";
-import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
+import { X, Upload, Check, AlertCircle } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  CalendarDays,
-  Check,
-  Calendar,
-  Clock,
-  FileText,
-  Upload,
-  File,
-  X,
-  FileCheck,
-  Paperclip,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
-import { Checkbox } from "@/components/ui/checkbox";
-import { toast } from "sonner";
-
-interface Entregavel {
-  id: string;
-  nome: string;
-  descricao?: string;
-  data?: string;
-  anexo?: string;
-}
-
-// Estendendo a interface Task para incluir entregáveis
-interface TaskWithEntregaveis extends Task {
-  entregaveis?: Entregavel[];
-}
+import { type Task, type Entregavel } from "@/types/project";
+import { format } from "date-fns";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface MenuTarefaProps {
-  task: TaskWithEntregaveis;
+  task: Task;
   open: boolean;
   onClose: () => void;
-  onUpdate: (task: TaskWithEntregaveis) => void;
-  onMarkCompleted?: (taskId: number) => void;
+  onUpdate: (task: Task) => void;
 }
 
-export function MenuTarefa({
-  task: initialTask,
-  open,
-  onClose,
-  onUpdate,
-  onMarkCompleted,
-}: MenuTarefaProps) {
-  const [task, setTask] = useState<TaskWithEntregaveis>(initialTask);
-  const [uploading, setUploading] = useState<Record<string, boolean>>({});
+export function MenuTarefa({ task, open, onClose, onUpdate }: MenuTarefaProps) {
+  const [localTask, setLocalTask] = useState<Task>(task);
+  const [files, setFiles] = useState<{ [key: string]: File | null }>({});
+  const [uploading, setUploading] = useState<{ [key: string]: boolean }>({});
+  const [uploadError, setUploadError] = useState<{ [key: string]: string | null }>({});
 
   useEffect(() => {
-    setTask(initialTask);
-  }, [initialTask]);
+    setLocalTask(task);
+    // Reset files state when task changes
+    setFiles({});
+    setUploading({});
+    setUploadError({});
+  }, [task]);
 
-  const handleUpdateTask = (updates: Partial<TaskWithEntregaveis>) => {
-    const updatedTask = { ...task, ...updates };
-    setTask(updatedTask);
+  const handleToggleStatus = () => {
+    const updatedTask = {
+      ...localTask,
+      status: localTask.status === "completed" ? "pending" : "completed"
+    };
+    setLocalTask(updatedTask);
     onUpdate(updatedTask);
   };
 
-  const handleStatusChange = (newStatus: boolean) => {
-    handleUpdateTask({ status: newStatus ? "completed" : "pending" });
-    if (newStatus && onMarkCompleted) {
-      onMarkCompleted(task.id);
-    }
+  const handleFileChange = (entregavelId: string, file: File | null) => {
+    setFiles(prev => ({
+      ...prev,
+      [entregavelId]: file
+    }));
   };
 
-  const handleFileUpload = (entregavelId: string, file: File) => {
+  const handleUpload = (entregavelId: string) => {
+    const file = files[entregavelId];
+    if (!file) return;
+
     setUploading(prev => ({ ...prev, [entregavelId]: true }));
-    
-    // Simulação de upload - em produção, substituir por API real
+    setUploadError(prev => ({ ...prev, [entregavelId]: null }));
+
+    // Simulate file upload
     setTimeout(() => {
-      const updatedEntregaveis = task.entregaveis?.map(entregavel => 
-        entregavel.id === entregavelId 
-          ? { ...entregavel, anexo: file.name } 
-          : entregavel
+      // In a real app, you would upload the file to your server/cloud storage here
+      // and get back a URL to store in the task
+
+      // Update the task with the new file URL (in a real app, this would be the actual URL)
+      const updatedEntregaveis = localTask.entregaveis?.map(e => 
+        e.id === entregavelId 
+          ? { ...e, anexo: URL.createObjectURL(file) }
+          : e
       ) || [];
-      
-      handleUpdateTask({ entregaveis: updatedEntregaveis });
+
+      const updatedTask = {
+        ...localTask,
+        entregaveis: updatedEntregaveis
+      };
+
+      setLocalTask(updatedTask);
+      onUpdate(updatedTask);
       setUploading(prev => ({ ...prev, [entregavelId]: false }));
-      toast.success(`Ficheiro "${file.name}" enviado com sucesso!`);
     }, 1500);
   };
 
-  const getEntregaveisProgress = () => {
-    if (!task.entregaveis?.length) return 0;
-    const completedCount = task.entregaveis.filter(e => e.anexo).length;
-    return (completedCount / task.entregaveis.length) * 100;
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "Data não definida";
+    try {
+      return format(new Date(dateString), "dd/MM/yyyy");
+    } catch (error) {
+      return "Data inválida";
+    }
   };
 
   return (
-    <Sheet open={open} onOpenChange={onClose}>
-      <SheetContent
-        side="right"
-        className="w-full lg:w-[500px] p-0 overflow-y-auto sm:max-w-none bg-gradient-to-b from-gray-50 to-gray-100 shadow-2xl border-l border-white/20 rounded-l-2xl"
-      >
-        <div className="h-full flex flex-col">
-          <div className="border-b border-white/20 p-6 bg-white/70 backdrop-blur-sm">
-            <SheetHeader className="space-y-4">
-              <div className="flex flex-col items-start">
-                <Input
-                  value={task.name}
-                  onChange={(e) => handleUpdateTask({ name: e.target.value })}
-                  className="text-xl font-semibold bg-transparent border-none p-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-900"
-                  autoFocus={false}
-                />
-                <div className="flex items-center justify-between w-full mt-2">
-                  <Badge
-                    variant="outline"
-                    className={cn(
-                      "text-sm backdrop-blur-sm shadow-sm",
-                      task.status === "completed"
-                        ? "border-emerald-200 text-emerald-600 bg-emerald-50/70"
-                        : "border-amber-200 text-amber-600 bg-amber-50/70"
-                    )}
-                  >
-                    {task.status === "completed" ? "Concluído" : "Pendente"}
-                  </Badge>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleStatusChange(task.status !== "completed")}
-                    className={cn(
-                      "gap-2 rounded-full border shadow-sm hover:shadow-md transition-all duration-300 ease-in-out",
-                      task.status === "completed"
-                        ? "text-amber-600 border-amber-200 hover:bg-amber-50/70 backdrop-blur-sm"
-                        : "text-emerald-600 border-emerald-200 hover:bg-emerald-50/70 backdrop-blur-sm"
-                    )}
-                  >
-                    {task.status === "completed" ? (
-                      <>
-                        <X className="h-4 w-4" />
-                        Marcar como Pendente
-                      </>
-                    ) : (
-                      <>
-                        <Check className="h-4 w-4" />
-                        Marcar como Concluída
-                      </>
-                    )}
-                  </Button>
+    <Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
+        <ScrollArea className="h-[calc(100vh-8rem)] overflow-y-auto pr-4">
+          <SheetHeader className="space-y-2">
+            <SheetTitle className="text-xl font-bold flex items-center justify-between">
+              <div className="flex items-center gap-3 truncate">
+                {localTask.name}
+                <Badge 
+                  className={cn(
+                    localTask.status === "completed" 
+                      ? "bg-emerald-50/70 text-emerald-600 border-emerald-200" 
+                      : "bg-amber-50/70 text-amber-600 border-amber-200"
+                  )}
+                >
+                  {localTask.status === "completed" ? "Concluída" : "Pendente"}
+                </Badge>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={onClose}
+                className="rounded-full hover:bg-gray-100"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </SheetTitle>
+
+            <SheetDescription className="text-gray-600">
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <div>
+                  <span className="text-xs text-gray-500">Data de Início</span>
+                  <p className="font-medium">{formatDate(localTask.startDate)}</p>
+                </div>
+                <div>
+                  <span className="text-xs text-gray-500">Data de Fim</span>
+                  <p className="font-medium">{formatDate(localTask.endDate)}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-4 mt-4">
-                <div className="flex items-center gap-2 rounded-xl bg-white/70 p-3 shadow-md backdrop-blur-sm border border-white/30 w-full">
-                  <div className="h-8 w-8 rounded-full bg-blue-50/70 flex items-center justify-center shadow-sm">
-                    <Calendar className="h-4 w-4 text-customBlue" />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <p className="text-xs text-gray-500">Período</p>
-                    <div className="flex items-center gap-2">
-                      <Input
-                        type="date"
-                        value={task.startDate}
-                        onChange={(e) =>
-                          handleUpdateTask({ startDate: e.target.value })
-                        }
-                        className="text-sm border border-gray-200 rounded-md p-2 w-32 focus:ring-customBlue/50 hover:border-customBlue/50 transition-all duration-300 ease-in-out"
-                      />
-                      <span className="text-gray-600">-</span>
-                      <Input
-                        type="date"
-                        value={task.endDate}
-                        onChange={(e) =>
-                          handleUpdateTask({ endDate: e.target.value })
-                        }
-                        className="text-sm border border-gray-200 rounded-md p-2 w-32 focus:ring-customBlue/50 hover:border-customBlue/50 transition-all duration-300 ease-in-out"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </SheetHeader>
+            </SheetDescription>
+          </SheetHeader>
+
+          <div className="mt-6">
+            <h3 className="text-base font-medium text-gray-700 mb-2">Descrição</h3>
+            <p className="text-sm text-gray-600">{localTask.description || "Sem descrição disponível."}</p>
           </div>
-
-          <div className="flex-1 p-6 space-y-8 overflow-y-auto">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Clock className="h-4 w-4 text-customBlue" />
-                Descrição
-              </Label>
-              <Textarea
-                value={task.description}
-                onChange={(e) => handleUpdateTask({ description: e.target.value })}
-                className="min-h-[100px] border border-gray-200 rounded-xl p-3 text-gray-900 focus:ring-customBlue/20 bg-white/70 backdrop-blur-sm shadow-md hover:shadow-lg transition-all duration-300 ease-in-out"
-              />
-            </div>
-
-            {/* Entregáveis Section */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-full bg-green-50/70 flex items-center justify-center shadow-sm">
-                    <FileText className="h-4 w-4 text-green-600" />
-                  </div>
-                  <h3 className="text-sm font-medium text-gray-900">Entregáveis</h3>
-                </div>
-                
-                {task.entregaveis?.length ? (
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">
-                      {task.entregaveis.filter(e => e.anexo).length} de {task.entregaveis.length} entregue(s)
-                    </span>
-                    <Progress value={getEntregaveisProgress()} className="w-24 h-2" />
-                  </div>
-                ) : null}
-              </div>
-
-              {task.entregaveis?.length ? (
-                <div className="space-y-4">
-                  {task.entregaveis.map((entregavel) => (
-                    <Card 
-                      key={entregavel.id} 
-                      className="glass-card border-white/20 p-4 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out rounded-xl overflow-hidden"
-                    >
-                      <div className="mb-2 flex items-center justify-between">
-                        <h4 className="font-medium text-gray-900 flex items-center gap-2">
+          
+          <Separator className="my-6" />
+          
+          <div>
+            <h3 className="text-base font-medium text-gray-700 mb-4">Entregáveis</h3>
+            
+            {localTask.entregaveis && localTask.entregaveis.length > 0 ? (
+              <div className="space-y-6">
+                {localTask.entregaveis.map((entregavel) => (
+                  <div key={entregavel.id} className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-medium text-gray-800 mb-1">{entregavel.nome}</h4>
+                    {entregavel.descricao && (
+                      <p className="text-sm text-gray-600 mb-3">{entregavel.descricao}</p>
+                    )}
+                    
+                    <div className="mt-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1">
                           {entregavel.anexo ? (
-                            <FileCheck className="h-4 w-4 text-green-600" />
+                            <div className="flex items-center justify-between bg-white p-2 rounded border">
+                              <div className="flex items-center gap-2">
+                                <div className="h-8 w-8 rounded-full bg-green-50 flex items-center justify-center">
+                                  <Check className="h-4 w-4 text-green-600" />
+                                </div>
+                                <div className="text-sm">
+                                  <p className="font-medium">Anexo enviado</p>
+                                  <a 
+                                    href={entregavel.anexo} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-xs text-blue-600 hover:underline"
+                                  >
+                                    Ver anexo
+                                  </a>
+                                </div>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  const updatedEntregaveis = localTask.entregaveis?.map(e => 
+                                    e.id === entregavel.id ? { ...e, anexo: undefined } : e
+                                  );
+                                  setLocalTask({
+                                    ...localTask,
+                                    entregaveis: updatedEntregaveis
+                                  });
+                                  onUpdate({
+                                    ...localTask,
+                                    entregaveis: updatedEntregaveis
+                                  });
+                                }}
+                                className="text-xs text-red-600"
+                              >
+                                Remover
+                              </Button>
+                            </div>
                           ) : (
-                            <File className="h-4 w-4 text-amber-600" />
-                          )}
-                          {entregavel.nome}
-                        </h4>
-                        {entregavel.data && (
-                          <Badge variant="outline" className="text-xs bg-gray-50">
-                            {new Date(entregavel.data).toLocaleDateString()}
-                          </Badge>
-                        )}
-                      </div>
-                      
-                      {entregavel.descricao && (
-                        <p className="text-sm text-gray-600 mb-3">{entregavel.descricao}</p>
-                      )}
-                      
-                      {entregavel.anexo ? (
-                        <div className="flex items-center justify-between p-2 rounded-lg bg-green-50/50 border border-green-100">
-                          <div className="flex items-center gap-2">
-                            <Paperclip className="h-4 w-4 text-green-600" />
-                            <span className="text-sm text-gray-700">{entregavel.anexo}</span>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 text-xs text-red-500 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => {
-                              const updatedEntregaveis = task.entregaveis?.map(e => 
-                                e.id === entregavel.id ? { ...e, anexo: undefined } : e
-                              );
-                              handleUpdateTask({ entregaveis: updatedEntregaveis });
-                            }}
-                          >
-                            Remover
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="mt-2">
-                          <Label htmlFor={`file-${entregavel.id}`} className="w-full">
-                            <div className={cn(
-                              "flex items-center justify-center gap-2 p-3 rounded-lg border border-dashed border-gray-300 text-gray-500 cursor-pointer hover:bg-gray-50 transition-all duration-200",
-                              uploading[entregavel.id] ? "bg-blue-50/50 border-blue-200" : ""
-                            )}>
-                              {uploading[entregavel.id] ? (
-                                <span className="text-sm">A carregar ficheiro...</span>
-                              ) : (
-                                <>
-                                  <Upload className="h-4 w-4" />
-                                  <span className="text-sm">Carregar entregável</span>
-                                </>
+                            <div>
+                              <Label htmlFor={`file-${entregavel.id}`} className="text-xs text-gray-500 mb-1 block">
+                                Anexar ficheiro
+                              </Label>
+                              <div className="flex gap-2">
+                                <Input
+                                  id={`file-${entregavel.id}`}
+                                  type="file"
+                                  onChange={(e) => handleFileChange(entregavel.id, e.target.files?.[0] || null)}
+                                  className="flex-1 text-sm"
+                                />
+                                <Button
+                                  onClick={() => handleUpload(entregavel.id)}
+                                  disabled={!files[entregavel.id] || uploading[entregavel.id]}
+                                  className="gap-1"
+                                  size="sm"
+                                >
+                                  {uploading[entregavel.id] ? (
+                                    <span>Enviando...</span>
+                                  ) : (
+                                    <>
+                                      <Upload className="h-4 w-4" />
+                                      <span>Enviar</span>
+                                    </>
+                                  )}
+                                </Button>
+                              </div>
+                              {uploadError[entregavel.id] && (
+                                <div className="flex items-center gap-1 mt-1 text-xs text-red-600">
+                                  <AlertCircle className="h-3 w-3" />
+                                  <span>{uploadError[entregavel.id]}</span>
+                                </div>
                               )}
                             </div>
-                          </Label>
-                          <Input
-                            id={`file-${entregavel.id}`}
-                            type="file"
-                            className="hidden"
-                            onChange={(e) => {
-                              if (e.target.files && e.target.files[0]) {
-                                handleFileUpload(entregavel.id, e.target.files[0]);
-                              }
-                            }}
-                            disabled={uploading[entregavel.id]}
-                          />
+                          )}
                         </div>
-                      )}
-                    </Card>
-                  ))}
-                </div>
-              ) : (
-                <Card className="p-8 flex flex-col items-center justify-center text-gray-500 border-dashed border-gray-300 bg-white/50">
-                  <FileText className="h-12 w-12 mb-3 text-gray-300" />
-                  <p className="text-center">Não existem entregáveis definidos para esta tarefa.</p>
-                </Card>
-              )}
-            </div>
-            
-            <div className="pt-4 flex justify-end">
-              <Button 
-                className="rounded-full bg-customBlue hover:bg-customBlue/90 text-white gap-2 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out"
-                onClick={onClose}
-              >
-                <Check className="h-4 w-4" />
-                Guardar Alterações
-              </Button>
-            </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 italic">Não existem entregáveis definidos para esta tarefa.</p>
+            )}
           </div>
-        </div>
+        </ScrollArea>
+        
+        <SheetFooter className="mt-6 flex flex-col sm:flex-row sm:justify-between gap-2">
+          <Button 
+            variant="outline" 
+            onClick={onClose}
+          >
+            Fechar
+          </Button>
+          <Button
+            onClick={handleToggleStatus}
+            className={cn(
+              localTask.status === "completed" 
+                ? "bg-amber-600 hover:bg-amber-700"
+                : "bg-emerald-600 hover:bg-emerald-700"
+            )}
+          >
+            {localTask.status === "completed" ? "Marcar como Pendente" : "Marcar como Concluída"}
+          </Button>
+        </SheetFooter>
       </SheetContent>
     </Sheet>
   );

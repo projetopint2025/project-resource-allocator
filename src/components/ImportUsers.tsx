@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,7 @@ const ImportUsers = () => {
   const navigate = useNavigate();
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<any[]>([]);
+  const [preview, setPreview] = useState<Record<string, any[]>>({});
   const [error, setError] = useState<string | null>(null);
   const [showJson, setShowJson] = useState(false);
 
@@ -30,7 +31,7 @@ const ImportUsers = () => {
       const workbook = XLSX.read(data);
       
       // Criar um objeto com todas as sheets
-      const jsonData: { [key: string]: any[] } = {};
+      const jsonData: Record<string, any[]> = {};
       
       // Processar cada sheet
       workbook.SheetNames.forEach(sheetName => {
@@ -69,7 +70,7 @@ const ImportUsers = () => {
   };
 
   const handleImport = () => {
-    if (preview.length > 0) {
+    if (Object.keys(preview).length > 0) {
       setShowJson(true);
     }
   };
