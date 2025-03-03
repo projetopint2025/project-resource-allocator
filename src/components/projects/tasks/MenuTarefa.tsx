@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { type Task, type Entregavel, TaskStatus } from "@/types/project";
+import { type Task, type Entregavel } from "@/types/project";
 import { format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -36,7 +36,7 @@ export function MenuTarefa({ task, open, onClose, onUpdate }: MenuTarefaProps) {
   const handleToggleStatus = () => {
     const updatedTask = {
       ...localTask,
-      status: localTask.status === TaskStatus.completed ? TaskStatus.pending : TaskStatus.completed
+      status: localTask.status === "completed" ? "pending" : "completed"
     };
     setLocalTask(updatedTask);
     onUpdate(updatedTask);
@@ -98,12 +98,12 @@ export function MenuTarefa({ task, open, onClose, onUpdate }: MenuTarefaProps) {
                 {localTask.name}
                 <Badge 
                   className={cn(
-                    localTask.status === TaskStatus.completed 
+                    localTask.status === "completed" 
                       ? "bg-emerald-50/70 text-emerald-600 border-emerald-200 backdrop-blur-sm shadow-sm" 
                       : "bg-amber-50/70 text-amber-600 border-amber-200 backdrop-blur-sm shadow-sm"
                   )}
                 >
-                  {localTask.status === TaskStatus.completed ? "Concluída" : "Pendente"}
+                  {localTask.status === "completed" ? "Concluída" : "Pendente"}
                 </Badge>
               </div>
               <Button 
@@ -265,12 +265,12 @@ export function MenuTarefa({ task, open, onClose, onUpdate }: MenuTarefaProps) {
             onClick={handleToggleStatus}
             className={cn(
               "rounded-full shadow-sm hover:shadow-md transition-all duration-300 ease-in-out",
-              localTask.status === TaskStatus.completed 
+              localTask.status === "completed" 
                 ? "bg-amber-600 hover:bg-amber-700"
                 : "bg-emerald-600 hover:bg-emerald-700"
             )}
           >
-            {localTask.status === TaskStatus.completed ? "Marcar como Pendente" : "Marcar como Concluída"}
+            {localTask.status === "completed" ? "Marcar como Pendente" : "Marcar como Concluída"}
           </Button>
         </SheetFooter>
       </SheetContent>
