@@ -27,6 +27,8 @@ import {
   Trash,
   ListTodo,
   Users,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import {
   Table,
@@ -37,6 +39,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Trash2 } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface WorkPackage {
   id: string;
@@ -113,7 +116,13 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
   });
   const [workPackages, setWorkPackages] = useState<WorkPackage[]>([]);
   const [selectedResource, setSelectedResource] = useState("");
-  const [selectedYear, setSelectedYear] = useState(2024);
+  
+  // Creating years and months for allocation view
+  const allocationYears = [2024, 2025, 2026, 2027];
+  const months = [
+    'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
+    'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
+  ];
 
   const addWorkPackage = () => {
     setWorkPackages([
@@ -193,33 +202,6 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
     );
   };
 
-  const years = Array.from({ length: 5 }, (_, i) => 2024 + i);
-  const months = [
-    'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
-    'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
-  ];
-
-  const handleNext = () => {
-    if (step === 1 && !selectedTemplate) return;
-    if (step === 4) {
-      onSubmit({
-        ...formData,
-        template: selectedTemplate,
-        workPackages,
-      });
-      return;
-    }
-    setStep(step + 1);
-  };
-
-  const handleBack = () => {
-    if (step === 1) {
-      onClose();
-      return;
-    }
-    setStep(step - 1);
-  };
-
   const addResourceToTask = (wpId: string, taskId: string) => {
     if (!selectedResource) return;
     
@@ -235,7 +217,11 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
                 task.id === taskId
                   ? {
                       ...task,
-                      resources: [...task.resources, resource]
+                      resources: [...task.resources, resource],
+                      allocations: {
+                        ...(task.allocations || {}),
+                        [resource]: {}
+                      }
                     }
                   : task
               )
@@ -256,7 +242,46 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
                 task.id === taskId
                   ? {
                       ...task,
-                      resources: task.resources.filter(r => r !== resourceName)
+                      resources: task.resources.filter(r => r !== resourceName),
+                      allocations: (() => {
+                        const newAllocations = { ...task.allocations };
+                        if (newAllocations && newAllocations[resourceName]) {
+                          delete newAllocations[resourceName];
+                        }
+                        return newAllocations;
+                      })()
+                    }
+                  : task
+              )
+            }
+          : wp
+      )
+    );
+  };
+
+  const handleAllocationChange = (wpId: string, taskId: string, resourceName: string, year: number, monthIndex: number, value: string) => {
+    const numValue = parseFloat(value);
+    if (isNaN(numValue) || numValue < 0 || numValue > 1) return;
+    
+    // Create a unique key for each month using year and month index
+    const monthKey = `${year}-${monthIndex}`;
+    
+    setWorkPackages(prev =>
+      prev.map(wp =>
+        wp.id === wpId
+          ? {
+              ...wp,
+              tasks: wp.tasks.map(task =>
+                task.id === taskId
+                  ? {
+                      ...task,
+                      allocations: {
+                        ...(task.allocations || {}),
+                        [resourceName]: {
+                          ...(task.allocations?.[resourceName] || {}),
+                          [monthKey]: numValue
+                        }
+                      }
                     }
                   : task
               )
@@ -592,60 +617,73 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
                         </Card>
                       )}
 
-                      {/* Resource Allocation */}
+                      {/* Resource Allocation - Horizontal Scrolling */}
                       {task.resources.length > 0 && (
                         <div className="space-y-6 pt-4">
-                          <div className="flex items-center justify-between">
-                            <h6 className="text-sm font-medium text-gray-700">Alocação Mensal</h6>
-                            <Select
-                              value={selectedYear.toString()}
-                              onValueChange={(value) => setSelectedYear(Number(value))}
-                            >
-                              <SelectTrigger className="w-[120px]">
-                                <SelectValue placeholder="Ano" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {years.map((year) => (
-                                  <SelectItem key={year} value={year.toString()}>
-                                    {year}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          {task.resources.map((resource, resourceIndex) => (
-                            <div key={resource} className="space-y-2 bg-gray-50/50 p-4 rounded-lg">
+                          <h6 className="text-sm font-medium text-gray-700">Alocação Mensal</h6>
+                          
+                          {task.resources.map((resource) => (
+                            <div key={resource} className="bg-gray-50/50 p-4 rounded-lg space-y-4">
                               <p className="text-sm font-medium text-gray-700">{resource}</p>
-                              <div className="grid grid-cols-6 gap-4">
-                                {months.slice(0, 6).map((month, monthIndex) => (
-                                  <div key={monthIndex} className="space-y-1">
-                                    <Label className="text-xs text-gray-500">{month}</Label>
-                                    <Input
-                                      type="number"
-                                      min="0"
-                                      max="1"
-                                      step="0.1"
-                                      className="text-right h-8 text-sm"
-                                      onChange={(e) => handleAllocationChange(wp.id, task.id, resourceIndex, monthIndex, e.target.value)}
-                                    />
+                              
+                              <div className="relative">
+                                <div className="flex justify-between mb-2">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="h-7 w-7 rounded-full"
+                                  >
+                                    <ChevronLeft className="h-4 w-4" />
+                                  </Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="h-7 w-7 rounded-full"
+                                  >
+                                    <ChevronRight className="h-4 w-4" />
+                                  </Button>
+                                </div>
+
+                                <ScrollArea className="w-full" orientation="horizontal">
+                                  <div className="flex space-x-4 pb-4 px-1">
+                                    {allocationYears.map((year) => (
+                                      <div key={year} className="space-y-2">
+                                        <Badge variant="outline" className="bg-white font-semibold">
+                                          {year}
+                                        </Badge>
+                                        <div className="flex space-x-4">
+                                          {months.map((month, monthIndex) => (
+                                            <div key={`${year}-${monthIndex}`} className="flex flex-col items-center space-y-1 min-w-16">
+                                              <Label className="text-xs text-gray-500">
+                                                {month}/{year.toString().substring(2)}
+                                              </Label>
+                                              <Input
+                                                type="number"
+                                                min="0"
+                                                max="1"
+                                                step="0.1"
+                                                className="text-center h-9 w-14 text-sm"
+                                                onChange={(e) => handleAllocationChange(
+                                                  wp.id, 
+                                                  task.id, 
+                                                  resource, 
+                                                  year, 
+                                                  monthIndex, 
+                                                  e.target.value
+                                                )}
+                                                value={
+                                                  task.allocations?.[resource]?.[`${year}-${monthIndex}`] !== undefined
+                                                    ? task.allocations[resource][`${year}-${monthIndex}`]
+                                                    : ""
+                                                }
+                                              />
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    ))}
                                   </div>
-                                ))}
-                              </div>
-                              <div className="grid grid-cols-6 gap-4">
-                                {months.slice(6).map((month, monthIndex) => (
-                                  <div key={monthIndex} className="space-y-1">
-                                    <Label className="text-xs text-gray-500">{month}</Label>
-                                    <Input
-                                      type="number"
-                                      min="0"
-                                      max="1"
-                                      step="0.1"
-                                      className="text-right h-8 text-sm"
-                                      onChange={(e) => handleAllocationChange(wp.id, task.id, resourceIndex, monthIndex + 6, e.target.value)}
-                                    />
-                                  </div>
-                                ))}
+                                </ScrollArea>
                               </div>
                             </div>
                           ))}
@@ -663,33 +701,25 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
     }
   };
 
-  const handleAllocationChange = (wpId: string, taskId: string, resourceIndex: number, monthIndex: number, value: string) => {
-    const numValue = parseFloat(value);
-    if (isNaN(numValue) || numValue < 0 || numValue > 1) return;
-  
-    setWorkPackages(prev =>
-      prev.map(wp =>
-        wp.id === wpId
-          ? {
-              ...wp,
-              tasks: wp.tasks.map(task =>
-                task.id === taskId
-                  ? {
-                      ...task,
-                      allocations: {
-                        ...task.allocations,
-                        [task.resources[resourceIndex]]: {
-                          ...(task.allocations?.[task.resources[resourceIndex]] || {}),
-                          [monthIndex]: numValue
-                        }
-                      }
-                    }
-                  : task
-              )
-            }
-          : wp
-      )
-    );
+  const handleNext = () => {
+    if (step === 1 && !selectedTemplate) return;
+    if (step === 4) {
+      onSubmit({
+        ...formData,
+        template: selectedTemplate,
+        workPackages,
+      });
+      return;
+    }
+    setStep(step + 1);
+  };
+
+  const handleBack = () => {
+    if (step === 1) {
+      onClose();
+      return;
+    }
+    setStep(step - 1);
   };
 
   return (
