@@ -25,14 +25,14 @@ const JsonViewer = () => {
 
   if (!jsonData) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-8">
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-8 custom-blue-blur">
         <div className="max-w-4xl mx-auto">
-          <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20">
+          <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20 hover:shadow-2xl transition-all duration-300 ease-in-out">
             <CardContent className="p-6">
               <p className="text-center text-gray-500">Nenhum dado JSON encontrado</p>
               <Button
                 onClick={() => navigate('/users/import')}
-                className="mt-4 rounded-full"
+                className="mt-4 rounded-full bg-customBlue hover:bg-customBlue/90 text-white shadow-md hover:shadow-lg transition-all duration-300 ease-in-out"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Voltar para Importação
@@ -52,7 +52,7 @@ const JsonViewer = () => {
     : Array.isArray(jsonData) ? jsonData.length : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-8">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-8 custom-blue-blur">
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
@@ -65,31 +65,31 @@ const JsonViewer = () => {
             <Button
               variant="outline"
               onClick={handleCopy}
-              className="rounded-full"
+              className="rounded-full bg-white/70 hover:bg-white/90 shadow-md hover:shadow-lg border-gray-200 text-gray-700 transition-all duration-300 ease-in-out"
             >
-              <Copy className="h-4 w-4 mr-2" />
+              <Copy className="h-4 w-4 mr-2 text-customBlue" />
               Copiar
             </Button>
             <Button
               variant="outline"
               onClick={handleDownload}
-              className="rounded-full"
+              className="rounded-full bg-white/70 hover:bg-white/90 shadow-md hover:shadow-lg border-gray-200 text-gray-700 transition-all duration-300 ease-in-out"
             >
-              <Download className="h-4 w-4 mr-2" />
+              <Download className="h-4 w-4 mr-2 text-customBlue" />
               Download
             </Button>
             <Button
               variant="outline"
               onClick={() => navigate('/users/import')}
-              className="rounded-full"
+              className="rounded-full bg-white/70 hover:bg-white/90 shadow-md hover:shadow-lg border-gray-200 text-gray-700 transition-all duration-300 ease-in-out"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-4 w-4 mr-2 text-customBlue" />
               Voltar
             </Button>
           </div>
         </div>
 
-        <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20">
+        <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20 hover:shadow-2xl transition-all duration-300 ease-in-out">
           <CardContent className="p-6">
             <div className="bg-gray-900 rounded-lg p-4 overflow-auto max-h-[70vh] text-left">
               {isRecordObject ? (
