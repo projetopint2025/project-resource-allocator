@@ -1,10 +1,12 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { CalendarClock, Users, LineChart, DollarSign, ArrowLeft, Download, FileText, Calendar, Clock, ChevronRight, Search } from "lucide-react";
-import { type Project, type Task, TaskStatus, TaskType } from "@/types/project";
+import { CalendarClock, Users, LineChart, DollarSign, ArrowLeft, Download, FileText, Calendar, Clock, ChevronRight, Search, Package, Edit, Plus } from "lucide-react";
+import { type Project, type Task, type WorkPackage, TaskStatus, TaskType } from "@/types/project";
 import { MenuTarefa } from "@/components/projects/tasks/MenuTarefa";
 import { Timeline } from "@/components/projects/Timeline";
+import { WorkPackageDetails } from "@/components/projects/workpackages/WorkPackageDetails";
 import {
   Tabs,
   TabsContent,
@@ -19,6 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { NotificationsPopover } from "@/components/notifications/NotificationsPopover";
 
+// Mock data with materials in the workpackage
 const mockProject: Project = {
   id: 1,
   name: "INOVC+",
@@ -33,9 +36,11 @@ const mockProject: Project = {
     {
       id: 1,
       name: "WP1 - Análise de Requisitos",
+      description: "Fase inicial do projeto para levantamento e validação de requisitos com stakeholders",
       startDate: "2026-01-01",
       endDate: "2026-01-31",
       status: "in-progress",
+      materials: [],
       tasks: [
         {
           id: 1,
@@ -93,10 +98,27 @@ const mockProject: Project = {
     },
     {
       id: 2,
-      name: "WP2 - Desenvolvimento",
+      name: "WP2 - Desenvolvimento de Framework",
+      description: "Desenvolvimento do framework central do sistema",
       startDate: "2026-02-01",
       endDate: "2026-03-15",
-      status: "in-progress",
+      status: "completed",
+      materials: [
+        {
+          id: 1,
+          name: "Laptop Dell XPS 15",
+          units: 8,
+          unitPrice: 1799.99,
+          category: "MATERIAIS",
+        },
+        {
+          id: 2,
+          name: "Tomadas grandes",
+          units: 10,
+          unitPrice: 50.00,
+          category: "MATERIAIS",
+        }
+      ],
       tasks: [
         {
           id: 3,
@@ -128,6 +150,7 @@ const mockProject: Project = {
       startDate: "2026-03-16",
       endDate: "2026-05-15",
       status: "in-progress",
+      materials: [],
       tasks: [
         {
           id: 4,
@@ -181,6 +204,7 @@ const mockProject: Project = {
       startDate: "2026-05-16",
       endDate: "2026-07-15",
       status: "in-progress",
+      materials: [],
       tasks: [
         {
           id: 6,
@@ -242,6 +266,7 @@ const mockProject: Project = {
 export function ProjectDetails() {
   const navigate = useNavigate();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [selectedWorkPackage, setSelectedWorkPackage] = useState<WorkPackage | null>(null);
   const [activeTab, setActiveTab] = useState("timeline");
 
   const handleUpdateTask = (updatedTask: Task) => {
@@ -454,6 +479,13 @@ export function ProjectDetails() {
                 <span>Finanças</span>
               </TabsTrigger>
             </TabsList>
+            
+            <Button 
+              className="bg-customBlue text-white hover:bg-customBlue/90 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 ease-in-out hover:scale-105"
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Novo Work Package
+            </Button>
           </div>
           
           <TabsContent value="timeline" className="focus-visible:outline-none mt-4">
@@ -469,52 +501,90 @@ export function ProjectDetails() {
           </TabsContent>
           
           <TabsContent value="overview" className="focus-visible:outline-none mt-4">
-            <Card className="glass-card border-white/20 shadow-xl overflow-hidden rounded-2xl hover:shadow-2xl transition-all duration-300 ease-in-out">
-              <CardHeader className="border-b border-white/10 px-6 py-4 sticky top-0 bg-white/70 backdrop-blur-sm z-10 shadow-sm">
-                <CardTitle className="text-lg font-semibold text-gray-900">Detalhes do Projeto</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 overflow-y-auto h-[440px]">
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                  <div className="space-y-4">
-                    <h3 className="font-medium text-gray-700">Informações Gerais</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm text-gray-500">Data de Início</p>
-                        <p className="font-medium">{new Date(mockProject.startDate).toLocaleDateString('pt-BR')}</p>
+            <div className="space-y-6">
+              {mockProject.workPackages.map((wp) => (
+                <Card 
+                  key={wp.id}
+                  onClick={() => setSelectedWorkPackage(wp)}
+                  className="glass-card border-white/20 shadow-xl overflow-hidden rounded-2xl hover:shadow-2xl transition-all duration-300 ease-in-out cursor-pointer"
+                >
+                  <div className="p-6 border-b border-customBlue/10">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-xl bg-customBlue/10 flex items-center justify-center">
+                          <Package className="h-5 w-5 text-customBlue" />
+                        </div>
+                        <div>
+                          <h3 className="text-base font-medium text-customBlue">{wp.name}</h3>
+                          <div className="flex items-center gap-3 mt-1">
+                            <Badge 
+                              className={`${
+                                wp.status === 'completed' 
+                                  ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                                  : 'bg-amber-50 text-amber-600 border-amber-200'
+                              }`}
+                            >
+                              {wp.status === 'completed' ? 'Concluído' : 'Em Progresso'}
+                            </Badge>
+                            <span className="text-xs text-customBlue/60">
+                              {new Date(wp.startDate).toLocaleDateString('pt')} - {new Date(wp.endDate).toLocaleDateString('pt')}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Data de Fim</p>
-                        <p className="font-medium">{new Date(mockProject.endDate).toLocaleDateString('pt-BR')}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Duração</p>
-                        <p className="font-medium">{durationInMonths} meses</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Financiamento</p>
-                        <p className="font-medium">{mockProject.fundingType}</p>
-                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        className="h-8 w-8 rounded-full bg-customBlue/5 hover:bg-customBlue/10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedWorkPackage(wp);
+                        }}
+                      >
+                        <ChevronRight className="h-5 w-5 text-customBlue" />
+                      </Button>
                     </div>
                   </div>
                   
-                  <div className="space-y-4">
-                    <h3 className="font-medium text-gray-700">Equipa</h3>
-                    <div>
-                      <p className="text-sm text-gray-500">Número de Membros</p>
-                      <p className="font-medium">{teamSize}</p>
+                  <div className="p-4">
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="p-3 bg-white/50 rounded-lg">
+                        <p className="text-xs text-customBlue/60">Tarefas</p>
+                        <p className="text-lg font-medium">{wp.tasks.length}</p>
+                      </div>
+                      
+                      <div className="p-3 bg-white/50 rounded-lg">
+                        <p className="text-xs text-customBlue/60">Concluídas</p>
+                        <p className="text-lg font-medium">
+                          {wp.tasks.filter(t => t.status === "completed").length}
+                        </p>
+                      </div>
+                      
+                      <div className="p-3 bg-white/50 rounded-lg">
+                        <p className="text-xs text-customBlue/60">Progresso</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="w-full bg-gray-200/50 rounded-full h-2 overflow-hidden">
+                            <div 
+                              className="h-full bg-customBlue rounded-full"
+                              style={{ 
+                                width: `${wp.tasks.length > 0 
+                                  ? (wp.tasks.filter(t => t.status === "completed").length / wp.tasks.length) * 100 
+                                  : 0}%` 
+                              }}
+                            ></div>
+                          </div>
+                          <span className="text-xs font-medium">
+                            {wp.tasks.length > 0 
+                              ? Math.round((wp.tasks.filter(t => t.status === "completed").length / wp.tasks.length) * 100) 
+                              : 0}%
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className="space-y-4">
-                    <h3 className="font-medium text-gray-700">Progresso</h3>
-                    <div>
-                      <p className="text-sm text-gray-500">Tarefas Concluídas</p>
-                      <p className="font-medium">{completedTasks} de {totalTasks}</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </Card>
+              ))}
+            </div>
           </TabsContent>
           
           <TabsContent value="resources" className="focus-visible:outline-none mt-4">
@@ -574,6 +644,19 @@ export function ProjectDetails() {
           onClose={() => setSelectedTask(null)}
           onUpdate={handleUpdateTask}
         />
+      )}
+
+      {
+        selectedWorkPackage && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center overflow-auto">
+          <div className="w-full max-w-5xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-auto">
+            <WorkPackageDetails 
+              workPackage={selectedWorkPackage}
+              onClose={() => setSelectedWorkPackage(null)}
+              onEdit={() => console.log('Edit work package', selectedWorkPackage.id)}
+            />
+          </div>
+        </div>
       )}
     </div>
   );
