@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -911,4 +912,91 @@ const CreateProject = () => {
             <TimelinePreview 
               workPackages={workPackages}
               startDate={formData.startDate}
-              endDate={
+              endDate={formData.endDate}
+            />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="container mx-auto py-8 px-4 md:px-6 max-w-7xl">
+      <div className="mb-8">
+        <Button
+          variant="ghost"
+          className="mb-4 p-0 hover:bg-transparent text-gray-600 hover:text-gray-900"
+          onClick={() => navigate("/projects")}
+        >
+          <ChevronLeft className="h-4 w-4 mr-1" /> Voltar para projetos
+        </Button>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Criar Novo Projeto</h1>
+        <p className="text-gray-600">Preencha os dados abaixo para criar um novo projeto</p>
+      </div>
+
+      <div className="flex items-center mb-8">
+        <div className="flex items-center w-full max-w-2xl mx-auto">
+          {[1, 2, 3, 4].map((stepNum) => (
+            <React.Fragment key={stepNum}>
+              <div 
+                className={`flex-1 relative rounded-full h-2 ${
+                  stepNum <= step ? "bg-customBlue" : "bg-gray-200"
+                }`}
+              >
+                <div
+                  className={`absolute -top-4 -left-4 h-10 w-10 rounded-full flex items-center justify-center text-sm font-medium ${
+                    stepNum <= step
+                      ? "bg-customBlue text-white"
+                      : "bg-gray-200 text-gray-600"
+                  }`}
+                >
+                  {stepNum}
+                </div>
+              </div>
+              {stepNum < 4 && (
+                <div
+                  className={`h-[2px] w-8 ${
+                    stepNum < step ? "bg-customBlue" : "bg-gray-200"
+                  }`}
+                ></div>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+
+      <div className="mb-8">{renderStep()}</div>
+
+      <div className="flex justify-between items-center mt-8">
+        <Button
+          variant="outline"
+          onClick={() => setStep(Math.max(1, step - 1))}
+          disabled={step === 1}
+          className="px-6 py-3 bg-white border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50"
+        >
+          <ChevronLeft className="mr-2 h-4 w-4" />
+          Anterior
+        </Button>
+        {step < 4 ? (
+          <Button
+            onClick={() => setStep(Math.min(4, step + 1))}
+            className="px-6 py-3 bg-customBlue text-white rounded-xl hover:bg-customBlue/90"
+          >
+            Próximo
+            <ChevronRight className="ml-2 h-4 w-4" />
+          </Button>
+        ) : (
+          <Button
+            onClick={handleSubmit}
+            className="px-6 py-3 bg-customBlue text-white rounded-xl hover:bg-customBlue/90"
+          >
+            Concluir
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default CreateProject;
