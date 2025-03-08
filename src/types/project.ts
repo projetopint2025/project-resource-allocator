@@ -53,7 +53,7 @@ export interface WorkPackage {
   endDate: string;
   status: 'completed' | 'in-progress';
   tasks: Task[];
-  materials: Material[]; // Adicionando materiais ao WorkPackage
+  materials: Material[]; // Adicionando materiais ao WorkPackage (this was already here, but confirming it's required)
   description?: string;   // Adicionando descrição ao WorkPackage
 }
 

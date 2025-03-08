@@ -644,7 +644,7 @@ export function ProjectTemplateWizard({ onClose, onSubmit }: ProjectTemplateWiza
                                   </Button>
                                 </div>
 
-                                <ScrollArea className="w-full" orientation="horizontal">
+                                <ScrollArea className="w-full">
                                   <div className="flex space-x-4 pb-4 px-1">
                                     {allocationYears.map((year) => (
                                       <div key={year} className="space-y-2">
