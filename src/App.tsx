@@ -8,6 +8,7 @@ import { AppSidebar } from "@/components/sidebar";
 import Index from "@/pages/Index";
 import Projects from "@/pages/projects/Projects";
 import { ProjectDetails } from "@/pages/projects/ProjectDetails";
+import CreateProject from "@/pages/projects/CreateProject";
 import Users from "@/pages/users/Users";
 import Validations from "@/pages/Validations";
 import Profile from "@/pages/users/Profile";
@@ -32,6 +33,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/projects" element={<Projects />} />
+              <Route path="/projects/new" element={<CreateProject />} />
               <Route path="/projects/:id" element={<ProjectDetails />} />
               <Route path="/users" element={<Users />} />
               <Route path="/users/:id" element={<UserProfile />} />
