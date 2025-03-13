@@ -34,16 +34,16 @@ export interface Entregavel {
 export interface Task {
   id: number;
   name: string;
-  type?: TaskType; // Tornando o tipo opcional
+  type?: TaskType;
   description: string;
   startDate: string;
   endDate: string;
   status: TaskStatus;
-  rationale?: string; // Tornando a razão opcional
-  assignedTo?: string; // Tornando a atribuição opcional
+  rationale?: string;
+  assignedTo?: string;
   resources: Resource[];
-  materials: Material[]; // Mantido para compatibilidade, mas não deve ser usado
-  entregaveis?: Entregavel[]; // Entregáveis serão definidos posteriormente
+  materials: Material[];
+  entregaveis?: Entregavel[];
 }
 
 export interface WorkPackage {
@@ -53,8 +53,8 @@ export interface WorkPackage {
   endDate: string;
   status: 'completed' | 'in-progress';
   tasks: Task[];
-  materials: Material[]; // Adicionando materiais ao WorkPackage (this was already here, but confirming it's required)
-  description?: string;   // Adicionando descrição ao WorkPackage
+  materials: Material[];
+  description?: string;
 }
 
 export interface Project {

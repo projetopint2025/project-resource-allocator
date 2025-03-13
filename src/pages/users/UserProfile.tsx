@@ -3,37 +3,26 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
-  Calendar,
-  BarChart4,
   Phone, 
-  Mail, 
-  MapPin, 
-  File, 
-  Clock, 
+  Mail,
   Calendar as CalendarIcon,
-  ClipboardList,
-  Award,
-  Briefcase,
   ChevronRight,
-  Sparkles,
   X,
   ArrowLeft,
   BarChart,
   FileText,
+  Briefcase,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { RelatorioUser } from '@/components/users/RelatorioUser';
 import * as Dialog from "@radix-ui/react-dialog";
 
-// Mais dados de exemplo para simular vários utilizadores
 const mockUsers = [
-  // O utilizador existente como id=1 (atualizado para corresponder aos dados em Users.tsx)
   {
     id: 1,
     name: "João Silva",
@@ -66,7 +55,6 @@ const mockUsers = [
     ],
     bio: "Gestor de Recursos Humanos com mais de 8 anos de experiência. Especialista em recrutamento, seleção e gestão de talento. Focado em criar ambientes de trabalho produtivos e saudáveis."
   },
-  // Adicionar mais utilizadores correspondentes aos da tabela Users.tsx
   {
     id: 2,
     name: "Ana Martins",
@@ -254,7 +242,6 @@ const mockUsers = [
   }
 ];
 
-// Dados de exemplo para o relatório de alocação
 const mockReportData = [
   {
     name: "INOVC+",
@@ -334,7 +321,6 @@ const UserProfile = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
   
-  // Encontrar o utilizador correto com base no ID da URL
   const currentUser = useMemo(() => {
     const numericId = Number(id);
     if (isNaN(numericId)) return null;
@@ -342,7 +328,6 @@ const UserProfile = () => {
   }, [id]);
   
   useEffect(() => {
-    // Simulação de carregamento de dados
     setLoading(true);
     setError(false);
     
@@ -358,7 +343,6 @@ const UserProfile = () => {
     console.log(`Carregando utilizador com ID: ${id}`);
   }, [id, currentUser]);
   
-  // Mensagem de erro se o utilizador não for encontrado
   if (error || !currentUser) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-8 custom-blue-blur flex items-center justify-center">
@@ -379,7 +363,6 @@ const UserProfile = () => {
     );
   }
   
-  // Estado de carregamento
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-8 custom-blue-blur flex items-center justify-center">
@@ -391,10 +374,6 @@ const UserProfile = () => {
     );
   }
   
-  // Calcular a carga de trabalho total
-  const totalAllocation = currentUser.projects.reduce((total, project) => total + project.allocation, 0);
-  
-  // Formatar data
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
@@ -404,26 +383,10 @@ const UserProfile = () => {
       return "Data inválida";
     }
   };
-  
-  // Calcular tempo na empresa
-  const calculateTimeInCompany = (joinDate: string) => {
-    const start = new Date(joinDate);
-    const today = new Date();
-    
-    const yearDiff = today.getFullYear() - start.getFullYear();
-    const monthDiff = today.getMonth() - start.getMonth();
-    
-    if (monthDiff < 0) {
-      return `${yearDiff - 1} anos e ${monthDiff + 12} meses`;
-    }
-    
-    return `${yearDiff} anos e ${monthDiff} meses`;
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-8 custom-blue-blur">
-      <div className="max-w-8xl mx-auto space-y-8">
-        {/* Cabeçalho Simplificado */}
+      <div className="max-w-4xl mx-auto space-y-8">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-2">
             <Button 
@@ -454,284 +417,191 @@ const UserProfile = () => {
           </div>
         </div>
         
-        {/* Perfil Principal */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Coluna Principal - Informações */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Card de Perfil */}
-            <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20 hover:shadow-2xl transition-all duration-300 ease-in-out overflow-hidden">
-              <div className="h-40 bg-gradient-to-r from-blue-500 to-customBlue" />
-              <div className="px-8 pb-6 pt-20 relative">
-                <Avatar className="w-32 h-32 border-4 border-white shadow-xl absolute -top-16 left-8">
-                  <AvatarImage src={currentUser.photo} alt={currentUser.name} />
-                  <AvatarFallback className="bg-gradient-to-br from-customBlue to-blue-600 text-white text-2xl">
-                    {currentUser.name.split(' ').map(name => name[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
-                
-                <div className="space-y-4">
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900">{currentUser.name}</h2>
-                    <div className="flex items-center gap-2">
-                      <p className="text-gray-600">{currentUser.role}</p>
-                      <span className="text-gray-400">•</span>
-                      <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100">
-                        {currentUser.level}
-                      </Badge>
-                    </div>
-                  </div>
-                  
-                  <p className="text-gray-700 leading-relaxed">{currentUser.bio}</p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100">
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Mail className="w-4 h-4 text-customBlue" />
-                      <span>{currentUser.email}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Phone className="w-4 h-4 text-customBlue" />
-                      <span>{currentUser.phone}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <MapPin className="w-4 h-4 text-customBlue" />
-                      <span>{currentUser.location}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <CalendarIcon className="w-4 h-4 text-customBlue" />
-                      <span>Entrou em {formatDate(currentUser.joinDate)}</span>
-                    </div>
-                  </div>
+        <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20 hover:shadow-2xl transition-all duration-300 ease-in-out overflow-hidden">
+          <div className="h-40 bg-gradient-to-r from-blue-500 to-customBlue" />
+          <div className="px-8 pb-6 pt-20 relative">
+            <Avatar className="w-32 h-32 border-4 border-white shadow-xl absolute -top-16 left-8">
+              <AvatarImage src={currentUser.photo} alt={currentUser.name} />
+              <AvatarFallback className="bg-gradient-to-br from-customBlue to-blue-600 text-white text-2xl">
+                {currentUser.name.split(' ').map(name => name[0]).join('')}
+              </AvatarFallback>
+            </Avatar>
+            
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">{currentUser.name}</h2>
+                <div className="flex items-center gap-2">
+                  <p className="text-gray-600">{currentUser.role}</p>
+                  <span className="text-gray-400">•</span>
+                  <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100">
+                    {currentUser.level}
+                  </Badge>
                 </div>
               </div>
-            </Card>
-            
-            {/* Tabs de Conteúdo */}
-            <Tabs defaultValue="projects" className="w-full">
-              <TabsList className="grid grid-cols-3 mb-6 bg-white/40 backdrop-blur-sm rounded-lg p-1 shadow-md">
-                <TabsTrigger value="projects" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-300">
-                  <Briefcase className="w-4 h-4 mr-2" />
-                  Projetos
-                </TabsTrigger>
-                <TabsTrigger value="skills" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-300">
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Competências
-                </TabsTrigger>
-                <TabsTrigger value="achievements" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-300">
-                  <Award className="w-4 h-4 mr-2" />
-                  Conquistas
-                </TabsTrigger>
-              </TabsList>
               
-              {/* Conteúdo dos Projetos */}
-              <TabsContent value="projects" className="mt-0">
-                <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20 transition-all duration-300 ease-in-out overflow-hidden">
-                  <CardHeader className="px-6 py-4 border-b border-white/10 bg-white/20 backdrop-blur-sm">
-                    <CardTitle className="text-lg font-semibold text-gray-900">Projetos Atuais</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6 space-y-6">
-                    {currentUser.projects.map((project) => (
-                      <div key={project.id} className="bg-white/60 backdrop-blur-sm rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out">
-                        <div className="flex justify-between items-start flex-wrap gap-2">
-                          <div>
-                            <h3 className="font-semibold text-lg text-gray-900">{project.name}</h3>
-                            <p className="text-gray-600 text-sm">{project.role}</p>
-                          </div>
-                          <Badge className={cn(
-                            "px-3 py-1 rounded-full text-xs whitespace-nowrap",
-                            project.allocation <= 0.3 ? "bg-green-50 text-green-600 border-green-200" :
-                            project.allocation <= 0.7 ? "bg-blue-50 text-blue-600 border-blue-200" :
-                            "bg-amber-50 text-amber-600 border-amber-200"
-                          )}>
-                            {(project.allocation * 100).toFixed(0)}% alocação
-                          </Badge>
-                        </div>
-                        <div className="mt-4">
-                          <div className="flex justify-between items-center mb-1 text-xs text-gray-500">
-                            <span>Alocação</span>
-                            <span>{(project.allocation * 100).toFixed(0)}%</span>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-100">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Mail className="w-4 h-4 text-customBlue" />
+                  <span>{currentUser.email}</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Phone className="w-4 h-4 text-customBlue" />
+                  <span>{currentUser.phone}</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <CalendarIcon className="w-4 h-4 text-customBlue" />
+                  <span>Desde {formatDate(currentUser.joinDate)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+        
+        <Tabs defaultValue="allocations" className="w-full">
+          <TabsList className="grid grid-cols-2 mb-6 bg-white/40 backdrop-blur-sm rounded-lg p-1 shadow-md">
+            <TabsTrigger value="allocations" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-300">
+              <Briefcase className="w-4 h-4 mr-2" />
+              Alocações
+            </TabsTrigger>
+            <TabsTrigger value="info" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-300">
+              <FileText className="w-4 h-4 mr-2" />
+              Informações
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="allocations" className="mt-0">
+            <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20 transition-all duration-300 ease-in-out overflow-hidden">
+              <CardHeader className="px-6 py-4 border-b border-white/10 bg-white/20 backdrop-blur-sm">
+                <CardTitle className="text-lg font-semibold text-gray-900">Projetos e Alocações</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 space-y-6">
+                {currentUser.projects.map((project) => (
+                  <div key={project.id} className="bg-white/60 backdrop-blur-sm rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out">
+                    <div className="flex justify-between items-start flex-wrap gap-2">
+                      <div>
+                        <h3 className="font-semibold text-lg text-gray-900">{project.name}</h3>
+                        <p className="text-gray-600 text-sm">{project.role}</p>
+                      </div>
+                      <Badge className={cn(
+                        "px-3 py-1 rounded-full text-xs whitespace-nowrap",
+                        project.allocation <= 0.3 ? "bg-green-50 text-green-600 border-green-200" :
+                        project.allocation <= 0.7 ? "bg-blue-50 text-blue-600 border-blue-200" :
+                        "bg-amber-50 text-amber-600 border-amber-200"
+                      )}>
+                        {(project.allocation * 100).toFixed(0)}% alocação
+                      </Badge>
+                    </div>
+                    <div className="mt-4">
+                      <div className="flex justify-between items-center mb-1 text-xs text-gray-500">
+                        <span>Alocação</span>
+                        <span>{(project.allocation * 100).toFixed(0)}%</span>
+                      </div>
+                      <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                        <div 
+                          className={cn(
+                            "h-full rounded-full",
+                            project.allocation <= 0.3 ? "bg-green-500" :
+                            project.allocation <= 0.7 ? "bg-blue-500" :
+                            "bg-amber-500"
+                          )}
+                          style={{ width: `${project.allocation * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                
+                {currentUser.projects.length === 0 && (
+                  <div className="text-center py-8">
+                    <div className="bg-gray-50 rounded-full w-16 h-16 mx-auto flex items-center justify-center mb-4">
+                      <Briefcase className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <h3 className="text-gray-700 font-medium">Sem projetos ativos</h3>
+                    <p className="text-gray-500 text-sm mt-1">O colaborador não está alocado a nenhum projeto atualmente.</p>
+                  </div>
+                )}
+              </CardContent>
+              <CardFooter className="px-6 py-4 border-t border-white/10 bg-white/10 backdrop-blur-sm">
+                <Button 
+                  onClick={() => setShowReport(true)}
+                  variant="ghost" 
+                  className="text-customBlue hover:bg-white/60 w-full justify-center rounded-lg shadow-sm hover:shadow-md transition-all duration-300 ease-in-out" 
+                  size="sm"
+                >
+                  Ver detalhes de alocação
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
+              </CardFooter>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="info" className="mt-0">
+            <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20 transition-all duration-300 ease-in-out overflow-hidden">
+              <CardHeader className="px-6 py-4 border-b border-white/10 bg-white/20 backdrop-blur-sm">
+                <CardTitle className="text-lg font-semibold text-gray-900">Perfil Profissional</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 mb-2">Biografia</h3>
+                    <p className="text-gray-700 leading-relaxed">{currentUser.bio}</p>
+                  </div>
+                  
+                  <div className="border-t border-gray-100 pt-4">
+                    <h3 className="text-sm font-semibold text-gray-900 mb-2">Competências</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      {currentUser.skills.map((skill, index) => (
+                        <div key={index} className="space-y-2">
+                          <div className="flex justify-between items-center gap-2">
+                            <h4 className="text-sm font-medium text-gray-900">{skill.name}</h4>
+                            <span className="text-xs text-gray-600">{skill.level}%</span>
                           </div>
                           <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
                             <div 
-                              className={cn(
-                                "h-full rounded-full",
-                                project.allocation <= 0.3 ? "bg-green-500" :
-                                project.allocation <= 0.7 ? "bg-blue-500" :
-                                "bg-amber-500"
-                              )}
-                              style={{ width: `${project.allocation * 100}%` }}
+                              className="h-full bg-gradient-to-r from-customBlue to-blue-500 rounded-full"
+                              style={{ width: `${skill.level}%` }}
                             />
                           </div>
                         </div>
-                      </div>
-                    ))}
-                    
-                    {currentUser.projects.length === 0 && (
-                      <div className="text-center py-8">
-                        <div className="bg-gray-50 rounded-full w-16 h-16 mx-auto flex items-center justify-center mb-4">
-                          <Briefcase className="w-8 h-8 text-gray-400" />
-                        </div>
-                        <h3 className="text-gray-700 font-medium">Sem projetos ativos</h3>
-                        <p className="text-gray-500 text-sm mt-1">O colaborador não está alocado a nenhum projeto atualmente.</p>
-                      </div>
-                    )}
-                  </CardContent>
-                  <CardFooter className="px-6 py-4 border-t border-white/10 bg-white/10 backdrop-blur-sm">
-                    <Button variant="ghost" className="text-customBlue hover:bg-white/60 w-full justify-center rounded-lg shadow-sm hover:shadow-md transition-all duration-300 ease-in-out" size="sm">
-                      Ver histórico completo
-                      <ChevronRight className="w-4 h-4 ml-1" />
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </TabsContent>
-              
-              {/* Conteúdo das Competências */}
-              <TabsContent value="skills" className="mt-0">
-                <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20 transition-all duration-300 ease-in-out overflow-hidden">
-                  <CardHeader className="px-6 py-4 border-b border-white/10 bg-white/20 backdrop-blur-sm">
-                    <CardTitle className="text-lg font-semibold text-gray-900">Competências e Habilidades</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6 space-y-6">
-                    {currentUser.skills.map((skill, index) => (
-                      <div key={index} className="space-y-2">
-                        <div className="flex justify-between items-center flex-wrap gap-2">
-                          <h3 className="font-medium text-gray-900">{skill.name}</h3>
-                          <span className="text-sm text-gray-600">{skill.level}%</span>
-                        </div>
-                        <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-gradient-to-r from-customBlue to-blue-500 rounded-full"
-                            style={{ width: `${skill.level}%` }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                    
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-6">
-                      {["JavaScript", "HTML/CSS", "Git", "Scrum", "Jest", "Python", "Docker", "AWS", "Figma"].map((tag, index) => (
-                        <Badge key={index} variant="outline" className="justify-center bg-white/70 text-gray-700 border-gray-200 hover:bg-white/90 py-1">
-                          {tag}
-                        </Badge>
                       ))}
                     </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              {/* Conteúdo das Conquistas */}
-              <TabsContent value="achievements" className="mt-0">
-                <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20 transition-all duration-300 ease-in-out overflow-hidden">
-                  <CardHeader className="px-6 py-4 border-b border-white/10 bg-white/20 backdrop-blur-sm">
-                    <CardTitle className="text-lg font-semibold text-gray-900">Conquistas e Certificações</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <div className="space-y-6 relative before:absolute before:inset-y-0 before:left-3 before:w-0.5 before:bg-gray-200">
-                      {currentUser.achievements.map((achievement, index) => (
-                        <div key={achievement.id} className="flex gap-4 relative">
-                          <div className="w-6 h-6 rounded-full bg-white shadow-md border-2 border-customBlue flex-shrink-0 z-10">
-                            <Award className="w-3 h-3 text-customBlue absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                  </div>
+                  
+                  <div className="border-t border-gray-100 pt-4">
+                    <h3 className="text-sm font-semibold text-gray-900 mb-2">Experiência Anterior</h3>
+                    <div className="space-y-3">
+                      {currentUser.workHistory.map((work) => (
+                        <div key={work.id} className="bg-white/60 backdrop-blur-sm rounded-lg p-3 shadow-sm">
+                          <div className="flex justify-between items-start">
+                            <h4 className="font-medium text-gray-900">{work.role}</h4>
+                            <span className="text-xs text-gray-500">{work.period}</span>
                           </div>
-                          <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out flex-grow">
-                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-                              <h3 className="font-semibold text-gray-900">{achievement.title}</h3>
-                              <span className="text-sm text-gray-500 whitespace-nowrap">{formatDate(achievement.date)}</span>
-                            </div>
-                            <p className="text-gray-700 mt-1">{achievement.description}</p>
-                          </div>
+                          <p className="text-sm text-gray-600">{work.company}</p>
                         </div>
                       ))}
                     </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
-          
-          {/* Coluna Lateral - Informações Adicionais */}
-          <div className="space-y-8">
-            {/* Estatísticas Rápidas */}
-            <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20 hover:shadow-2xl transition-all duration-300 ease-in-out overflow-hidden">
-              <CardHeader className="px-6 py-4 border-b border-white/10 bg-white/20 backdrop-blur-sm">
-                <CardTitle className="text-lg font-semibold text-gray-900">Resumo</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 space-y-6">
-                {/* Carga de Trabalho */}
-                <div className="space-y-2">
-                  <div className="flex justify-between flex-wrap gap-2">
-                    <h3 className="text-sm font-medium text-gray-700">Carga de Trabalho</h3>
-                    <span className={cn(
-                      "text-sm font-medium",
-                      totalAllocation <= 0.5 ? "text-green-600" :
-                      totalAllocation <= 0.8 ? "text-blue-600" :
-                      totalAllocation <= 1.0 ? "text-amber-600" :
-                      "text-red-600"
-                    )}>
-                      {Math.min(totalAllocation * 100, 100).toFixed(0)}%
-                    </span>
                   </div>
-                  <Progress 
-                    value={Math.min(totalAllocation * 100, 100)} 
-                    className={cn(
-                      "h-2 bg-gray-100",
-                      totalAllocation <= 0.5 ? "[&>div]:bg-green-500" :
-                      totalAllocation <= 0.8 ? "[&>div]:bg-blue-500" :
-                      totalAllocation <= 1.0 ? "[&>div]:bg-amber-500" :
-                      "[&>div]:bg-red-500"
-                    )}
-                  />
-                  <p className="text-xs text-gray-500">Baseado nos projetos ativos</p>
-                </div>
-                
-                {/* Tempo na Empresa */}
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-customBlue flex-shrink-0">
-                    <Clock className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-900">Tempo na Empresa</h3>
-                    <p className="text-gray-700 break-words">{calculateTimeInCompany(currentUser.joinDate)}</p>
-                  </div>
-                </div>
-                
-                {/* Departamento */}
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-customBlue flex-shrink-0">
-                    <Briefcase className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-900">Departamento</h3>
-                    <p className="text-gray-700">{currentUser.department}</p>
+                  
+                  <div className="border-t border-gray-100 pt-4">
+                    <h3 className="text-sm font-semibold text-gray-900 mb-2">Certificações e Prêmios</h3>
+                    <div className="space-y-3">
+                      {currentUser.achievements.map((achievement) => (
+                        <div key={achievement.id} className="bg-white/60 backdrop-blur-sm rounded-lg p-3 shadow-sm">
+                          <div className="flex justify-between items-start">
+                            <h4 className="font-medium text-gray-900">{achievement.title}</h4>
+                            <span className="text-xs text-gray-500">{formatDate(achievement.date)}</span>
+                          </div>
+                          <p className="text-sm text-gray-600">{achievement.description}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            
-            {/* Experiência Anterior */}
-            <Card className="border-none shadow-xl rounded-2xl glass-card border-white/20 hover:shadow-2xl transition-all duration-300 ease-in-out overflow-hidden">
-              <CardHeader className="px-6 py-4 border-b border-white/10 bg-white/20 backdrop-blur-sm">
-                <CardTitle className="text-lg font-semibold text-gray-900">Experiência Anterior</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  {currentUser.workHistory.map((work) => (
-                    <div key={work.id} className="bg-white/60 backdrop-blur-sm rounded-xl p-4 hover:shadow-md transition-all duration-300 ease-in-out">
-                      <h3 className="font-medium text-gray-900">{work.role}</h3>
-                      <div className="flex items-center gap-1 text-sm text-gray-600 mt-1 flex-wrap">
-                        <Briefcase className="w-3 h-3 flex-shrink-0" />
-                        <span>{work.company}</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-sm text-gray-600 mt-1 flex-wrap">
-                        <Calendar className="w-3 h-3 flex-shrink-0" />
-                        <span>{work.period}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
         
-        {/* Modal do Relatório */}
         <Dialog.Root open={showReport} onOpenChange={setShowReport}>
           <Dialog.Portal>
             <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-all duration-300 ease-in-out" />
@@ -759,4 +629,4 @@ const UserProfile = () => {
   );
 };
 
-export default UserProfile; 
+export default UserProfile;
