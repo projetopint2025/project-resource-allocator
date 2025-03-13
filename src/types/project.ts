@@ -82,3 +82,32 @@ export interface BudgetCategory {
   allocated: number;
   spent: number;
 }
+
+export interface UserAllocation {
+  workPackageId: number;
+  workPackageName: string;
+  taskId: number;
+  taskName: string;
+  projectId: number;
+  projectName: string;
+  allocation: number;
+  startDate: string;
+  endDate: string;
+}
+
+export interface UserInfo {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  department: string;
+  joinDate: string;
+  skills: string[];
+  languages: string[];
+  location: string;
+  bio: string;
+  education: string;
+  avatar: string;
+  allocations: UserAllocation[];
+}
