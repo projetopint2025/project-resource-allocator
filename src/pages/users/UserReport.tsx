@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { RelatorioUser } from "@/components/users/RelatorioUser";
@@ -9,55 +10,20 @@ import { ArrowLeft, FileText, DownloadCloud } from "lucide-react";
 const mockWorkPackages = [
   {
     name: "WP1 - Gestão de Projeto",
-    tasks: [
-      {
-        id: 1,
-        name: "T1.1 - Coordenação",
-        workpackage: "WP1",
-        allocations: [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
-      },
-      {
-        id: 2,
-        name: "T1.2 - Reuniões",
-        workpackage: "WP1",
-        allocations: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
-      },
-    ],
+    allocations: [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3],
   },
   {
     name: "WP2 - Desenvolvimento",
-    tasks: [
-      {
-        id: 3,
-        name: "T2.1 - Frontend",
-        workpackage: "WP2",
-        allocations: [0.3, 0.3, 0.3, 0.2, 0.2, 0.2, 0.1, 0.1, 0.1, 0.0, 0.0, 0.0],
-      },
-      {
-        id: 4,
-        name: "T2.2 - Backend",
-        workpackage: "WP2",
-        allocations: [0.3, 0.3, 0.3, 0.3, 0.2, 0.2, 0.2, 0.1, 0.1, 0.1, 0.0, 0.0],
-      },
-    ],
+    allocations: [0.6, 0.6, 0.6, 0.5, 0.4, 0.4, 0.3, 0.2, 0.2, 0.1, 0.0, 0.0],
   },
   {
     name: "WP3 - Testes",
-    tasks: [
-      {
-        id: 5,
-        name: "T3.1 - Testes Unitários",
-        workpackage: "WP3",
-        allocations: [0.0, 0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.3, 0.3, 0.3, 0.2, 0.2],
-      },
-      {
-        id: 6,
-        name: "T3.2 - Testes de Integração",
-        workpackage: "WP3",
-        allocations: [0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, 0.2, 0.2, 0.2, 0.3, 0.3],
-      },
-    ],
+    allocations: [0.0, 0.0, 0.0, 0.0, 0.2, 0.3, 0.3, 0.5, 0.5, 0.5, 0.5, 0.5],
   },
+  {
+    name: "WP4 - Documentação",
+    allocations: [0.0, 0.0, 0.0, 0.1, 0.1, 0.1, 0.2, 0.2, 0.2, 0.2, 0.3, 0.3],
+  }
 ];
 
 const UserReport = () => {

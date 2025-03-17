@@ -1,7 +1,8 @@
+
 import * as React from "react";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -19,35 +20,24 @@ import {
   TableRow,
   TableFooter,
 } from "@/components/ui/table";
-import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
   BarChart, 
   Calendar, 
-  Download, 
-  FileText, 
-  Sparkles, 
+  Check, 
   Clock, 
   Activity, 
-  ArrowUpDown, 
-  Filter, 
-  Check, 
-  ChevronRight,
+  ArrowUpDown,
+  ChevronDown,
+  ChevronUp,
+  FileText
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useNavigate } from "react-router-dom";
-
-interface TaskAllocation {
-  id: number;
-  name: string;
-  workpackage: string;
-  allocations: number[];
-}
 
 interface WorkPackageAllocation {
   name: string;
-  tasks: TaskAllocation[];
+  allocations: number[];
 }
 
 interface RelatorioUserProps {
@@ -57,12 +47,11 @@ interface RelatorioUserProps {
   userName?: string;
 }
 
-export function RelatorioUser({ year, onYearChange, data, userName = "Vasco Fernandes" }: RelatorioUserProps) {
+export function RelatorioUser({ year, onYearChange, data, userName = "Utilizador" }: RelatorioUserProps) {
   const [allocations, setAllocations] = useState<WorkPackageAllocation[]>(data);
   const [targetTotals, setTargetTotals] = useState<number[]>(Array(12).fill(0.8)); // Valores padrão mais realistas
   const [viewMonth, setViewMonth] = useState<number | null>(null); // null significa todos os meses
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const months = [
     "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -71,7 +60,6 @@ export function RelatorioUser({ year, onYearChange, data, userName = "Vasco Fern
 
   const handleAllocationChange = (
     wpIndex: number,
-    taskIndex: number,
     timeIndex: number,
     value: string
   ) => {
@@ -82,15 +70,8 @@ export function RelatorioUser({ year, onYearChange, data, userName = "Vasco Fern
           i === wpIndex
             ? {
                 ...wp,
-                tasks: wp.tasks.map((task, j) =>
-                  j === taskIndex
-                    ? {
-                        ...task,
-                        allocations: task.allocations.map((alloc, k) =>
-                          k === timeIndex ? 0 : alloc
-                        ),
-                      }
-                    : task
+                allocations: wp.allocations.map((alloc, k) =>
+                  k === timeIndex ? 0 : alloc
                 ),
               }
             : wp
@@ -124,15 +105,8 @@ export function RelatorioUser({ year, onYearChange, data, userName = "Vasco Fern
         i === wpIndex
           ? {
               ...wp,
-              tasks: wp.tasks.map((task, j) =>
-                j === taskIndex
-                  ? {
-                      ...task,
-                      allocations: task.allocations.map((alloc, k) =>
-                        k === timeIndex ? numValue : alloc
-                      ),
-                    }
-                  : task
+              allocations: wp.allocations.map((alloc, k) =>
+                k === timeIndex ? numValue : alloc
               ),
             }
           : wp
@@ -180,12 +154,7 @@ export function RelatorioUser({ year, onYearChange, data, userName = "Vasco Fern
   const calculateMonthTotal = useCallback(
     (timeIndex: number): number => {
       return allocations.reduce(
-        (sum, wp) =>
-          sum +
-          wp.tasks.reduce(
-            (taskSum, task) => taskSum + task.allocations[timeIndex],
-            0
-          ),
+        (sum, wp) => sum + wp.allocations[timeIndex],
         0
       );
     },
@@ -215,17 +184,6 @@ export function RelatorioUser({ year, onYearChange, data, userName = "Vasco Fern
       return [viewMonth];
     }
   };
-
-  const calculateWPAllocations = useCallback(
-    (tasks: TaskAllocation[]) => {
-      return Array(12)
-        .fill(0)
-        .map((_, monthIndex) => {
-          return tasks.reduce((sum, task) => sum + task.allocations[monthIndex], 0);
-        });
-    },
-    []
-  );
 
   const getStatusColor = (percentage: number) => {
     if (percentage > 95 && percentage < 105) return "text-green-500";
@@ -281,7 +239,7 @@ export function RelatorioUser({ year, onYearChange, data, userName = "Vasco Fern
         <Card className="glass-card border-white/20 shadow-xl transition-all duration-300 ease-in-out hover:shadow-2xl hover:translate-y-[-2px] bg-gradient-to-br from-white/80 to-white/50">
           <div className="p-5 flex items-center gap-4">
             <div className="h-12 w-12 rounded-xl bg-green-50/70 backdrop-blur-sm flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-300 hover:bg-green-100/80 border border-green-100/50">
-              <Sparkles className="h-6 w-6 text-green-600" />
+              <FileText className="h-6 w-6 text-green-600" />
             </div>
             <div>
               <p className="text-sm text-gray-500">WorkPackages</p>
@@ -360,7 +318,7 @@ export function RelatorioUser({ year, onYearChange, data, userName = "Vasco Fern
               <TableRow className="border-b border-white/20 hover:bg-transparent">
                 <TableHead className="w-[300px] text-sm font-medium text-gray-700 py-4">
                   <div className="flex items-center gap-1">
-                    WorkPackage/Tarefa
+                    WorkPackages
                     <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full text-gray-400 hover:text-customBlue">
                       <ArrowUpDown className="h-3 w-3" />
                     </Button>
@@ -375,51 +333,33 @@ export function RelatorioUser({ year, onYearChange, data, userName = "Vasco Fern
             </TableHeader>
             <TableBody>
               {allocations.map((wp, wpIndex) => (
-                <React.Fragment key={wp.name}>
-                  <TableRow className="bg-white/10 hover:bg-white/30 transition-all duration-200">
-                    <TableCell className="font-semibold text-gray-900">
-                      <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-lg bg-customBlue/10 border border-customBlue/30 flex items-center justify-center">
-                          <FileText className="h-4 w-4 text-customBlue" />
-                        </div>
-                        {wp.name}
+                <TableRow 
+                  key={wp.name} 
+                  className="bg-white/10 hover:bg-white/30 transition-all duration-200"
+                >
+                  <TableCell className="font-semibold text-gray-900">
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 w-8 rounded-lg bg-customBlue/10 border border-customBlue/30 flex items-center justify-center">
+                        <FileText className="h-4 w-4 text-customBlue" />
+                      </div>
+                      {wp.name}
+                    </div>
+                  </TableCell>
+                  {getVisibleMonths().map((monthIndex) => (
+                    <TableCell key={monthIndex} className="text-right py-3">
+                      <div className="relative flex justify-end">
+                        <Input
+                          type="number"
+                          step="0.1"
+                          value={wp.allocations[monthIndex] === 0 ? "" : wp.allocations[monthIndex].toFixed(1)}
+                          onChange={(e) => handleAllocationChange(wpIndex, monthIndex, e.target.value)}
+                          className="w-20 text-right text-gray-900 border border-gray-200 rounded-md focus:ring-customBlue/50 focus:border-customBlue/50 shadow-sm hover:shadow-md transition-all duration-200"
+                          placeholder="0.0"
+                        />
                       </div>
                     </TableCell>
-                    {getVisibleMonths().map((monthIndex) => (
-                      <TableCell key={monthIndex} className="text-right">
-                        <Badge variant="outline" className="bg-white/70 backdrop-blur-sm px-3 py-1 text-gray-700 shadow-sm border-gray-200 font-medium">
-                          {calculateWPAllocations(wp.tasks)[monthIndex].toFixed(1)}
-                        </Badge>
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                  {wp.tasks.map((task, taskIndex) => (
-                    <TableRow key={task.id} className="hover:bg-white/10 backdrop-blur-sm transition-all duration-200">
-                      <TableCell className="pl-8 text-gray-600">
-                        <div className="flex items-center gap-2">
-                          <div className="h-6 w-6 rounded-md bg-gray-100 flex items-center justify-center">
-                            <Activity className="h-3 w-3 text-gray-500" />
-                          </div>
-                          {task.name}
-                        </div>
-                      </TableCell>
-                      {getVisibleMonths().map((monthIndex) => (
-                        <TableCell key={monthIndex} className="text-right py-3">
-                          <div className="relative flex justify-end">
-                            <Input
-                              type="number"
-                              step="0.1"
-                              value={task.allocations[monthIndex] === 0 ? "" : task.allocations[monthIndex].toFixed(1)}
-                              onChange={(e) => handleAllocationChange(wpIndex, taskIndex, monthIndex, e.target.value)}
-                              className="w-20 text-right text-gray-900 border border-gray-200 rounded-md focus:ring-customBlue/50 focus:border-customBlue/50 shadow-sm hover:shadow-md transition-all duration-200"
-                              placeholder="0.0"
-                            />
-                          </div>
-                        </TableCell>
-                      ))}
-                    </TableRow>
                   ))}
-                </React.Fragment>
+                </TableRow>
               ))}
             </TableBody>
             <TableFooter>
