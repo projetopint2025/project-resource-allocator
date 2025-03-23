@@ -63,7 +63,7 @@ export const AppSidebar = () => {
     >
       <motion.div 
         className={cn(
-          "p-2 rounded-xl transition-all duration-300",
+          "p-2 rounded-xl transition-all duration-300 flex items-center justify-center",
           location.pathname === item.href 
             ? "bg-customBlue text-white shadow-md shadow-customBlue/20" 
             : "bg-gray-50 text-gray-500 group-hover:bg-customBlue group-hover:text-white"
@@ -127,11 +127,11 @@ export const AppSidebar = () => {
   };
 
   return (
-    <div className="fixed left-0 top-0 bottom-0 z-40 p-4 h-screen pointer-events-none">
+    <div className="fixed left-0 top-0 bottom-0 z-40 p-4 h-screen">
       <motion.div
         ref={sidebarRef}
         className={cn(
-          "h-full glass-card pointer-events-auto",
+          "h-full glass-card",
           "flex flex-col backdrop-blur-xl",
           "border border-white/30 shadow-xl",
           "relative overflow-hidden"
