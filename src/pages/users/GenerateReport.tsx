@@ -193,7 +193,7 @@ const GenerateReport = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-6 md:p-8">
       <motion.div
-        className="max-w-7xl mx-auto space-y-6 pl-16 md:pl-20 lg:pl-24" // Adjusted padding for sidebar
+        className="max-w-7xl mx-auto space-y-6 md:pl-20 lg:pl-24" // Adjusted padding for sidebar
         initial="hidden"
         animate="show"
         variants={container}
