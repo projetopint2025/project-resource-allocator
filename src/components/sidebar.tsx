@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import {
   Home,
@@ -10,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
+  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";
@@ -28,6 +28,7 @@ const menuItems = [
 // Management section items
 const managementItems = [
   { icon: Settings, label: "Validações", href: "/validations" },
+  { icon: HelpCircle, label: "Guia", href: "/landing" }, // Add the new landing page link
 ];
 
 export const AppSidebar = () => {

@@ -1,14 +1,15 @@
-
-import { Calendar, Clock, BarChart3, AlertTriangle, Search, Users, CircleDollarSign, TrendingUp } from "lucide-react";
+import { Calendar, Clock, BarChart3, AlertTriangle, Search, Users, CircleDollarSign, TrendingUp, HelpCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { NewProjectButton } from "@/components/projects/NewProjectButton";
 import { NotificationsPopover } from "@/components/notifications/NotificationsPopover";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const nextDeliveries = [
   { project: "INOVC+", deliverable: "Relatório de Requisitos", deadline: "25 Apr 2024", status: "Em progresso" },
@@ -81,6 +82,11 @@ const Index = () => {
                 className="w-full pl-10 pr-4 py-2 rounded-full border-gray-200 bg-white/80 backdrop-blur-sm shadow-sm focus:ring-2 focus:ring-customBlue/20 transition-all duration-300"
               />
             </div>
+            <Button asChild variant="outline" className="rounded-full border-customBlue/20 text-customBlue hover:bg-customBlue/5 h-9">
+              <Link to="/landing">
+                <HelpCircle className="h-4 w-4 mr-1" /> Guia
+              </Link>
+            </Button>
             <NotificationsPopover />
             <NewProjectButton />
           </div>

@@ -18,6 +18,7 @@ import UserReport from "@/pages/users/UserReport";
 import GenerateReport from "@/pages/users/GenerateReport";
 import ImportUsers from "./components/ImportUsers";
 import JsonViewer from "./components/jsonviewer";
+import Landing from "@/pages/Landing"; // Import the new Landing page
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
           <main className="flex-1 overflow-auto relative">
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/landing" element={<Landing />} /> {/* Add the Landing page route */}
               <Route path="/projects" element={<Projects />} />
               <Route path="/projects/new" element={<CreateProject />} />
               <Route path="/projects/:id" element={<ProjectDetails />} />
