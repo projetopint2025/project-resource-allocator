@@ -496,7 +496,8 @@ export const mockProject: Project = {
             resources,
             materials: []
           };
-        })
+        }),
+      materials: [] // Add the missing materials property
     })),
   progress: projetos[0].progress || 0
 };
@@ -558,6 +559,7 @@ export const mockWorkPackages: WorkPackage[] = workpackages
           resources,
           materials
         };
-      })
+      }),
+      materials: [] // Add the missing materials property
     };
-  }); 
+  });
